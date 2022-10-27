@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Subsystem;
 public class Lift implements Subsystem {
     private static final double SCALE_FACTOR = 0.8;
     private final DcMotor motor;
-    private final Servo bottomServo;
+    private final Servo rotationServo;
     private final Servo clawServo; // TODO this assumes one claw servo, which may not be accurate.
     private final Gamepad manualGamepad;
     /** true if controlled using the manual gamepad, and false if controlled using async cycles */
@@ -19,12 +19,12 @@ public class Lift implements Subsystem {
 
     public Lift(HardwareMap hardwareMap, Gamepad manualGamepad) {
         motor = hardwareMap.get(DcMotor.class, "liftMotor");
-        bottomServo = hardwareMap.get(Servo.class, "bottomServo");
+        rotationServo = hardwareMap.get(Servo.class, "rotationServo");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
         this.manualGamepad = manualGamepad;
 
         // Set an auto-clamp for the servo
-        bottomServo.scaleRange(0.1, 0.9); // TODO test these numbers
+        rotationServo.scaleRange(0.1, 0.9); // TODO test these numbers
         clawServo.scaleRange(0.1, 0.9); // TODO test these numbers
     }
 
@@ -32,7 +32,7 @@ public class Lift implements Subsystem {
         if (manualGamepad == null || !manualControl) return;
 
         // rotation
-        bottomServo.setPosition((manualGamepad.right_stick_x + 1) / 2);
+        rotationServo.setPosition((manualGamepad.right_stick_x + 1) / 2);
 
         // slide
         motor.setPower(manualGamepad.left_stick_y * SCALE_FACTOR);
