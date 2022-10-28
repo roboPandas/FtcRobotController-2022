@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Drivetrain;
-import org.firstinspires.ftc.teamcode.Lift;
+import org.firstinspires.ftc.teamcode.AsyncController;
+import org.firstinspires.ftc.teamcode.hardware.Drivetrain;
+import org.firstinspires.ftc.teamcode.hardware.Lift;
+import org.firstinspires.ftc.teamcode.Subsystem;
 
 /**
  * Controls:
@@ -17,19 +19,22 @@ import org.firstinspires.ftc.teamcode.Lift;
  * Right trigger - open/close claw
  */
 @TeleOp
-public class ControlledOpMode extends OpMode {
-    private Drivetrain drivetrain;
-    private Lift lift;
+public class ControlledOpMode extends OpMode { // TODO merge this with auto if needed
+    private Subsystem[] all;
 
     @Override
     public void init() {
-        drivetrain = new Drivetrain(hardwareMap, gamepad1);
-        lift = new Lift(hardwareMap, gamepad2);
+        all = new Subsystem[] {
+                new Drivetrain(hardwareMap, gamepad1),
+                new Lift(hardwareMap, gamepad2),
+                null
+        };
+        // this assignment must happen after so the lift can be referenced
+        all[2] = new AsyncController(gamepad1, (Lift) all[1]);
     }
 
     @Override
     public void loop() {
-        drivetrain.tick();
-        lift.tick();
+        for (Subsystem subsystem : all) subsystem.loop();
     }
 }

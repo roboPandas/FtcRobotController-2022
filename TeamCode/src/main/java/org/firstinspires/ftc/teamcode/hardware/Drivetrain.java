@@ -1,10 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class Drivetrain {
+import org.firstinspires.ftc.teamcode.Subsystem;
+import org.jetbrains.annotations.Nullable;
+
+public class Drivetrain implements Subsystem {
     private static final double SCALE_FACTOR = -0.8;
     private static final int[][] MULTIPLIERS = {
             {+1, +1},
@@ -13,9 +16,9 @@ public class Drivetrain {
             {-1, -1}
     }; // z doesn't need a multiplier since everything is +1
     private final DcMotor[] all;
-    private final Gamepad gamepad;
+    @Nullable private final Gamepad gamepad;
 
-    public Drivetrain(HardwareMap hardwareMap, Gamepad gamepad) {
+    public Drivetrain(HardwareMap hardwareMap, @Nullable Gamepad gamepad) {
         this.gamepad = gamepad;
         all = new DcMotor[] {
                 hardwareMap.get(DcMotor.class, "frontLeft"),
@@ -25,7 +28,8 @@ public class Drivetrain {
         };
     }
 
-    public void tick() {
+    @Override
+    public void loop() {
         double x = -gamepad.left_stick_x;
         double y = gamepad.left_stick_y;
         double z = -gamepad.right_stick_x;
