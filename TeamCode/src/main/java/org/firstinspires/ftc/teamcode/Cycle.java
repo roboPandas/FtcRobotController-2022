@@ -1,36 +1,37 @@
 package org.firstinspires.ftc.teamcode;
 
-import org.firstinspires.ftc.teamcode.hardware.Lift;
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
+import static org.firstinspires.ftc.teamcode.Utils.delay;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Represents one intake cycle. */
-public class Cycle { // TODO add probing
+public class Cycle {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final Lift lift;
+    private final LiftInternals liftInternals;
     public volatile Stage stage = Stage.WAITING;
-    private final Lift.Position targetPosition;
+    private final LiftInternals.Position topPosition;
+    private final LiftInternals.Position bottomPosition;
 
-    public Cycle(Lift lift, Lift.Position targetPosition) {
-        this.lift = lift;
-        this.targetPosition = targetPosition;
+    public Cycle(LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
+        this.liftInternals = liftInternals;
+        this.topPosition = topPosition;
+        this.bottomPosition = bottomPosition;
     }
 
     public void start() { // TODO how should we handle preload?
+        stage = Stage.IN_START;
         executor.submit(() -> {
-            stage = Stage.IN_START;
-            lift.manualControl = false;
-
             // grab item
-            lift.grab();
+            liftInternals.grab();
             delay(500); // this delay is to make sure it's in there TODO test this number
 
             // TODO make sure that the slide and servo happen simultaneously
-            lift.rotateToDrop();
+            liftInternals.rotateToDrop();
 
             // wait until lift is done before finishing
-            waitForPosition(targetPosition);
+            liftInternals.goToPositionBlocking(topPosition, 1);
 
             stage = Stage.BETWEEN;
         });
@@ -38,21 +39,19 @@ public class Cycle { // TODO add probing
 
     // TODO this is basically the same as start so can it be refactored somehow?
     public void finish() {
+        stage = Stage.IN_FINISH;
         executor.submit(() -> {
-            stage = Stage.IN_FINISH;
-
             // drop item
-            lift.drop();
+            liftInternals.drop();
             delay(500); // this delay is to make sure it's out of our way TODO test this number
 
             // TODO make sure that the slide and servo happen simultaneously
-            lift.rotateToGrab();
+            liftInternals.rotateToGrab();
 
             // wait until lift is done before finishing
-            waitForPosition(Lift.Position.BEGIN_PROBING);
+            liftInternals.goToPositionBlocking(bottomPosition, 1);
 
             stage = Stage.COMPLETE;
-            lift.manualControl = true;
         });
     }
 
@@ -67,17 +66,6 @@ public class Cycle { // TODO add probing
         delay(100); // Make sure that the other thread has a chance to set the state
         while (isBusy()) delay(50);
         return stage == Stage.COMPLETE;
-    }
-
-    private void waitForPosition(Lift.Position position) {
-        lift.goToPosition(position, 1); // TODO test this power
-        while (Math.abs(lift.motor.getCurrentPosition() - position.value) > 20) delay(50); // TODO test the tolerance
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    private void delay(long millis) {
-        long endTime = System.currentTimeMillis() + millis;
-        while (System.currentTimeMillis() < endTime);
     }
 
     public enum Stage {
