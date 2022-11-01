@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class AsyncLift implements LiftSubsystem {
     @NotNull private final Gamepad gamepad;
     @Nullable private Cycle currentCycle = null;
+    private boolean canSwitch = true;
     private final LiftInternals liftInternals;
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
     private LiftInternals.Position bottomPosition = LiftInternals.Position.GROUND;
@@ -22,7 +23,6 @@ public class AsyncLift implements LiftSubsystem {
 
     @Override
     public void loop() {
-        // TODO we need a new button layout to allow for ground junctions :despair:
         if (currentCycle == null) {
             // reset encoder
             if (gamepad.left_bumper && gamepad.right_bumper) liftInternals.resetEncoder();
@@ -31,20 +31,24 @@ public class AsyncLift implements LiftSubsystem {
             if (gamepad.b) topPosition = LiftInternals.Position.HIGH;
             else if (gamepad.y) topPosition = LiftInternals.Position.MIDDLE;
             else if (gamepad.x) topPosition = LiftInternals.Position.LOW;
+            else if (gamepad.a) topPosition = LiftInternals.Position.GROUND;
 
             if (gamepad.dpad_down) bottomPosition = LiftInternals.Position.GROUND;
             if (gamepad.dpad_up) bottomPosition = LiftInternals.Position.STACK;
-            // FIXME actually set the position of the lift without canSwitch() breaking
+            canSwitch = false;
+            liftInternals.goToPosition(bottomPosition, 1);
             if (Math.abs(liftInternals.motor.getCurrentPosition() - bottomPosition.value) > 20) return; // do not create cycles while lift is moving
+            canSwitch = true;
 
             // create cycle
-            if (gamepad.a) {
+            if (gamepad.right_bumper) {
                 currentCycle = new Cycle(liftInternals, topPosition, bottomPosition);
                 currentCycle.start();
             }
 
             return;
         }
+        canSwitch = false;
 
         // cycle is already present
         if (currentCycle.stage == Cycle.Stage.COMPLETE) {
@@ -58,7 +62,7 @@ public class AsyncLift implements LiftSubsystem {
     }
 
     @Override
-    public boolean canSwitch() { return currentCycle == null; }
+    public boolean canSwitch() { return canSwitch; }
 
     @Override
     public void prepareForSwitch() {

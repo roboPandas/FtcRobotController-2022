@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
-// TODO perhaps get this off sticks so controller 2 can also have manual control over the drivetrain if needed
 public class LiftInternals {
     public static final double SCALE_FACTOR = 0.8;
     public final DcMotor motor;
