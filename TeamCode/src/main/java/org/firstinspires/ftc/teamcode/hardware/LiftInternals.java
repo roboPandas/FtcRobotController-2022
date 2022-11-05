@@ -11,6 +11,7 @@ public class LiftInternals {
     public final DcMotor motor;
     public final Servo rotationServo;
     public final Servo clawServo; // TODO this assumes one claw servo, which may not be accurate.
+    public final Servo lockServo;
     /** @see #setMode(DcMotor.RunMode) */
     private DcMotor.RunMode mode = DcMotor.RunMode.RUN_TO_POSITION;
 
@@ -18,12 +19,14 @@ public class LiftInternals {
         motor = hardwareMap.get(DcMotor.class, "liftMotor");
         rotationServo = hardwareMap.get(Servo.class, "rotationServo");
         clawServo = hardwareMap.get(Servo.class, "clawServo");
+        lockServo = hardwareMap.get(Servo.class, "lockServo");
 
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        // Set an auto-clamp for the servo
-        rotationServo.scaleRange(0.1, 0.9); // TODO test these numbers
-        clawServo.scaleRange(0.1, 0.9); // TODO test these numbers
+        // Set an auto-clamp for the servo TODO test these numbers
+        rotationServo.scaleRange(0.1, 0.9);
+        clawServo.scaleRange(0.1, 0.9);
+        lockServo.scaleRange(0.1, 0.9);
     }
 
 
@@ -43,6 +46,15 @@ public class LiftInternals {
 
     public void rotateToGrab() {
         rotationServo.setPosition(0);
+    }
+
+    // Lock TODO test these numbers
+    public void lock() {
+        lockServo.setPosition(1);
+    }
+
+    public void unlock() {
+        lockServo.setPosition(0);
     }
 
     // motor
@@ -66,7 +78,9 @@ public class LiftInternals {
     /** Power MUST be positive. */
     private void goToPosition(int targetPosition, double power) { // just in case
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        unlock();
         motor.setPower(power);
+        lock();
     }
 
     public void resetEncoder() {
@@ -76,7 +90,10 @@ public class LiftInternals {
 
     public enum Position {
         // TODO do we need two bottom positions or more?
-        GROUND(0), STACK(0), // GROUND is for a low stack or ground; STACK is for a higher stack
+        // GROUND is for a low stack or ground; STACK is for a higher stack
+        // CAN_ROTATE is the lowest position where we can start rotating the lift.
+        // TODO test if we need to explicitly disable locking for the GROUND position
+        GROUND(0), STACK(0), CAN_ROTATE(0),
         LOW(0), MIDDLE(0), HIGH(0);
 
         public final int value;

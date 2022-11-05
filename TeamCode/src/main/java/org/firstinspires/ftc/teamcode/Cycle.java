@@ -27,6 +27,9 @@ public class Cycle {
             liftInternals.grab();
             delay(500); // this delay is to make sure it's in there TODO test this number
 
+            // don't rotate until safe to do so
+            liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
+
             // TODO make sure that the slide and servo happen simultaneously
             liftInternals.rotateToDrop();
 
