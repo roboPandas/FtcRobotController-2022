@@ -40,12 +40,12 @@ public class LiftInternals {
     }
 
     // Rotation TODO test these numbers
-    public void rotateToDrop() {
-        rotationServo.setPosition(1);
+    public void rotateToDrop(boolean reversed) {
+        rotationServo.setPosition(reversed ? 0 : 1);
     }
 
-    public void rotateToGrab() {
-        rotationServo.setPosition(0);
+    public void rotateToGrab(boolean reversed) {
+        rotationServo.setPosition(reversed ? 1 : 0);
     }
 
     // Lock TODO test these numbers

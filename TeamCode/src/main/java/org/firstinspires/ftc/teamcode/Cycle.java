@@ -20,7 +20,9 @@ public class Cycle {
         this.bottomPosition = bottomPosition;
     }
 
-    public void start() { // TODO how should we handle preload?
+    public void start() { start(false); }
+
+    public void start(boolean reversed) { // TODO how should we handle preload?
         stage = Stage.IN_START;
         executor.submit(() -> {
             // grab item
@@ -31,7 +33,7 @@ public class Cycle {
             liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
 
             // TODO make sure that the slide and servo happen simultaneously
-            liftInternals.rotateToDrop();
+            liftInternals.rotateToDrop(reversed);
 
             // wait until lift is done before finishing
             liftInternals.goToPositionBlocking(topPosition, 1);
@@ -40,8 +42,10 @@ public class Cycle {
         });
     }
 
+    public void finish() { finish(false); }
+
     // TODO this is basically the same as start so can it be refactored somehow?
-    public void finish() {
+    public void finish(boolean reversed) {
         stage = Stage.IN_FINISH;
         executor.submit(() -> {
             // drop item
@@ -49,7 +53,7 @@ public class Cycle {
             delay(500); // this delay is to make sure it's out of our way TODO test this number
 
             // TODO make sure that the slide and servo happen simultaneously
-            liftInternals.rotateToGrab();
+            liftInternals.rotateToGrab(reversed);
 
             // wait until lift is done before finishing
             liftInternals.goToPositionBlocking(bottomPosition, 1);
