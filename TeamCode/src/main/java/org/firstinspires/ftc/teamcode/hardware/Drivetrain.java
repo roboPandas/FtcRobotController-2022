@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Subsystem;
+import org.jetbrains.annotations.Nullable;
 
 public class Drivetrain implements Subsystem {
     private static final double SCALE_FACTOR = -0.8;
@@ -15,9 +16,9 @@ public class Drivetrain implements Subsystem {
             {-1, -1}
     }; // z doesn't need a multiplier since everything is +1
     private final DcMotor[] all;
-    private final Gamepad gamepad;
+    @Nullable private final Gamepad gamepad;
 
-    public Drivetrain(HardwareMap hardwareMap, Gamepad gamepad) {
+    public Drivetrain(HardwareMap hardwareMap, @Nullable Gamepad gamepad) {
         this.gamepad = gamepad;
         all = new DcMotor[] {
                 hardwareMap.get(DcMotor.class, "frontLeft"),
