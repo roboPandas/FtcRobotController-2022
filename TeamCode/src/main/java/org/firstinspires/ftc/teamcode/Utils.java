@@ -4,7 +4,12 @@ package org.firstinspires.ftc.teamcode;
 public class Utils {
     @SuppressWarnings("StatementWithEmptyBody")
     public static void delay(long millis) {
-        long endTime = System.currentTimeMillis() + millis;
-        while (System.currentTimeMillis() < endTime);
+//        long endTime = System.currentTimeMillis() + millis;
+//        while (System.currentTimeMillis() < endTime);
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("L");
+        }
     }
 }

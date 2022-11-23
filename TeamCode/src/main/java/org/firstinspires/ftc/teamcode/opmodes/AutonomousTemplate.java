@@ -25,6 +25,7 @@ public abstract class AutonomousTemplate extends LinearOpMode {
 
     public void setup() {
         // TODO camera code in here - determine end coordinate
+        liftInternals.grab();
     }
 
     public abstract void main();
@@ -45,4 +46,5 @@ public abstract class AutonomousTemplate extends LinearOpMode {
     }
 
     protected double negateIfReversed(double a) { return reversed() ? -a : a; }
+    protected Cycle createCycle(LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) { return new Cycle(liftInternals, topPosition, bottomPosition); }
 }

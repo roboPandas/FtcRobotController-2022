@@ -22,35 +22,47 @@ public class Cycle {
 
     public void start() { start(false); }
 
-    public void start(boolean reversed) { // TODO how should we handle preload?
-        stage = Stage.IN_START;
+    public void start(boolean reversed) {
+        stage = Stage.GRABBING;
         executor.submit(() -> {
             // grab item
             liftInternals.grab();
             delay(500); // this delay is to make sure it's in there TODO test this number
 
-            // don't rotate until safe to do so
-            liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
-
-            // TODO make sure that the slide and servo happen simultaneously
-            liftInternals.rotateToDrop(reversed);
-
-            // wait until lift is done before finishing
-            liftInternals.goToPositionBlocking(topPosition, 1);
-
-            stage = Stage.BETWEEN;
+            whenGrabbed(reversed);
         });
+    }
+
+    public void startPreload() { startPreload(false);}
+
+    public void startPreload(boolean reversed) { executor.submit(() -> whenGrabbed(reversed)); }
+
+    private void whenGrabbed(boolean reversed) {
+        stage = Stage.GRABBED;
+
+        // don't rotate until safe to do so
+        liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
+
+        // TODO make sure that the slide and servo happen simultaneously
+        liftInternals.rotateToDrop(reversed);
+
+        // wait until lift is done before finishing
+        liftInternals.goToPositionBlocking(topPosition, 1);
+
+        stage = Stage.BETWEEN;
     }
 
     public void finish() { finish(false); }
 
     // TODO this is basically the same as start so can it be refactored somehow?
     public void finish(boolean reversed) {
-        stage = Stage.IN_FINISH;
+        stage = Stage.DROPPING;
         executor.submit(() -> {
             // drop item
             liftInternals.drop();
             delay(500); // this delay is to make sure it's out of our way TODO test this number
+
+            stage = Stage.DROPPED;
 
             // TODO make sure that the slide and servo happen simultaneously
             liftInternals.rotateToGrab(reversed);
@@ -63,7 +75,7 @@ public class Cycle {
     }
 
     public boolean isBusy() {
-        return stage == Stage.IN_START || stage == Stage.IN_FINISH;
+        return !(stage == Stage.WAITING || stage == Stage.BETWEEN || stage == Stage.COMPLETE);
     }
 
     /**
@@ -75,7 +87,12 @@ public class Cycle {
         return stage == Stage.COMPLETE;
     }
 
+    public void waitUntil(Stage stage) {
+        delay(100); // Make sure that the other thread has a chance to set the state
+        while (this.stage != stage) delay(50);
+    }
+
     public enum Stage {
-        WAITING, IN_START, BETWEEN, IN_FINISH, COMPLETE
+        WAITING, GRABBING, GRABBED, BETWEEN, DROPPING, DROPPED, COMPLETE
     }
 }
