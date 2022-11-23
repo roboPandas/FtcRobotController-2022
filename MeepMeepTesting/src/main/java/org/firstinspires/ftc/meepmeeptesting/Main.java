@@ -10,38 +10,34 @@ public class Main {
     public static final double DEG_90 = Math.toRadians(90);
 
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(600);
+        MeepMeep meepMeep = new MeepMeep(900);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
+                .setConstraints(24, 36, Math.toRadians(180), Math.toRadians(180), 13)
                 .setDimensions(15, 17)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose()) // TODO is this 72-based or 70-based?
                                 // FIXME if splines don't work use linear
                                 // Preload
-                                .forward(53.5) // 2 tiles + 5.5 inches to reach the center
+                                .forward(59.5) // 2 tiles + 5.5 inches to reach the center + 6 inches to push cone out of the way
+                                .back(6)
                                 .turn(negateIfReversed(-Math.PI / 4))
-                                .forward(5) // takes us to (-32.46, -8.46)
+                                .forward(10.47) // takes us to (-28.6, -4.6) - claw is at (-24, 0)
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineToLinearHeading(new Pose2d(negateIfReversed(-46), -12, reversed() ? Math.PI : 0), reversed() ? 0 : Math.PI)
                                 .setReversed(false)
-                                .back(10)
+                                .back(17.5)
                                 // Delivery
-                                .forward(15)
-                                .splineToLinearHeading(new Pose2d(negateIfReversed(-32.46), -8.46, reversed() ? 3 * Math.PI / 4 : Math.PI / 4), Math.PI / 2)
-                                // Intake
-                                .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .splineToLinearHeading(new Pose2d(negateIfReversed(-46), -12, reversed() ? Math.PI : 0), reversed() ? 0 : Math.PI)
-                                .setReversed(false)
-                                .back(10)
-                                // Delivery
-                                .forward(15)
-                                .splineToLinearHeading(new Pose2d(negateIfReversed(-32.46), -8.46, reversed() ? 3 * Math.PI / 4 : Math.PI / 4), Math.PI / 2)
+                                .forward(22.5)
+                                .splineToLinearHeading(new Pose2d(negateIfReversed(-28.6), -4.6, reversed() ? 3 * Math.PI / 4 : Math.PI / 4), Math.PI / 2)
                                 // Parking
+                                .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineToLinearHeading(new Pose2d(negateIfReversed(-36), -12, reversed() ? Math.PI : 0), -Math.PI / 2)
+                                .setReversed(false)
                                 .strafeRight(negateIfReversed(24))
+                                .forward(negateIfReversed(24))
                                 .build()
                 );
 
