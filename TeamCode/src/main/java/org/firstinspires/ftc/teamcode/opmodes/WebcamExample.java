@@ -42,7 +42,8 @@ public class WebcamExample extends LinearOpMode {
          * of a frame from the camera. Note that switching pipelines on-the-fly
          * (while a streaming session is in flight) *IS* supported.
          */
-        webcam.setPipeline(new SignalPipeline());
+        SignalPipeline pipeline = new SignalPipeline();
+        webcam.setPipeline(pipeline);
 
         /*
          * Open the connection to the camera device. New in v1.4.0 is the ability
@@ -53,6 +54,7 @@ public class WebcamExample extends LinearOpMode {
          *
          * If you really want to open synchronously, the old method is still available.
          */
+
         webcam.setMillisecondsPermissionTimeout(2500); // Timeout for obtaining permission is configurable. Set before opening.
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -102,6 +104,10 @@ public class WebcamExample extends LinearOpMode {
             telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
             telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
+
+            telemetry.addData("MAGENTA DETECTION", pipeline.getDetectedMagenta());
+            telemetry.addData("GREEN DETECTION", pipeline.getDetectedGreen());
+            telemetry.addData("CYAN DETECTION", pipeline.getDetectedCyan());
             telemetry.update();
 
             /*
