@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.AsyncLift;
 import org.firstinspires.ftc.teamcode.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.ManualLift;
