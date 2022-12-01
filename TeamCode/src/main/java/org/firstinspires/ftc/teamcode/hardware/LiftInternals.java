@@ -24,9 +24,10 @@ public class LiftInternals {
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Set an auto-clamp for the servo TODO test these numbers
-        rotationServo.scaleRange(0.1, 0.9);
-        clawServo.scaleRange(0.1, 0.9);
-        lockServo.scaleRange(0.1, 0.9);
+        // These all assume that the position scaling is linear, and that we are using the center of the servo's range
+        rotationServo.scaleRange(0.2, 0.8); // 180° out of 300°
+        clawServo.scaleRange(0.425, 0.575); // 45° out of 300°
+        lockServo.scaleRange(0.25, 0.75); // 90° out of 180°
     }
 
 
