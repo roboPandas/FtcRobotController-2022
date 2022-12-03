@@ -108,6 +108,7 @@ public class WebcamExample extends LinearOpMode {
             telemetry.addData("MAGENTA DETECTION", pipeline.getDetectedMagenta());
             telemetry.addData("GREEN DETECTION", pipeline.getDetectedGreen());
             telemetry.addData("CYAN DETECTION", pipeline.getDetectedCyan());
+            telemetry.addData("Detected park position", pipeline.colorToString(pipeline.getDetected()));
             telemetry.update();
 
             /*
