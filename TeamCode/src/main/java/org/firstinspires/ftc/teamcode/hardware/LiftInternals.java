@@ -68,7 +68,7 @@ public class LiftInternals {
 
     public void goToPositionBlocking(LiftInternals.Position position, double power) {
         goToPosition(position, power);
-        while (Math.abs(motor.getCurrentPosition() - position.value) > 20) delay(50); // TODO test the tolerance
+        while (motor.isBusy()) delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
     }
 
     /** Power MUST be positive. */
@@ -79,9 +79,11 @@ public class LiftInternals {
     /** Power MUST be positive. */
     private void goToPosition(int targetPosition, double power) { // just in case
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        unlock();
+        // this assumes positive = up; flip the sign if not true
+        boolean needsLock = targetPosition < motor.getCurrentPosition();
+        if (needsLock) unlock();
         motor.setPower(power);
-        lock();
+        if (needsLock) lock();
     }
 
     public void resetEncoder() {
