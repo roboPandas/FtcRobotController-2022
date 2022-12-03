@@ -71,7 +71,7 @@ public class SignalPipeline extends OpenCvPipeline {
         detectedCyan = Core.countNonZero(Color.CYAN.mask);
         detectedGreen = Core.countNonZero(Color.GREEN.mask);
 
-        return Color.CYAN.mask;
+        return getDetected().mask;
     }
 
     public int getDetectedMagenta() {
@@ -86,21 +86,47 @@ public class SignalPipeline extends OpenCvPipeline {
         return Core.countNonZero(Color.GREEN.mask);
     }
 
-    public int getParkPosition() {
+    public String colorToString(Color color) {
+        switch (color) {
+            case CYAN:
+                return "cyan lol";
+            case GREEN:
+                return "green xd";
+            case MAGENTA:
+                return "magenta lmao";
+            default:
+                return "fu-";
+        }
+    }
+
+    public Color getDetected() {
         int cyan = getDetectedCyan();
         int magenta = getDetectedMagenta();
         int green = getDetectedGreen();
         int max = Math.max(cyan, Math.max(magenta, green));
         // Priority goes in number order (Position 1, 2, 3)
-        if (max == magenta) return Color.MAGENTA.position;
-        if (max == green) return Color.GREEN.position;
-        return Color.CYAN.position;
+        if (max == magenta) return Color.MAGENTA;
+        if (max == green) return Color.GREEN;
+        return Color.CYAN;
+    }
+
+    public int getParkPosition() {
+        switch (getDetected()) {
+            case CYAN:
+                return Color.CYAN.position;
+            case GREEN:
+                return Color.GREEN.position;
+            case MAGENTA:
+                return Color.MAGENTA.position;
+            default:
+                return 0;
+        }
     }
 
     private enum Color {
         MAGENTA(rangeHSV(new int[] { 306, 50, 50 }), rangeHSV(new int[] { 326, 100, 100 }), new Mat(), -24),
         GREEN(rangeHSV(new int[] { 90, 50, 50 }), rangeHSV(new int[] { 150, 100, 100 }), new Mat(), 0),
-        CYAN(rangeHSV(new int[] { 180, 75, 50 }), rangeHSV(new int[] { 220, 100, 100 }), new Mat(), 24);
+        CYAN(rangeHSV(new int[] { 205, 90, 90 }), rangeHSV(new int[] { 210, 100, 100 }), new Mat(), 24);
 
         private final Scalar lower;
         private final Scalar upper;
