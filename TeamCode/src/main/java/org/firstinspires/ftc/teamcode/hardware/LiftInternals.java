@@ -6,11 +6,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class LiftInternals {
+    public static final ExecutorService executor = Executors.newSingleThreadExecutor(); // TODO can we find a way to do this without multithreading? are interrupts a thing?
     public static final double SCALE_FACTOR = 0.8;
     public final DcMotor motor;
     public final Servo rotationServo;
-    public final Servo clawServo; // TODO this assumes one claw servo, which may not be accurate.
+    public final Servo clawServo;
     public final Servo lockServo;
     /** @see #setMode(DcMotor.RunMode) */
     private DcMotor.RunMode mode = DcMotor.RunMode.RUN_TO_POSITION;
@@ -22,6 +26,7 @@ public class LiftInternals {
         lockServo = hardwareMap.get(Servo.class, "lockServo");
 
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set an auto-clamp for the servo TODO test these numbers
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
@@ -66,9 +71,11 @@ public class LiftInternals {
         mode = newMode;
     }
 
-    public void goToPositionBlocking(LiftInternals.Position position, double power) {
-        goToPosition(position, power);
+    public void goToPositionBlocking(LiftInternals.Position targetPosition, double power) {
+        // I didn't reuse as much code as I could have since I want to avoid multithreading unless needed
+        boolean needsLock = goToPositionInternal(targetPosition.value, power);
         while (motor.isBusy()) delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
+        if (needsLock) lock();
     }
 
     /** Power MUST be positive. */
@@ -78,12 +85,20 @@ public class LiftInternals {
 
     /** Power MUST be positive. */
     private void goToPosition(int targetPosition, double power) { // just in case
+        if (goToPositionInternal(targetPosition, power)) executor.submit(() -> {
+            while (motor.isBusy()) delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
+            lock();
+        });
+    }
+
+    private boolean goToPositionInternal(int targetPosition, double power) {
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
         // this assumes positive = up; flip the sign if not true
         boolean needsLock = targetPosition < motor.getCurrentPosition();
         if (needsLock) unlock();
         motor.setPower(power);
-        if (needsLock) lock();
+        motor.setTargetPosition(targetPosition);
+        return needsLock;
     }
 
     public void resetEncoder() {
@@ -92,16 +107,25 @@ public class LiftInternals {
     }
 
     public enum Position {
-        // TODO do we need two bottom positions or more?
-        // GROUND is for a low stack or ground; STACK is for a higher stack
-        // CAN_ROTATE is the lowest position where we can start rotating the lift.
+        // TODO document the math for why we need 5 separate stack positions
         // TODO test if we need to explicitly disable locking for the GROUND position
-        GROUND(0), STACK(0), CAN_ROTATE(0),
+        // STACK_N is a stack containing N cones
+        // STACK_1 is for a single cone, and should be the default bottom position
+        STACK_1(0), STACK_2(0), STACK_3(0), STACK_4(0), STACK_5(0),
+        // the lowest position that allows rotation
+        CAN_ROTATE(0),
+        // junction heights
         LOW(0), MIDDLE(0), HIGH(0);
+
+        public static final Position GROUND = STACK_2;
 
         public final int value;
         Position(int value) {
             this.value = value;
+        }
+
+        public static Position fromStackHeight(int height) {
+            return valueOf("STACK_" + height);
         }
     }
 }

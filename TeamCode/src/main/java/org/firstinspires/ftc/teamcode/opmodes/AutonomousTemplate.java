@@ -124,7 +124,7 @@ public abstract class AutonomousTemplate extends LinearOpMode {
     public void runOpMode() {
         drive = new SampleMecanumDrive(hardwareMap);
         liftInternals = new LiftInternals(hardwareMap);
-        currentCycle = new Cycle(liftInternals, LiftInternals.Position.HIGH, LiftInternals.Position.STACK);
+        currentCycle = new Cycle(liftInternals, LiftInternals.Position.HIGH, LiftInternals.Position.STACK_5);
 
         drive.setPoseEstimate(startPose());
 

@@ -14,7 +14,7 @@ public class AsyncLift implements LiftSubsystem {
     private boolean canSwitch = true;
     private final LiftInternals liftInternals;
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
-    private LiftInternals.Position bottomPosition = LiftInternals.Position.GROUND;
+    private int bottomPositionValue = 1;
 
     public AsyncLift(LiftInternals liftInternals, @NotNull Gamepad gamepad) {
         this.gamepad = gamepad;
@@ -31,17 +31,17 @@ public class AsyncLift implements LiftSubsystem {
             if (gamepad.b) topPosition = LiftInternals.Position.HIGH;
             else if (gamepad.y) topPosition = LiftInternals.Position.MIDDLE;
             else if (gamepad.x) topPosition = LiftInternals.Position.LOW;
-            else if (gamepad.a) topPosition = LiftInternals.Position.GROUND;
 
-            if (gamepad.dpad_down) bottomPosition = LiftInternals.Position.GROUND;
-            if (gamepad.dpad_up) bottomPosition = LiftInternals.Position.STACK;
+            if (gamepad.dpad_down) bottomPositionValue = Math.max(bottomPositionValue - 1, 1);
+            if (gamepad.dpad_up) bottomPositionValue = Math.max(bottomPositionValue + 1, 5);
             canSwitch = false;
+            LiftInternals.Position bottomPosition = LiftInternals.Position.fromStackHeight(bottomPositionValue);
             liftInternals.goToPosition(bottomPosition, 1);
-            if (Math.abs(liftInternals.motor.getCurrentPosition() - bottomPosition.value) > 20) return; // do not create cycles while lift is moving
+            if (liftInternals.motor.isBusy()) return; // do not create cycles while lift is moving
             canSwitch = true;
 
             // create cycle
-            if (gamepad.right_bumper) {
+            if (gamepad.a) {
                 currentCycle = new Cycle(liftInternals, topPosition, bottomPosition);
                 currentCycle.start();
             }

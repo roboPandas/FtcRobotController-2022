@@ -17,11 +17,6 @@ public class Left extends AutonomousTemplate { // TODO uncomment actual cycle co
     protected Trajectory finalMovement = null;
 
     protected final int ADDITIONAL_CYCLES = 2;
-    /**
-     * number of cycles to complete before switching from STACK to GROUND
-     */
-    protected final int STACK_THRESHOLD = 2;
-    protected LiftInternals.Position bottomPosition = LiftInternals.Position.STACK;
 
     @Override
     public Pose2d startPose() {
@@ -30,7 +25,6 @@ public class Left extends AutonomousTemplate { // TODO uncomment actual cycle co
 
     @Override
     public void initializeTrajectories() {
-        // copied from meepmeep
         deliverPreload = drive.trajectorySequenceBuilder(startPose()) // TODO is this 72-based or 70-based?
                 // FIXME if splines don't work use linear
                 // Preload
@@ -74,8 +68,8 @@ public class Left extends AutonomousTemplate { // TODO uncomment actual cycle co
         for (int i = 0; i < ADDITIONAL_CYCLES; i++) {
             drive.followTrajectorySequence(intake);
             if (!currentCycle.await()) throw new RuntimeException("A cycle should have finished by now, but it did not.");
-            if (i > STACK_THRESHOLD) bottomPosition = LiftInternals.Position.GROUND;
-            currentCycle = createCycle(LiftInternals.Position.HIGH, bottomPosition);
+            currentCycle = createCycle(LiftInternals.Position.HIGH,
+                    LiftInternals.Position.fromStackHeight(Math.max(4 - i, 1)));
             currentCycle.start();
             currentCycle.waitUntil(Cycle.Stage.GRABBED);
             drive.followTrajectorySequence(delivery);
