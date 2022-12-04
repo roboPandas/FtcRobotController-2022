@@ -25,6 +25,7 @@ public class LiftInternals {
         clawServo = hardwareMap.get(Servo.class, "clawServo");
         lockServo = hardwareMap.get(Servo.class, "lockServo");
 
+        motor.setTargetPosition(Position.STACK_1.value);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 

@@ -36,7 +36,8 @@ public class ManualLift implements LiftSubsystem {
 
     @Override
     public void prepareForSwitch() {
-        liftInternals.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftInternals.motor.setTargetPosition(LiftInternals.Position.STACK_1.value);
+        liftInternals.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftInternals.drop();
         liftInternals.rotateToGrab(false);
         liftInternals.goToPosition(LiftInternals.Position.STACK_1, 1);
