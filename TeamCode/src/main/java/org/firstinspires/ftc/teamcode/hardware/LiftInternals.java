@@ -52,6 +52,7 @@ public class LiftInternals {
     }
 
     private void internalSetClaw(double pos) {
+        if (clawServo.getPosition() == pos) return;
         Utils.pwmEnable(clawServo, true);
         clawServo.setPosition(pos);
         Utils.delay(600); // FIXME make this non-blocking, probably with kotlin coroutines. time travel requires that this doesn't block.
