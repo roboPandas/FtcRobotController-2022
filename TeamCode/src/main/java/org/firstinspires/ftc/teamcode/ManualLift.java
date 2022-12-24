@@ -26,7 +26,8 @@ public class ManualLift implements LiftSubsystem {
         ); // TODO perhaps make a method to automatically scale the motor power
 
         // claw (closed by default)
-        liftInternals.clawServo.setPosition(gamepad.right_trigger);
+        if (gamepad.right_trigger > 0.5) liftInternals.drop();
+        else liftInternals.grab();
     }
 
     @Override
