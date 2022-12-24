@@ -1,50 +1,47 @@
-package org.firstinspires.ftc.teamcode.hardware;
+package org.firstinspires.ftc.teamcode.hardware
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.HardwareMap
+import com.qualcomm.robotcore.hardware.Gamepad
+import org.firstinspires.ftc.teamcode.Subsystem
+import com.qualcomm.robotcore.hardware.DcMotor
+import kotlin.math.abs
+import kotlin.math.hypot
+import kotlin.math.max
 
-import org.firstinspires.ftc.teamcode.Subsystem;
-import org.jetbrains.annotations.Nullable;
+class Drivetrain(hardwareMap: HardwareMap, private val gamepad: Gamepad) : Subsystem {
+    private val all: Array<DcMotor>
 
-public class Drivetrain implements Subsystem {
-    private static final double SCALE_FACTOR = -0.8;
-    private static final int[][] MULTIPLIERS = {
-            {+1, +1},
-            {+1, -1},
-            {-1, +1},
-            {-1, -1}
-    }; // z doesn't need a multiplier since everything is +1
-    private final DcMotor[] all;
-    @Nullable private final Gamepad gamepad;
-
-    public Drivetrain(HardwareMap hardwareMap, @Nullable Gamepad gamepad) {
-        this.gamepad = gamepad;
-        all = new DcMotor[] {
-                hardwareMap.get(DcMotor.class, "frontLeft"),
-                hardwareMap.get(DcMotor.class, "frontRight"),
-                hardwareMap.get(DcMotor.class, "backLeft"),
-                hardwareMap.get(DcMotor.class, "backRight")
-        };
+    init {
+        all = arrayOf(
+                hardwareMap.dcMotor["frontLeft"],
+                hardwareMap.dcMotor["frontRight"],
+                hardwareMap.dcMotor["backLeft"],
+                hardwareMap.dcMotor["backRight"]
+        )
     }
 
-    @Override
-    public void loop() {
-        double x = -gamepad.left_stick_x;
-        double y = gamepad.left_stick_y;
-        double z = -gamepad.right_stick_x;
-
-        double total = Math.abs(x) + Math.abs(y) + Math.abs(z);
-
-        if (total == 0) { // prevent division by 0
-            for (DcMotor motor : all) motor.setPower(0);
-            return;
+    override suspend fun loop() {
+        val x = -gamepad.left_stick_x.toDouble()
+        val y = gamepad.left_stick_y.toDouble()
+        val z = -gamepad.right_stick_x.toDouble()
+        val total = abs(x) + abs(y) + abs(z)
+        if (total == 0.0) { // prevent division by 0
+            for (motor in all) motor.power = 0.0
+            return
         }
 
         // Adjust input to never exceed 1
-        double factor = Math.max(Math.hypot(x, y), Math.abs(z)) * SCALE_FACTOR / total;
-        for (int i = 0; i < 4; i++) all[i].setPower(
-                ((MULTIPLIERS[i][0] * x) + (MULTIPLIERS[i][1] * y) + z) * factor
-        );
+        val factor = max(hypot(x, y), abs(z)) * SCALE_FACTOR / total
+        for (i in 0..3) all[i].power = (MULTIPLIERS[i][0] * x + MULTIPLIERS[i][1] * y + z) * factor
+    }
+
+    companion object {
+        private const val SCALE_FACTOR = -0.8
+        private val MULTIPLIERS = arrayOf(
+                intArrayOf(+1, +1),
+                intArrayOf(+1, -1),
+                intArrayOf(-1, +1),
+                intArrayOf(-1, -1)
+        ) // z doesn't need a multiplier since everything is +1
     }
 }

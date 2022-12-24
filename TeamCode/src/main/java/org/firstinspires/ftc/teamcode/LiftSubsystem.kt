@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode
 
-public interface LiftSubsystem extends Subsystem {
-    boolean canSwitch();
-    void prepareForSwitch();
+interface LiftSubsystem : Subsystem {
+    val canSwitch: Boolean
+    fun prepareForSwitch()
 }
