@@ -33,11 +33,11 @@ public class LiftInternals {
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Set an auto-clamp for the servo TODO test these numbers
+        // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
-        rotationServo.scaleRange(0.2, 0.8); // 180° out of 300°
-        clawServo.scaleRange(0.6, 0.8); // tuned
-        lockServo.scaleRange(0.25, 0.75); // 90° out of 180°
+        rotationServo.scaleRange(0.17, 0.845);
+        clawServo.scaleRange(0.6, 0.8);
+        lockServo.scaleRange(0, 0.15);
     }
 
 
