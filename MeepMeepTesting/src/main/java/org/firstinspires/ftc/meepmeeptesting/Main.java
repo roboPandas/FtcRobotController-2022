@@ -13,7 +13,7 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
  * 4. If we can, set RIDICULOUSLY high accel and vel constraints right before a distance sensor.
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) { // TODO is the new way of parking faster?
         MeepMeep meepMeep = new MeepMeep(700);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
@@ -33,7 +33,7 @@ public class Main {
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(18)
+                                .back(17.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
@@ -41,7 +41,7 @@ public class Main {
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(18)
+                                .back(17.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
@@ -49,7 +49,7 @@ public class Main {
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(18)
+                                .back(17.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
@@ -57,7 +57,7 @@ public class Main {
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(18)
+                                .back(17.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
@@ -65,7 +65,7 @@ public class Main {
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(18)
+                                .back(17.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
@@ -73,15 +73,26 @@ public class Main {
                                 // Parking
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .back(4) // TODO make this longer as needed
+
+                                // LEFT (right on reverse)
                                 // slower but MAY be more reliable
 //                                .splineToLinearHeading(new Pose2d(negateIfReversed(-36), -12, reversed() ? Math.PI : 0), -Math.PI / 2)
 //                                .setReversed(false)
 //                                .strafeRight(negateIfReversed(24))
 //                                .forward(negateIfReversed(24))
                                 // faster but MAY be less reliable
+//                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
+//                                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
+//                                .back(18)
+
+                                // CENTER
+//                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
+//                                .back(14)
+
+                                // RIGHT (left on reverse)
                                 .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
-                                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
-                                .back(18)
+                                .splineTo(new Vector2d(negateIfReversed(-12), -36), reversed() ? Math.PI : 0)
+
                                 .setReversed(false)
                                 .build()
                 );
@@ -96,6 +107,6 @@ public class Main {
     private static Pose2d startPose() {
         return new Pose2d(negateIfReversed(-36), -65.5, -Math.PI / 2);
     }
-    private static boolean reversed() { return true; }
+    private static boolean reversed() { return false; }
     private static double negateIfReversed(double a) { return reversed() ? -a : a; }
 }
