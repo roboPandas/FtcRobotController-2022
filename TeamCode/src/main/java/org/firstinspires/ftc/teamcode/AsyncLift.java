@@ -33,7 +33,7 @@ public class AsyncLift implements LiftSubsystem {
             else if (gamepad.x) topPosition = LiftInternals.Position.LOW;
 
             if (gamepad.dpad_down) bottomPositionValue = Math.max(bottomPositionValue - 1, 1);
-            if (gamepad.dpad_up) bottomPositionValue = Math.max(bottomPositionValue + 1, 5);
+            if (gamepad.dpad_up) bottomPositionValue = Math.min(bottomPositionValue + 1, 5);
             canSwitch = false;
             LiftInternals.Position bottomPosition = LiftInternals.Position.fromStackHeight(bottomPositionValue);
             liftInternals.goToPosition(bottomPosition, 1);
