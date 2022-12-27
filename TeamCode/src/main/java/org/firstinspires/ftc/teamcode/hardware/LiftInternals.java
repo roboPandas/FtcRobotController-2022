@@ -31,7 +31,6 @@ public class LiftInternals {
 
         motor.setTargetPosition(Position.STACK_1.value);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set an auto-clamp for the servo
