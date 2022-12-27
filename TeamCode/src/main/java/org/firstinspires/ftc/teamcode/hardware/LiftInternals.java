@@ -13,7 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class LiftInternals {
-    public static final ExecutorService executor = Executors.newSingleThreadExecutor(); // TODO can we find a way to do this without multithreading? are interrupts a thing?
+    public static final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
+    public static final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
     public static final double SCALE_FACTOR = 0.8;
     public final DcMotor motor;
     public final Servo rotationServo;
@@ -55,8 +56,10 @@ public class LiftInternals {
         if (clawServo.getPosition() == pos) return;
         Utils.pwmEnable(clawServo, true);
         clawServo.setPosition(pos);
-        Utils.delay(600); // FIXME make this non-blocking, probably with kotlin coroutines. time travel requires that this doesn't block.
-        Utils.pwmEnable(clawServo, false);
+        clawExecutor.submit(() -> {
+            Utils.delay(600);
+            Utils.pwmEnable(clawServo, false);
+        });
     }
 
     // Rotation TODO test these numbers
@@ -100,7 +103,7 @@ public class LiftInternals {
 
     /** Power MUST be positive. */
     private void goToPosition(int targetPosition, double power) { // just in case
-        if (goToPositionInternal(targetPosition, power)) executor.submit(() -> {
+        if (goToPositionInternal(targetPosition, power)) liftExecutor.submit(() -> {
             while (motor.isBusy()) delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
             lock();
         });

@@ -84,14 +84,17 @@ public class Main {
 //                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
 //                                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
 //                                .back(18)
+                                // mega shady TODO save this for when we get 5 - see pastebin for original
+//                                .splineTo(new Vector2d(negateIfReversed(-56), -21), -Math.PI / 2)
+//                                .back(15)
 
                                 // CENTER
 //                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
 //                                .back(14)
 
                                 // RIGHT (left on reverse)
-                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
-                                .splineTo(new Vector2d(negateIfReversed(-12), -36), reversed() ? Math.PI : 0)
+//                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
+//                                .splineTo(new Vector2d(negateIfReversed(-12), -36), reversed() ? Math.PI : 0)
 
                                 .setReversed(false)
                                 .build()

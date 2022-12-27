@@ -65,13 +65,10 @@ public class DriveConstants {
      * inches.
      */
 
-    private final static double STICKING_WITH_SOMETHING_2 = 180;
-    private final static double STICKING_WITH_SOMETHING = 36;
-
-    public static double MAX_VEL = STICKING_WITH_SOMETHING;
-    public static double MAX_ACCEL = STICKING_WITH_SOMETHING;
-    public static double MAX_ANG_VEL = Math.toRadians(STICKING_WITH_SOMETHING_2);
-    public static double MAX_ANG_ACCEL = Math.toRadians(STICKING_WITH_SOMETHING_2);
+    public static double MAX_VEL = 36;
+    public static double MAX_ACCEL = 36;
+    public static double MAX_ANG_VEL = Math.PI;
+    public static double MAX_ANG_ACCEL = Math.PI;
 
 
     public static double encoderTicksToInches(double ticks) {
