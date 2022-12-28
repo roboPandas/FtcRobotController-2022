@@ -56,7 +56,7 @@ public class LiftInternals {
         Utils.pwmEnable(clawServo, true);
         clawServo.setPosition(pos);
         clawExecutor.submit(() -> {
-            Utils.delay(600);
+            Utils.delay(650);
             Utils.pwmEnable(clawServo, false);
         });
     }
