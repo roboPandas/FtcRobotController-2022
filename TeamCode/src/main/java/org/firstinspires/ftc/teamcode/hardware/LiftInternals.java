@@ -36,7 +36,7 @@ public class LiftInternals {
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.17, 0.845);
-        clawServo.scaleRange(0.6, 0.8);
+        clawServo.scaleRange(0.1, 0.195);
         lockServo.scaleRange(0, 0.15);
     }
 
@@ -63,11 +63,11 @@ public class LiftInternals {
 
     // Rotation TODO test these numbers
     public void rotateToDrop(boolean reversed) {
-        rotationServo.setPosition(reversed ? 0 : 1);
+        rotationServo.setPosition(reversed ? 1 : 0);
     }
 
     public void rotateToGrab(boolean reversed) {
-        rotationServo.setPosition(reversed ? 1 : 0);
+        rotationServo.setPosition(reversed ? 0 : 1);
     }
 
     // Lock

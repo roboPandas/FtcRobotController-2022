@@ -133,6 +133,10 @@ public abstract class AutonomousTemplate extends LinearOpMode {
         initializeTrajectories();
         waitForStart();
         main();
+
+        // close camera
+        webcam.stopStreaming();
+        // TODO depending on the pipeline that we use, we may need to call a close method for it here.
     }
 
     protected double negateIfReversed(double a) { return reversed() ? -a : a; }

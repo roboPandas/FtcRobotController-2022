@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Subsystem;
  * Controls:
  * Left stick X/Y - drivetrain translation
  * Right stick X - drivetrain rotation
- * Logitech button - swap between async and manual lift controls (it is async at start(
+ * Logitech button - swap between async and manual lift controls (it is async at start)
  *
  * Manual lift control
  * Dpad up/down - raise/lower lift
