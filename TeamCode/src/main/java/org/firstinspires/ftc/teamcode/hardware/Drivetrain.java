@@ -16,7 +16,7 @@ public class Drivetrain implements Subsystem {
             {-1, -1}
     }; // z doesn't need a multiplier since everything is +1
     private final DcMotor[] all;
-    @Nullable private final Gamepad gamepad;
+    private final Gamepad gamepad;
 
     public Drivetrain(HardwareMap hardwareMap, @Nullable Gamepad gamepad) {
         this.gamepad = gamepad;

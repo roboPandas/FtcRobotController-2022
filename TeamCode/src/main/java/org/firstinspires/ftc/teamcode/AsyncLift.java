@@ -44,6 +44,7 @@ public class AsyncLift implements LiftSubsystem {
             if (gamepad.a) {
                 currentCycle = new Cycle(liftInternals, topPosition, bottomPosition);
                 currentCycle.start();
+                canSwitch = false;
             }
 
             return;

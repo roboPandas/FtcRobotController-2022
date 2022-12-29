@@ -30,7 +30,7 @@ public class LiftInternals {
         lockServo = hardwareMap.get(Servo.class, "lockServo");
 
         motor.setTargetPosition(Position.STACK_1.value);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        resetEncoder(); // TODO do we need this?
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set an auto-clamp for the servo

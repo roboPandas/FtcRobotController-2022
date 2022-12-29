@@ -17,13 +17,19 @@ public class ManualLift implements LiftSubsystem {
     @Override
     public void loop() {
         // rotation
-        liftInternals.rotationServo.setPosition(gamepad.left_trigger);
+        liftInternals.rotationServo.setPosition(1 - gamepad.left_trigger);
 
         // slide
-        liftInternals.motor.setPower(
-                gamepad.dpad_up ? LiftInternals.SCALE_FACTOR :
-                        gamepad.dpad_down ? -LiftInternals.SCALE_FACTOR : 0
-        ); // TODO perhaps make a method to automatically scale the motor power
+        if (gamepad.dpad_up) {
+            liftInternals.lock();
+            liftInternals.motor.setPower(LiftInternals.SCALE_FACTOR);
+        } else if (gamepad.dpad_down) {
+            liftInternals.unlock(); // FIXME do we need to add a delay to make sure locking is safe (use the existing liftExecutor - DO NOT MAKE A NEW ONE)
+            liftInternals.motor.setPower(-LiftInternals.SCALE_FACTOR);
+        } else {
+            liftInternals.lock();
+            liftInternals.motor.setPower(0);
+        }
 
         // claw (closed by default)
         if (gamepad.right_trigger > 0.5) liftInternals.drop();
@@ -36,7 +42,7 @@ public class ManualLift implements LiftSubsystem {
     }
 
     @Override
-    public void prepareForSwitch() {
+    public void prepareForSwitch() { // FIXME fix this to be more elegant and to not break things. as of now this function is NOT safe to call.
         liftInternals.motor.setTargetPosition(LiftInternals.Position.STACK_1.value);
         liftInternals.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftInternals.drop();

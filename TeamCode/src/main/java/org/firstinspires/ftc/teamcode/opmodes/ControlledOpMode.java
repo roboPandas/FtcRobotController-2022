@@ -19,12 +19,13 @@ import org.firstinspires.ftc.teamcode.Subsystem;
  * Manual lift control
  * Dpad up/down - raise/lower lift
  * Left trigger - turn claw
+ * TODO: bind claw to left and right dpad to preserve state and allow micro-adjustments
  * Right trigger - open/close claw
  *
  * Async lift control
  * Dpad up/down - change bottom position; default is the lowest setting
- * B/Y/X/A - set top position to high/medium/low/ground (respectively); default is high
- * Right bumper - start/continue cycle
+ * B/Y/X - set top position to high/medium/low (respectively); default is high
+ * A - start/continue cycle
  */
 @TeleOp
 public class ControlledOpMode extends OpMode { // TODO merge this with auto if needed
