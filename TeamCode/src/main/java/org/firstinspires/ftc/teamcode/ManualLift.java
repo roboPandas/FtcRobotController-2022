@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 
 public class ManualLift implements LiftSubsystem {
-    private final LiftInternals liftInternals;
+    public/*private*/ final LiftInternals liftInternals;
     private final Gamepad gamepad;
 
     public ManualLift(LiftInternals liftInternals, Gamepad gamepad) {
@@ -22,13 +22,22 @@ public class ManualLift implements LiftSubsystem {
         // slide
         if (gamepad.dpad_up) {
             liftInternals.lock();
-            liftInternals.motor.setPower(LiftInternals.SCALE_FACTOR);
+            LiftInternals.liftExecutor.submit(() -> {
+                Utils.delay(50);
+                liftInternals.motor.setPower(LiftInternals.SCALE_FACTOR);
+            });
         } else if (gamepad.dpad_down) {
-            liftInternals.unlock(); // FIXME do we need to add a delay to make sure locking is safe (use the existing liftExecutor - DO NOT MAKE A NEW ONE)
-            liftInternals.motor.setPower(-LiftInternals.SCALE_FACTOR);
+            liftInternals.unlock();
+            LiftInternals.liftExecutor.submit(() -> {
+                Utils.delay(50);
+                liftInternals.motor.setPower(-LiftInternals.SCALE_FACTOR);
+            });
         } else {
             liftInternals.lock();
-            liftInternals.motor.setPower(0);
+            LiftInternals.liftExecutor.submit(() -> {
+                Utils.delay(50);
+                liftInternals.motor.setPower(0);
+            });
         }
 
         // claw (closed by default)

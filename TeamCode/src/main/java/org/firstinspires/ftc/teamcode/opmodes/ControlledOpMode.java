@@ -15,14 +15,15 @@ import org.firstinspires.ftc.teamcode.Subsystem;
  * Left stick X/Y - drivetrain translation
  * Right stick X - drivetrain rotation
  * Logitech button - swap between async and manual lift controls (it is async at start)
+ * Right bumper + left bumper - reset lift encoder
  *
- * Manual lift control
+ * Manual lift control:
  * Dpad up/down - raise/lower lift
  * Left trigger - turn claw
  * TODO: bind claw to left and right dpad to preserve state and allow micro-adjustments
  * Right trigger - open/close claw
  *
- * Async lift control
+ * Async lift control:
  * Dpad up/down - change bottom position; default is the lowest setting
  * B/Y/X - set top position to high/medium/low (respectively); default is high
  * A - start/continue cycle
