@@ -24,12 +24,15 @@ public class Main {
                         drive.trajectorySequenceBuilder(startPose()) // TODO is this 72-based or 70-based?
                                 // FIXME if splines don't work use linear
                                 // Preload
-                                // 27.98 maybe change hook to straight line
+//                                // 27.98 maybe change hook to straight line
+//                                .setReversed(true)
+//                                .back(16)
+//                                .splineToSplineHeading(new Pose2d(negateIfReversed(-33.6), -19.2, reversed() ? Math.PI / 2 + 1.11 : 1.11), reversed() ? Math.PI / 2 + 1.11 : 1.11)
+//                                .forward(Math.hypot(-24 - 2.9 - -33.6, -5.8 - -19.2))
                                 .setReversed(true)
-                                .back(16)
-                                .splineToSplineHeading(new Pose2d(negateIfReversed(-33.6), -19.2, reversed() ? Math.PI + 1.11 : 1.11), reversed() ? Math.PI + 1.11 : 1.11)
-                                .forward(Math.hypot(-24 - 2.9 - -33.6, -5.8 - -19.2))
-
+                                .back(14)
+                                .splineToSplineHeading(new Pose2d(negateIfReversed(-33.5), -20.5, reversed() ? Math.PI / 2 + 1.14 : 1.14), reversed() ? Math.PI / 2 + 1.14 : 1.14)
+                                .forward(Math.hypot(-24 - 2.9 - -33.5, -5.8 - -20.5))
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .splineTo(new Vector2d(negateIfReversed(-48), -12), reversed() ? 0 : Math.PI)
