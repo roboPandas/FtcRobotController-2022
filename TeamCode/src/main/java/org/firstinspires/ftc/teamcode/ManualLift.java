@@ -16,6 +16,9 @@ public class ManualLift implements LiftSubsystem {
 
     @Override
     public void loop() {
+        // reset encoder
+        if (gamepad.left_bumper && gamepad.right_bumper) liftInternals.resetEncoder();
+
         // rotation
         liftInternals.rotationServo.setPosition(1 - gamepad.left_trigger);
 
