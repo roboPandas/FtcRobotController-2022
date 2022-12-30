@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 public class ManualLift implements LiftSubsystem {
     public/*private*/ final LiftInternals liftInternals;
     private final Gamepad gamepad;
+    private double power;
 
     public ManualLift(LiftInternals liftInternals, Gamepad gamepad) {
         this.liftInternals = liftInternals;
@@ -25,27 +26,29 @@ public class ManualLift implements LiftSubsystem {
         // slide
         if (gamepad.dpad_up) {
             liftInternals.lock();
-            LiftInternals.liftExecutor.submit(() -> {
-                Utils.delay(50);
-                liftInternals.motor.setPower(LiftInternals.SCALE_FACTOR);
-            });
+            power = LiftInternals.SCALE_FACTOR;
         } else if (gamepad.dpad_down) {
             liftInternals.unlock();
-            LiftInternals.liftExecutor.submit(() -> {
-                Utils.delay(50);
-                liftInternals.motor.setPower(-LiftInternals.SCALE_FACTOR);
-            });
+            power = -LiftInternals.SCALE_FACTOR;
         } else {
             liftInternals.lock();
-            LiftInternals.liftExecutor.submit(() -> {
-                Utils.delay(50);
-                liftInternals.motor.setPower(0);
-            });
+            power = 0;
         }
+
+        if (liftInternals.motor.getPower() != power) liftInternals.liftExecutor.submit(() -> {
+            Utils.delay(100);
+            liftInternals.motor.setPower(power);
+        });
 
         // claw (closed by default)
         if (gamepad.right_trigger > 0.5) liftInternals.drop();
         else liftInternals.grab();
+    }
+
+    @Override
+    public void stop() {
+        liftInternals.clawExecutor.shutdown();
+        liftInternals.liftExecutor.shutdown();
     }
 
     @Override

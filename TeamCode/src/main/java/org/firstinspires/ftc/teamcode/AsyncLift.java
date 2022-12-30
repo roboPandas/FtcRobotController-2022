@@ -63,6 +63,12 @@ public class AsyncLift implements LiftSubsystem {
     }
 
     @Override
+    public void stop() {
+        liftInternals.clawExecutor.shutdown();
+        liftInternals.liftExecutor.shutdown();
+    }
+
+    @Override
     public boolean canSwitch() { return canSwitch; }
 
     @Override

@@ -13,8 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class LiftInternals {
-    public static final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
-    public static final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
+    public final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
+    public final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
     public static final double SCALE_FACTOR = 0.8;
     public final DcMotor motor;
     public final Servo rotationServo;
@@ -37,7 +37,7 @@ public class LiftInternals {
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.17, 0.845);
         clawServo.scaleRange(0.1, 0.195);
-        lockServo.scaleRange(0, 0.15);
+        lockServo.scaleRange(0, 0.12);
     }
 
 
@@ -128,13 +128,13 @@ public class LiftInternals {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(0), STACK_2(0), STACK_3(0), STACK_4(0), STACK_5(0),
+        STACK_1(0), STACK_2(300), STACK_3(300), STACK_4(450), STACK_5(450),
         // the lowest position that allows rotation
-        CAN_ROTATE(0),
+        CAN_ROTATE(1400),
         // junction heights
-        LOW(0), MIDDLE(0), HIGH(0);
+        LOW(1400), MIDDLE(2200), HIGH(2900);
 
-        public static final Position GROUND = STACK_2;
+        public static final Position GROUND = STACK_1;
 
         public final int value;
         Position(int value) {
