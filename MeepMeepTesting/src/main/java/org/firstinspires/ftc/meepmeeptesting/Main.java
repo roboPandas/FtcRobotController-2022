@@ -74,9 +74,9 @@ public class Main {
                                 .setReversed(false)
                                 .forward(10)
                                 .splineTo(new Vector2d(negateIfReversed(-24 - 5.6), -3.3), reversed() ? 5 * Math.PI / 6 : Math.PI / 6)
+//                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
                                 // Parking
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .back(4) // TODO make this longer as needed
 
                                 // LEFT (right on reverse)
                                 // slower but MAY be more reliable
@@ -89,6 +89,7 @@ public class Main {
 //                                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
 //                                .back(18)
                                 // mega shady TODO save this for when we get 5 - see pastebin for original
+                                .back(4)
                                 .splineTo(new Vector2d(negateIfReversed(-60), -30), reversed() ? -Math.PI / 2 + 0.2 : -Math.PI / 2 - 0.2) // it is fine to bump into the pole
                                 .back(6)
 
@@ -97,10 +98,9 @@ public class Main {
 //                                .back(14)
 
                                 // RIGHT (left on reverse)
-//                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
-//                                .splineTo(new Vector2d(negateIfReversed(-12), -36), reversed() ? Math.PI : 0)
-
-                                .setReversed(false)
+//                                .splineTo(new Vector2d(negateIfReversed(-36), -18), reversed() ? -Math.PI / 2 - 0.2 : -Math.PI / 2 + 0.2) // TODO does this work in real life?
+//                                .splineTo(new Vector2d(negateIfReversed(-20), -34), reversed() ? Math.PI + 0.1 : -0.1)
+//                                .back(8)
                                 .build()
                 );
 
@@ -114,6 +114,6 @@ public class Main {
     private static Pose2d startPose() {
         return new Pose2d(negateIfReversed(-36), -65.5, -Math.PI / 2);
     }
-    private static boolean reversed() { return false; }
+    private static boolean reversed() { return true; }
     private static double negateIfReversed(double a) { return reversed() ? -a : a; }
 }
