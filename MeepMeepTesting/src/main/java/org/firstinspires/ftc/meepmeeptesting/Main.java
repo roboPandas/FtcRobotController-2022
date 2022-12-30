@@ -24,52 +24,55 @@ public class Main {
                         drive.trajectorySequenceBuilder(startPose()) // TODO is this 72-based or 70-based?
                                 // FIXME if splines don't work use linear
                                 // Preload
+                                // 27.98 maybe change hook to straight line
                                 .setReversed(true)
-                                .back(7)
-                                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
-                                .setReversed(false)
-                                .splineTo(new Vector2d(negateIfReversed(-36), -22), Math.PI / 2 + (reversed() ? 0.1 : -0.1))
-                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+                                .back(16)
+                                .splineToSplineHeading(new Pose2d(negateIfReversed(-33.6), -19.2, reversed() ? Math.PI + 1.11 : 1.11), reversed() ? Math.PI + 1.11 : 1.11)
+                                .forward(Math.hypot(-24 - 2.9 - -33.6, -5.8 - -19.2))
+
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(17.5)
+                                .splineTo(new Vector2d(negateIfReversed(-48), -12), reversed() ? 0 : Math.PI)
+                                .back(15.5)
+//                                .splineToSplineHeading(new Pose2d(negateIfReversed(-54), -12, reversed() ? Math.PI : 0), reversed() ? 0 : Math.PI)
+//                                .back(9.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
-                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+                                .splineTo(new Vector2d(negateIfReversed(-24 - 5.6), -3.3), reversed() ? 5 * Math.PI / 6 : Math.PI / 6)
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(17.5)
+                                .splineTo(new Vector2d(negateIfReversed(-54), -12), reversed() ? 0 : Math.PI)
+                                .back(9.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
-                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+                                .splineTo(new Vector2d(negateIfReversed(-24 - 5.6), -3.3), reversed() ? 5 * Math.PI / 6 : Math.PI / 6)
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(17.5)
+                                .splineTo(new Vector2d(negateIfReversed(-54), -12), reversed() ? 0 : Math.PI)
+                                .back(9.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
-                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+                                .splineTo(new Vector2d(negateIfReversed(-24 - 5.6), -3.3), reversed() ? 5 * Math.PI / 6 : Math.PI / 6)
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(17.5)
+                                .splineTo(new Vector2d(negateIfReversed(-54), -12), reversed() ? 0 : Math.PI)
+                                .back(9.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
-                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+//                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+                                .splineTo(new Vector2d(negateIfReversed(-24 - 5.6), -3.3), reversed() ? 5 * Math.PI / 6 : Math.PI / 6)
                                 // Intake
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                                .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
-                                .back(17.5)
+                                .splineTo(new Vector2d(negateIfReversed(-54), -12), reversed() ? 0 : Math.PI)
+                                .back(9.5)
                                 // Delivery
                                 .setReversed(false)
                                 .forward(10)
-                                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
+                                .splineTo(new Vector2d(negateIfReversed(-24 - 5.6), -3.3), reversed() ? 5 * Math.PI / 6 : Math.PI / 6)
                                 // Parking
                                 .setReversed(true) // splines always start by moving forward, so we need to call backward forward
                                 .back(4) // TODO make this longer as needed
@@ -84,14 +87,17 @@ public class Main {
 //                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
 //                                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
 //                                .back(18)
+                                // mega shady TODO save this for when we get 5 - see pastebin for original
+                                .splineTo(new Vector2d(negateIfReversed(-60), -30), reversed() ? -Math.PI / 2 + 0.2 : -Math.PI / 2 - 0.2) // it is fine to bump into the pole
+                                .back(6)
 
                                 // CENTER
 //                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
 //                                .back(14)
 
                                 // RIGHT (left on reverse)
-                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
-                                .splineTo(new Vector2d(negateIfReversed(-12), -36), reversed() ? Math.PI : 0)
+//                                .splineTo(new Vector2d(negateIfReversed(-36), -22), -Math.PI / 2) // TODO does this work in real life?
+//                                .splineTo(new Vector2d(negateIfReversed(-12), -36), reversed() ? Math.PI : 0)
 
                                 .setReversed(false)
                                 .build()

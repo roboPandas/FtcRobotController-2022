@@ -86,3 +86,8 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 /.idea/
+
+Test.*
+
+Test.kt
+Test.java

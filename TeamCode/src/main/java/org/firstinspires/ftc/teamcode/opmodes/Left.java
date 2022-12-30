@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Cycle;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
@@ -25,28 +27,26 @@ public class Left extends AutonomousTemplate { // TODO uncomment actual cycle co
 
     @Override
     public void initializeTrajectories() {
-        deliverPreload = drive.trajectorySequenceBuilder(startPose()) // TODO is this 72-based or 70-based?
-                // FIXME if splines don't work use linear
-                // Preload
-                .forward(59.5) // 2 tiles + 5.5 inches to reach the center + 6 inches to push cone out of the way
-                .back(6)
-                .turn(negateIfReversed(-Math.PI / 4))
-                .forward(10.47) // takes us to (-28.6, -4.6) - claw is at (-24, 0)
+        deliverPreload = drive.trajectorySequenceBuilder(startPose())
+                .setReversed(true)
+                .back(7)
+                .splineTo(new Vector2d(negateIfReversed(-42), -34), reversed() ? 0 : Math.PI)
+                .setReversed(false)
+                .splineTo(new Vector2d(negateIfReversed(-36), -22), Math.PI / 2 + (reversed() ? 0.1 : -0.1))
+                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
                 .build();
         intake = drive.trajectorySequenceBuilder(deliverPreload.end())
-                // Intake
-                .setReversed(true) // splines always start by moving forward, so we need to call backward forward
-                .splineToLinearHeading(new Pose2d(negateIfReversed(-46), -12, reversed() ? Math.PI : 0), reversed() ? 0 : Math.PI)
-                .setReversed(false)
+                .setReversed(true) // splines always start by moving forward, so we need to call backward forward but only because backwards isn't forwards, so we backward forward
+                .splineTo(new Vector2d(negateIfReversed(-46), -12), reversed() ? 0 : Math.PI)
                 .back(17.5)
                 .build();
         delivery = drive.trajectorySequenceBuilder(intake.end())
-                // Delivery
-                .forward(22.5)
-                .splineToLinearHeading(new Pose2d(negateIfReversed(-28.6), -4.6, reversed() ? 3 * Math.PI / 4 : Math.PI / 4), Math.PI / 2)
+                .setReversed(false)
+                .forward(10)
+                .splineTo(new Vector2d(negateIfReversed(-28.6), -4.6), reversed() ? 3 * Math.PI / 4 : Math.PI / 4)
                 .build();
         park = drive.trajectorySequenceBuilder(delivery.end())
-                .setReversed(true) // splines always start by moving forward, so we need to call backward forward
+                .setReversed(true) // splines always start by moving forward, so we need to call backward forward but only because backwards isn't forwards, so we backward forward
                 .splineToLinearHeading(new Pose2d(negateIfReversed(-36), -12, reversed() ? Math.PI : 0), -Math.PI / 2)
                 .setReversed(false)
                 .strafeRight(negateIfReversed(24))

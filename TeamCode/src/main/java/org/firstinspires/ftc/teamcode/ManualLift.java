@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 
 public class ManualLift implements LiftSubsystem {
-    private final LiftInternals liftInternals;
+    public/*private*/ final LiftInternals liftInternals; // FIXME debug
     private final Gamepad gamepad;
 
     public ManualLift(LiftInternals liftInternals, Gamepad gamepad) {
@@ -28,7 +28,9 @@ public class ManualLift implements LiftSubsystem {
         // claw (closed by default)
         if (gamepad.right_trigger > 0.5) liftInternals.drop();
         else liftInternals.grab();
-    }
+
+        // reset encoder
+        if (gamepad.left_bumper && gamepad.right_bumper) liftInternals.resetEncoder();    }
 
     @Override
     public boolean canSwitch() {
