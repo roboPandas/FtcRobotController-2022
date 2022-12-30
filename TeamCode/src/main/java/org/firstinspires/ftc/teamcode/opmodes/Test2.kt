@@ -17,6 +17,9 @@ class Test2 : OpMode() {
     }
 
     override fun loop() {
+        // reset encoder
+        if (gamepad1.left_bumper && gamepad1.right_bumper) liftInternals.resetEncoder()
+
         if (gamepad1.dpad_up) {
             liftInternals.lock()
                 Utils.delay(50)
