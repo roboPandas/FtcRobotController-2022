@@ -2,23 +2,22 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.ManualLift
+import com.qualcomm.robotcore.hardware.DcMotor
 import org.firstinspires.ftc.teamcode.hardware.Drivetrain
-import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 
 @TeleOp
 class Test : OpMode() {
-    lateinit var lift: ManualLift
+    lateinit var motor: DcMotor
     lateinit var drivetrain: Drivetrain
 
     override fun init() {
-        lift = ManualLift(LiftInternals(hardwareMap), gamepad1)
+        motor = hardwareMap.dcMotor["liftMotor"]
         drivetrain = Drivetrain(hardwareMap, gamepad1)
     }
 
     override fun loop() {
-        lift.loop()
+        motor.power = if (gamepad1.dpad_up) 0.8 else if (gamepad1.dpad_down) -0.8 else 0.0
         drivetrain.loop()
-        telemetry.addData("encoder position", lift.liftInternals.motor.currentPosition)
+        telemetry.addData("encoder position", motor.currentPosition)
     }
 }
