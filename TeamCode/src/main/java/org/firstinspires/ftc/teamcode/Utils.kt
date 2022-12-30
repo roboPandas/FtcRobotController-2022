@@ -1,23 +1,24 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode
 
-import com.qualcomm.hardware.lynx.LynxServoController;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.Servo
+import com.qualcomm.robotcore.hardware.ServoControllerEx
 
-/** Functions used by more than one class */
-public class Utils {
-    @SuppressWarnings("StatementWithEmptyBody")
-    public static void delay(long millis) {
+/** Functions used by more than one class  */
+object Utils {
+    fun delay(millis: Long) {
 //        long endTime = System.currentTimeMillis() + millis;
 //        while (System.currentTimeMillis() < endTime);
         try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("L");
+            Thread.sleep(millis)
+        } catch (e: InterruptedException) {
+            throw RuntimeException("L")
         }
     }
 
-    public static void pwmEnable(Servo servo, boolean enabled) {
-        if (enabled) ((LynxServoController) servo.getController()).setServoPwmEnable(servo.getPortNumber());
-        else ((LynxServoController) servo.getController()).setServoPwmDisable(servo.getPortNumber());
-    }
+    var Servo.pwmEnabled: Boolean
+        set(enabled) = (controller as ServoControllerEx).run {
+            if (enabled) setServoPwmEnable(portNumber) else setServoPwmDisable(portNumber)
+        }
+        get() = (controller as ServoControllerEx).isServoPwmEnabled(portNumber)
+
 }

@@ -1,14 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode
 
-import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 
-public interface LiftSubsystem extends Subsystem {
-    boolean canSwitch();
-    void prepareForSwitch();
+interface LiftSubsystem {
+    fun loop(): Boolean
+    fun prepareForSwitch()
 
-    @Override
-    default void stop() {
-        LiftInternals.liftExecutor.shutdownNow();
-        LiftInternals.clawExecutor.shutdownNow();
+    fun stop() {
+        LiftInternals.liftExecutor.shutdownNow()
+        LiftInternals.clawExecutor.shutdownNow()
     }
 }

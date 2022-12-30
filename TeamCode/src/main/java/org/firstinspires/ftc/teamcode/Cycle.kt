@@ -1,98 +1,78 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode
 
-import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import static org.firstinspires.ftc.teamcode.Utils.delay;
+import org.firstinspires.ftc.teamcode.Utils.delay
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals
+import java.util.concurrent.Executors
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-/** Represents one intake cycle. */
-public class Cycle {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final LiftInternals liftInternals;
-    public volatile Stage stage = Stage.WAITING;
-    private final LiftInternals.Position topPosition;
-    private final LiftInternals.Position bottomPosition;
-
-    public Cycle(LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
-        this.liftInternals = liftInternals;
-        this.topPosition = topPosition;
-        this.bottomPosition = bottomPosition;
-    }
-
-    public void start() { start(false); }
-
-    public void start(boolean reversed) {
-        stage = Stage.GRABBING;
-        executor.submit(() -> {
+/** Represents one intake cycle.  */
+class Cycle(private val liftInternals: LiftInternals, private val topPosition: LiftInternals.Position, private val bottomPosition: LiftInternals.Position) {
+    @Volatile var stage = Stage.WAITING
+    fun start(reversed: Boolean = false) {
+        stage = Stage.GRABBING
+        executor.submit {
             // grab item
-            liftInternals.grab();
-            delay(500); // this delay is to make sure it's in there TODO test this number
-
-            whenGrabbed(reversed);
-        });
+            liftInternals.grab()
+            delay(500) // this delay is to make sure it's in there TODO test this number
+            whenGrabbed(reversed)
+        }
     }
 
-    public void startPreload() { startPreload(false);}
+    fun startPreload(reversed: Boolean = false) { executor.submit { whenGrabbed(reversed) } }
 
-    public void startPreload(boolean reversed) { executor.submit(() -> whenGrabbed(reversed)); }
-
-    private void whenGrabbed(boolean reversed) {
-        stage = Stage.GRABBED;
+    private fun whenGrabbed(reversed: Boolean) {
+        stage = Stage.GRABBED
 
         // don't rotate until safe to do so
-        liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
+        liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1.0)
 
         // TODO make sure that the slide and servo happen simultaneously
-        liftInternals.rotateToDrop(reversed);
+        liftInternals.rotateToDrop(reversed)
 
         // wait until lift is done before finishing
-        liftInternals.goToPositionBlocking(topPosition, 1);
-
-        stage = Stage.BETWEEN;
+        liftInternals.goToPositionBlocking(topPosition, 1.0)
+        stage = Stage.BETWEEN
     }
-
-    public void finish() { finish(false); }
 
     // TODO this is basically the same as start so can it be refactored somehow?
-    public void finish(boolean reversed) {
-        stage = Stage.DROPPING;
-        executor.submit(() -> {
+    fun finish(reversed: Boolean = false) {
+        stage = Stage.DROPPING
+        executor.submit {
             // drop item
-            liftInternals.drop();
-            delay(500); // this delay is to make sure it's out of our way TODO test this number
-
-            stage = Stage.DROPPED;
+            liftInternals.drop()
+            delay(500) // this delay is to make sure it's out of our way TODO test this number
+            stage = Stage.DROPPED
 
             // TODO make sure that the slide and servo happen simultaneously
-            liftInternals.rotateToGrab(reversed);
+            liftInternals.rotateToGrab(reversed)
 
             // wait until lift is done before finishing
-            liftInternals.goToPositionBlocking(bottomPosition, 1);
-
-            stage = Stage.COMPLETE;
-        });
+            liftInternals.goToPositionBlocking(bottomPosition, 1.0)
+            stage = Stage.COMPLETE
+        }
     }
 
-    public boolean isBusy() {
-        return !(stage == Stage.WAITING || stage == Stage.BETWEEN || stage == Stage.COMPLETE);
-    }
+    val isBusy: Boolean
+        get() = !(stage == Stage.WAITING || stage == Stage.BETWEEN || stage == Stage.COMPLETE)
 
     /**
      * @return true if COMPLETE, false if BETWEEN or WAITING
      */
-    public boolean await() {
-        delay(100); // Make sure that the other thread has a chance to set the state
-        while (isBusy()) delay(50);
-        return stage == Stage.COMPLETE;
+    fun await(): Boolean {
+        delay(100) // Make sure that the other thread has a chance to set the state
+        while (isBusy) delay(50)
+        return stage == Stage.COMPLETE
     }
 
-    public void waitUntil(Stage stage) {
-        delay(100); // Make sure that the other thread has a chance to set the state
-        while (this.stage != stage) delay(50);
+    fun waitUntil(stage: Stage) {
+        delay(100) // Make sure that the other thread has a chance to set the state
+        while (this.stage != stage) delay(50)
     }
 
-    public enum Stage {
+    enum class Stage {
         WAITING, GRABBING, GRABBED, BETWEEN, DROPPING, DROPPED, COMPLETE
+    }
+
+    companion object {
+        private val executor = Executors.newSingleThreadExecutor()
     }
 }
