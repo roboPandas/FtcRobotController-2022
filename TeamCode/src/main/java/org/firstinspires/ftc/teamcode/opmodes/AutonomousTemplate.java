@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Cycle;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import org.firstinspires.ftc.teamcode.pipelines.SignalPipeline;
+import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -20,7 +20,7 @@ public abstract class AutonomousTemplate extends LinearOpMode {
     private LiftInternals liftInternals;
     private OpenCvWebcam webcam;
 
-    protected int parkPosition = 0;
+    protected QuantizationPipeline.Color parkPosition;
 
     protected boolean reversed() {
         return false;
@@ -31,6 +31,7 @@ public abstract class AutonomousTemplate extends LinearOpMode {
     public abstract void initializeTrajectories();
 
     public void setup() {
+        long startTime = System.currentTimeMillis();
         /*
          * Instantiate an OpenCvCamera object for the camera we'll be using.
          * In this sample, we're using a webcam. Note that you will need to
@@ -52,7 +53,7 @@ public abstract class AutonomousTemplate extends LinearOpMode {
          * of a frame from the camera. Note that switching pipelines on-the-fly
          * (while a streaming session is in flight) *IS* supported.
          */
-        SignalPipeline pipeline = new SignalPipeline();
+        QuantizationPipeline pipeline = new QuantizationPipeline();
         webcam.setPipeline(pipeline);
 
         /*
@@ -103,18 +104,18 @@ public abstract class AutonomousTemplate extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
 
         while (opModeInInit()) { // TODO remove some of this stuff when no longer needed
-            telemetry.addData("Frame Count", webcam.getFrameCount());
+            if (System.currentTimeMillis() - startTime <= 3500) {
+                pipeline.snapshot();
+                parkPosition = pipeline.getParkPosition();
+            }
+            telemetry.addData("Detected color", parkPosition);
             telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
             telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
             telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
             telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
 
-            telemetry.addData("MAGENTA DETECTION", pipeline.getDetectedMagenta());
-            telemetry.addData("GREEN DETECTION", pipeline.getDetectedGreen());
-            telemetry.addData("CYAN DETECTION", pipeline.getDetectedCyan());
-            telemetry.update();
-            parkPosition = pipeline.getParkPosition(); // TODO what if camera no open.
+            telemetry.update(); // TODO what if camera no open.
         }
     }
 

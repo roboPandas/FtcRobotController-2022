@@ -51,8 +51,8 @@ public class Left extends AutonomousTemplate { // TODO uncomment actual cycle co
                 .setReversed(false)
                 .strafeRight(negateIfReversed(24))
                 .build();
-        if (parkPosition != 0) finalMovement = drive.trajectoryBuilder(deliverPreload.end())
-                .forward(negateIfReversed(parkPosition))
+        if (parkPosition != null) finalMovement = drive.trajectoryBuilder(deliverPreload.end())
+                .forward(negateIfReversed(parkPosition.idx))
                 .build();
     }
 
