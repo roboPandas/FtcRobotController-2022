@@ -27,7 +27,7 @@ public class Cycle {
         executor.submit(() -> {
             // grab item
             liftInternals.grab();
-            delay(500); // this delay is to make sure it's in there TODO test this number
+            delay(LiftInternals.GRAB_DELAY_MS); // this delay is to make sure it's in there
 
             whenGrabbed(reversed);
         });
@@ -60,7 +60,7 @@ public class Cycle {
         executor.submit(() -> {
             // drop item
             liftInternals.drop();
-            delay(500); // this delay is to make sure it's out of our way TODO test this number
+            delay(LiftInternals.DROP_DELAY_MS); // this delay is to make sure it's out of our way
 
             stage = Stage.DROPPED;
 

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 
 public class ManualLift implements LiftSubsystem {
-    public/*private*/ final LiftInternals liftInternals;
+    private final LiftInternals liftInternals;
     private final Gamepad gamepad;
     private double power;
 
@@ -35,7 +35,7 @@ public class ManualLift implements LiftSubsystem {
             power = 0;
         }
 
-        if (liftInternals.motor.getPower() != power) liftInternals.liftExecutor.submit(() -> {
+        if (liftInternals.motor.getPower() != power) LiftInternals.liftExecutor.submit(() -> {
             Utils.delay(100);
             liftInternals.motor.setPower(power);
         });
@@ -43,12 +43,6 @@ public class ManualLift implements LiftSubsystem {
         // claw (closed by default)
         if (gamepad.right_trigger > 0.5) liftInternals.drop();
         else liftInternals.grab();
-    }
-
-    @Override
-    public void stop() {
-        liftInternals.clawExecutor.shutdown();
-        liftInternals.liftExecutor.shutdown();
     }
 
     @Override

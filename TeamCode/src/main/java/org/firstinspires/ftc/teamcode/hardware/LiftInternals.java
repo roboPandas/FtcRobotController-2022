@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -13,15 +12,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class LiftInternals {
-    public final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
-    public final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
+    public static final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
+    public static final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
     public static final double SCALE_FACTOR = 0.8;
     public final DcMotor motor;
     public final Servo rotationServo;
     public final Servo clawServo;
     public final Servo lockServo;
     /** @see #setMode(DcMotor.RunMode) */
-    private DcMotor.RunMode mode = DcMotor.RunMode./*RUN_TO_POSITION*/RUN_USING_ENCODER;
+    private DcMotor.RunMode mode = DcMotor.RunMode.RUN_USING_ENCODER;
 
     public LiftInternals(HardwareMap hardwareMap) {
         motor = hardwareMap.get(DcMotor.class, "liftMotor");
@@ -37,7 +36,7 @@ public class LiftInternals {
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.17, 0.845);
         clawServo.scaleRange(0.08, 0.195);
-        lockServo.scaleRange(0, 0.12);
+        lockServo.scaleRange(0, 0.14);
     }
 
 
