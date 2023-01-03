@@ -36,27 +36,30 @@ public class LiftInternals {
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.17, 0.845);
-        clawServo.scaleRange(0.1, 0.195);
+        clawServo.scaleRange(0.08, 0.195);
         lockServo.scaleRange(0, 0.12);
     }
 
 
     // Claw
     // Grab is 0; drop is 1
+    public static final int GRAB_DELAY_MS = 600;
+    public static final int DROP_DELAY_MS = 750;
     public void grab() {
-        internalSetClaw(0);
+        internalSetClaw(0, GRAB_DELAY_MS); // TODO does 550 work??
     }
 
     public void drop() {
-        internalSetClaw(1);
+        internalSetClaw(1, DROP_DELAY_MS);
     }
 
-    private void internalSetClaw(double pos) {
-        if (clawServo.getPosition() == pos) return;
+    private void internalSetClaw(int pos, long delayMillis) {
+        int currentPos = (int) clawServo.getPosition();
+        if (currentPos == pos) return;
         Utils.pwmEnable(clawServo, true);
         clawServo.setPosition(pos);
         clawExecutor.submit(() -> {
-            Utils.delay(650);
+            Utils.delay(delayMillis);
             Utils.pwmEnable(clawServo, false);
         });
     }
