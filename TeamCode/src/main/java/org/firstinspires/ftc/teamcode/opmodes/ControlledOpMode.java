@@ -30,9 +30,10 @@ import org.firstinspires.ftc.teamcode.Subsystem;
  */
 @TeleOp
 public class ControlledOpMode extends OpMode { // TODO merge this with auto if needed
-    private Subsystem[] all;
-    private AsyncLift asyncLift;
-    private ManualLift manualLift;
+    protected Subsystem[] all;
+    protected LiftInternals liftInternals;
+    protected AsyncLift asyncLift;
+    protected ManualLift manualLift;
     private boolean manualControl = false;
 
     private boolean switchButtonCache = false;
@@ -52,7 +53,7 @@ public class ControlledOpMode extends OpMode { // TODO merge this with auto if n
 
     @Override
     public void init() {
-        LiftInternals liftInternals = new LiftInternals(hardwareMap);
+        liftInternals = new LiftInternals(hardwareMap);
         asyncLift = new AsyncLift(liftInternals, gamepad1);
         manualLift = new ManualLift(liftInternals, gamepad1);
         all = new Subsystem[] {

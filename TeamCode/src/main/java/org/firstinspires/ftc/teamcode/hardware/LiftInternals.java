@@ -20,7 +20,7 @@ public class LiftInternals {
     public final Servo clawServo;
     public final Servo lockServo;
     /** @see #setMode(DcMotor.RunMode) */
-    private DcMotor.RunMode mode = DcMotor.RunMode.RUN_USING_ENCODER;
+    private DcMotor.RunMode mode = DcMotor.RunMode.RUN_TO_POSITION;
 
     public LiftInternals(HardwareMap hardwareMap) {
         motor = hardwareMap.get(DcMotor.class, "liftMotor");
