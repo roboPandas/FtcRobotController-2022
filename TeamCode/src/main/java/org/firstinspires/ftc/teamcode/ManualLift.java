@@ -44,7 +44,7 @@ public class ManualLift implements LiftSubsystem {
         }
 
         if (lastPower != power) {
-            LiftInternals.liftExecutor.submit(() -> { // prevent float errors TODO is this comparison for float purposes needed
+            liftInternals.liftExecutor.submit(() -> { // prevent float errors TODO is this comparison for float purposes needed
                 if (needsUnlock) {
                     liftInternals.motor.setPower(LiftInternals.MOTOR_UNLOCK_POWER);
                     Utils.delay(100);

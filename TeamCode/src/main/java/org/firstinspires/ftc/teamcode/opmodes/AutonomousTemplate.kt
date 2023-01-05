@@ -11,10 +11,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive
 import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
 import org.openftc.easyopencv.OpenCvCameraRotation
-import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 // FIXME refactor this once more info on auto becomes available
-abstract class AutonomousTemplate : LinearOpMode(), ExecutorContainer {
+abstract class AutonomousTemplate : LinearOpMode() {
+    private val cycleExecutor = Executors.newSingleThreadExecutor()
     protected lateinit var drive: SampleMecanumDrive
     protected lateinit var currentCycle: Cycle
     protected lateinit var pipeline: QuantizationPipeline
@@ -22,10 +23,6 @@ abstract class AutonomousTemplate : LinearOpMode(), ExecutorContainer {
     private lateinit var webcam: OpenCvWebcam
     protected lateinit var detectedColor: QuantizationPipeline.Color
     protected open val reversed = false
-
-    override lateinit var clawExecutor: ExecutorService
-    override lateinit var liftExecutor: ExecutorService
-    override lateinit var cycleExecutor: ExecutorService
 
     abstract val startPose: Pose2d
     abstract fun initializeTrajectories()
@@ -119,7 +116,13 @@ abstract class AutonomousTemplate : LinearOpMode(), ExecutorContainer {
     override fun runOpMode() {
         drive = SampleMecanumDrive(hardwareMap)
         liftInternals = LiftInternals(this)
-        currentCycle = Cycle(liftInternals, LiftInternals.Position.HIGH, LiftInternals.Position.STACK_5)
+        currentCycle = Cycle(
+            this,
+            cycleExecutor,
+            liftInternals,
+            LiftInternals.Position.HIGH,
+            LiftInternals.Position.STACK_5
+        )
         drive.poseEstimate = startPose
 
         // TODO do we need separate setup and initialize trajectories functions?
@@ -139,6 +142,6 @@ abstract class AutonomousTemplate : LinearOpMode(), ExecutorContainer {
         topPosition: LiftInternals.Position,
         bottomPosition: LiftInternals.Position
     ): Cycle {
-        return Cycle(liftInternals, topPosition, bottomPosition)
+        return Cycle(this, cycleExecutor, liftInternals, topPosition, bottomPosition)
     }
 }

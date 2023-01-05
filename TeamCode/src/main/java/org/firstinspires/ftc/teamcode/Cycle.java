@@ -3,13 +3,15 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /** Represents one intake cycle. */
 public class Cycle {
-    public static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final OpMode opMode;
+    private final ExecutorService executor;
     private final LiftInternals liftInternals;
     public volatile Stage stage = Stage.WAITING;
     private final LiftInternals.Position topPosition;
@@ -17,7 +19,9 @@ public class Cycle {
     public static int GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS + 100;
     public static int DROP_DELAY_MS = LiftInternals.DROP_DELAY_MS + 100;
 
-    public Cycle(LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
+    public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
+        this.opMode = opMode;
+        this.executor = executor;
         this.liftInternals = liftInternals;
         this.topPosition = topPosition;
         this.bottomPosition = bottomPosition;

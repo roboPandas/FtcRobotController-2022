@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.AsyncLift
 import org.firstinspires.ftc.teamcode.ManualLift
 import org.firstinspires.ftc.teamcode.LiftSubsystem
 import org.firstinspires.ftc.teamcode.hardware.Drivetrain
-import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Controls:
@@ -29,16 +29,13 @@ import java.util.concurrent.ExecutorService
  * A - start/continue cycle
  */
 @TeleOp
-open class ControlledOpMode : OpMode(), ExecutorContainer {
+open class ControlledOpMode : OpMode() {
     // TODO merge this with auto if needed
+    private val cycleExecutor = Executors.newSingleThreadExecutor()
     protected lateinit var all: Array<Subsystem>
     protected lateinit var liftInternals: LiftInternals
     protected lateinit var asyncLift: AsyncLift
     protected lateinit var manualLift: ManualLift
-
-    override lateinit var clawExecutor: ExecutorService
-    override lateinit var liftExecutor: ExecutorService
-    override lateinit var cycleExecutor: ExecutorService
 
     protected var manualControl = false
     private var switchButtonCache = false
@@ -57,7 +54,7 @@ open class ControlledOpMode : OpMode(), ExecutorContainer {
 
     override fun init() {
         liftInternals = LiftInternals(this)
-        asyncLift = AsyncLift(liftInternals, this)
+        asyncLift = AsyncLift(liftInternals, this, cycleExecutor)
         manualLift = ManualLift(liftInternals, this)
         all = arrayOf(
             Drivetrain(this),

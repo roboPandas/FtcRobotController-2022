@@ -8,17 +8,23 @@ import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.ExecutorService;
+
 /** The bridge between the Cycle system and the controller input. */
 public class AsyncLift implements LiftSubsystem {
+    private final OpMode opMode;
     @NotNull private final Gamepad gamepad;
+    private final ExecutorService cycleExecutor;
     @Nullable private Cycle currentCycle = null;
     private boolean canSwitch = true;
     private final LiftInternals liftInternals;
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
     private int bottomPositionValue = 1;
 
-    public AsyncLift(LiftInternals liftInternals, OpMode opMode) {
+    public AsyncLift(LiftInternals liftInternals, OpMode opMode, ExecutorService cycleExecutor) {
+        this.opMode = opMode;
         this.gamepad = opMode.gamepad1;
+        this.cycleExecutor = cycleExecutor;
         this.liftInternals = liftInternals;
     }
 
@@ -43,7 +49,7 @@ public class AsyncLift implements LiftSubsystem {
 
             // create cycle
             if (gamepad.a) {
-                currentCycle = new Cycle(liftInternals, topPosition, bottomPosition);
+                currentCycle = new Cycle(opMode, cycleExecutor, liftInternals, topPosition, bottomPosition);
                 currentCycle.start();
                 canSwitch = false;
             }

@@ -7,15 +7,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Utils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class LiftInternals {
-    public static final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
-    public static final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
+    public final ExecutorService liftExecutor = Executors.newSingleThreadExecutor();
+    public final ExecutorService clawExecutor = Executors.newSingleThreadExecutor();
     public static final double MOTOR_SCALE_FACTOR = 0.8;
     public static final double MOTOR_UNLOCK_POWER = 0.1;
     private final OpMode opMode;
