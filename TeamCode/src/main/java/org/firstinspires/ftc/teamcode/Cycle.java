@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
+import org.firstinspires.ftc.teamcode.opmodes.CycleContainer;
+
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -19,9 +21,9 @@ public class Cycle {
     public static int GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS + 100;
     public static int DROP_DELAY_MS = LiftInternals.DROP_DELAY_MS + 100;
 
-    public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
-        this.opMode = opMode;
-        this.executor = executor;
+    public Cycle(CycleContainer opMode, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
+        this.opMode = (OpMode) opMode;
+        this.executor = opMode.getCycleExecutor();
         this.liftInternals = liftInternals;
         this.topPosition = topPosition;
         this.bottomPosition = bottomPosition;
@@ -50,12 +52,16 @@ public class Cycle {
         stage = Stage.GRABBED;
 
         // don't rotate until safe to do so
+        System.out.println("go to CAN_ROTATE");
         liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
+        System.out.println("CAN_ROTATE finished: " + liftInternals.motor.getCurrentPosition());
 
         // TODO make sure that the slide and servo happen simultaneously
+        System.out.println("start rotating");
         liftInternals.rotateToDrop(reversed);
 
         // wait until lift is done before finishing
+        System.out.println("go to final position");
         liftInternals.goToPositionBlocking(topPosition, 1);
 
         stage = Stage.BETWEEN;
@@ -66,18 +72,21 @@ public class Cycle {
     // TODO this is basically the same as start so can it be refactored somehow?
     public Future<?> finish(boolean reversed) {
         stage = Stage.DROPPING;
+        System.out.println("finish");
         return executor.submit(() -> {
             // drop item
+            System.out.println("drop");
             liftInternals.drop();
             delay(DROP_DELAY_MS); // this delay is to make sure it's out of our way
 
             stage = Stage.DROPPED;
 
-            // TODO make sure that the slide and servo happen simultaneously
+            System.out.println("start rotating");
             liftInternals.rotateToGrab(reversed);
             if (topPosition.value < LiftInternals.Position.MIDDLE.value) delay(600);
 
             // wait until lift is done before finishing
+            System.out.println("go to final position");
             liftInternals.goToPositionBlocking(bottomPosition, 1);
 
             stage = Stage.COMPLETE;

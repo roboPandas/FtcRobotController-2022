@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
+import org.firstinspires.ftc.teamcode.opmodes.CycleContainer;
 
 public class ManualLift implements LiftSubsystem {
     private final LiftInternals liftInternals;
@@ -67,15 +66,11 @@ public class ManualLift implements LiftSubsystem {
 
     @Override
     public boolean canSwitch() {
-        return true;
+        return liftInternals.motor.getCurrentPosition() > LiftInternals.Position.CAN_ROTATE.value;
     }
 
     @Override
-    public void prepareForSwitch() { // FIXME fix this to be more elegant and to not break things. as of now this function is NOT safe to call.
-        liftInternals.motor.setTargetPosition(LiftInternals.Position.STACK_1.value);
-        liftInternals.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftInternals.drop();
-        liftInternals.rotateToGrab(false);
-        liftInternals.goToPosition(LiftInternals.Position.STACK_1, 1);
+    public void prepareForSwitch() {
+        new Cycle((CycleContainer) opMode, liftInternals, LiftInternals.Position.LOW, LiftInternals.Position.STACK_1).finish();
     }
 }

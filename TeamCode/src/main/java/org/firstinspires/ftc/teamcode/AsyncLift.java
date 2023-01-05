@@ -5,26 +5,23 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
+import org.firstinspires.ftc.teamcode.opmodes.CycleContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.ExecutorService;
 
 /** The bridge between the Cycle system and the controller input. */
 public class AsyncLift implements LiftSubsystem {
     private final OpMode opMode;
     @NotNull private final Gamepad gamepad;
-    private final ExecutorService cycleExecutor;
     @Nullable private Cycle currentCycle = null;
     private boolean canSwitch = true;
     private final LiftInternals liftInternals;
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
-    private int bottomPositionValue = 1;
+    private int lastBottomPositionValue = 1;
 
-    public AsyncLift(LiftInternals liftInternals, OpMode opMode, ExecutorService cycleExecutor) {
+    public AsyncLift(LiftInternals liftInternals, OpMode opMode) {
         this.opMode = opMode;
-        this.gamepad = opMode.gamepad1;
-        this.cycleExecutor = cycleExecutor;
+        this.gamepad = this.opMode.gamepad1;
         this.liftInternals = liftInternals;
     }
 
@@ -39,21 +36,29 @@ public class AsyncLift implements LiftSubsystem {
             else if (gamepad.y) topPosition = LiftInternals.Position.MIDDLE;
             else if (gamepad.x) topPosition = LiftInternals.Position.LOW;
 
-            if (gamepad.dpad_down) bottomPositionValue = Math.max(bottomPositionValue - 1, 1);
-            if (gamepad.dpad_up) bottomPositionValue = Math.min(bottomPositionValue + 1, 5);
+            int bottomPositionValue = gamepad.dpad_down ? Math.max(lastBottomPositionValue - 1, 1)
+                    : gamepad.dpad_up ? Math.min(lastBottomPositionValue + 1, 5) : lastBottomPositionValue;
             canSwitch = false;
-            LiftInternals.Position bottomPosition = LiftInternals.Position.fromStackHeight(bottomPositionValue);
-            liftInternals.goToPosition(bottomPosition, 1);
-            if (liftInternals.motor.isBusy()) return; // do not create cycles while lift is moving
+            LiftInternals.Position bottomPosition = LiftInternals.Position.fromStackHeight(lastBottomPositionValue);
+            if (bottomPositionValue != lastBottomPositionValue) {
+                liftInternals.goToPosition(bottomPosition, 1);
+                System.out.println("going to position " + bottomPosition);
+            }
+            if (liftInternals.motor.isBusy()) {
+                System.out.println("motor is busy; cycles not being created");
+                return; // do not create cycles while lift is moving
+            }
             canSwitch = true;
 
             // create cycle
             if (gamepad.a) {
-                currentCycle = new Cycle(opMode, cycleExecutor, liftInternals, topPosition, bottomPosition);
+                currentCycle = new Cycle((CycleContainer) opMode, liftInternals, topPosition, bottomPosition);
+                System.out.println("A: start cycle");
                 currentCycle.start();
                 canSwitch = false;
             }
 
+            lastBottomPositionValue = bottomPositionValue;
             return;
         }
         canSwitch = false;
@@ -66,7 +71,10 @@ public class AsyncLift implements LiftSubsystem {
         if (currentCycle.isBusy()) return;
 
         // stage cannot be WAITING, so must be BETWEEN
-        if (gamepad.a) currentCycle.finish();
+        if (gamepad.a) {
+            System.out.println("A: finish cycle");
+            currentCycle.finish();
+        }
     }
 
     @Override
@@ -74,6 +82,7 @@ public class AsyncLift implements LiftSubsystem {
 
     @Override
     public void prepareForSwitch() {
+        liftInternals.motor.setPower(0);
         liftInternals.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }

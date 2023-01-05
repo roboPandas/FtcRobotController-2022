@@ -14,8 +14,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation
 import java.util.concurrent.Executors
 
 // FIXME refactor this once more info on auto becomes available
-abstract class AutonomousTemplate : LinearOpMode() {
-    private val cycleExecutor = Executors.newSingleThreadExecutor()
+abstract class AutonomousTemplate : LinearOpMode(), CycleContainer<AutonomousTemplate> {
+    override val cycleExecutor = Executors.newSingleThreadExecutor()
     protected lateinit var drive: SampleMecanumDrive
     protected lateinit var currentCycle: Cycle
     protected lateinit var pipeline: QuantizationPipeline
@@ -118,7 +118,6 @@ abstract class AutonomousTemplate : LinearOpMode() {
         liftInternals = LiftInternals(this)
         currentCycle = Cycle(
             this,
-            cycleExecutor,
             liftInternals,
             LiftInternals.Position.HIGH,
             LiftInternals.Position.STACK_5
@@ -142,6 +141,6 @@ abstract class AutonomousTemplate : LinearOpMode() {
         topPosition: LiftInternals.Position,
         bottomPosition: LiftInternals.Position
     ): Cycle {
-        return Cycle(this, cycleExecutor, liftInternals, topPosition, bottomPosition)
+        return Cycle(this, liftInternals, topPosition, bottomPosition)
     }
 }
