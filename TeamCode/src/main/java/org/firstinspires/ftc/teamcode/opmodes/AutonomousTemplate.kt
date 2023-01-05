@@ -1,37 +1,36 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Cycle;
-import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvWebcam;
+import com.acmerobotics.roadrunner.geometry.Pose2d
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import org.firstinspires.ftc.teamcode.Cycle
+import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals
+import org.openftc.easyopencv.OpenCvWebcam
+import org.openftc.easyopencv.OpenCvCameraFactory
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive
+import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
+import org.openftc.easyopencv.OpenCvCameraRotation
+import java.util.concurrent.ExecutorService
 
 // FIXME refactor this once more info on auto becomes available
-public abstract class AutonomousTemplate extends LinearOpMode {
-    protected SampleMecanumDrive drive;
-    protected Cycle currentCycle;
-    private LiftInternals liftInternals;
-    private OpenCvWebcam webcam;
+abstract class AutonomousTemplate : LinearOpMode(), ExecutorContainer {
+    protected lateinit var drive: SampleMecanumDrive
+    protected lateinit var currentCycle: Cycle
+    protected lateinit var pipeline: QuantizationPipeline
+    private lateinit var liftInternals: LiftInternals
+    private lateinit var webcam: OpenCvWebcam
+    protected lateinit var detectedColor: QuantizationPipeline.Color
+    protected open val reversed = false
 
-    protected QuantizationPipeline.Color parkPosition;
+    override lateinit var clawExecutor: ExecutorService
+    override lateinit var liftExecutor: ExecutorService
+    override lateinit var cycleExecutor: ExecutorService
 
-    protected boolean reversed() {
-        return false;
-    }
-
-    public abstract Pose2d startPose();
-
-    public abstract void initializeTrajectories();
-
-    public void setup() {
-        long startTime = System.currentTimeMillis();
+    abstract val startPose: Pose2d
+    abstract fun initializeTrajectories()
+    open fun setup() {
+        val startTime = System.currentTimeMillis()
         /*
          * Instantiate an OpenCvCamera object for the camera we'll be using.
          * In this sample, we're using a webcam. Note that you will need to
@@ -46,15 +45,17 @@ public abstract class AutonomousTemplate extends LinearOpMode {
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
         // OR...  Do Not Activate the Camera Monitor View
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(
+            hardwareMap[WebcamName::class.java, "Webcam 1"]
+        )
 
         /*
          * Specify the image processing pipeline we wish to invoke upon receipt
          * of a frame from the camera. Note that switching pipelines on-the-fly
          * (while a streaming session is in flight) *IS* supported.
          */
-        QuantizationPipeline pipeline = new QuantizationPipeline();
-        webcam.setPipeline(pipeline);
+        pipeline = QuantizationPipeline()
+        webcam.setPipeline(pipeline)
 
         /*
          * Open the connection to the camera device. New in v1.4.0 is the ability
@@ -67,10 +68,9 @@ public abstract class AutonomousTemplate extends LinearOpMode {
          */
         // TODO what if the camera doesn't open by the time we press init? (test to see if we need to worry about this and potentially use synchronous as a fix)
         // TODO if the camera doesn't open, will the use of the signal pipeline crash anything?
-        webcam.setMillisecondsPermissionTimeout(2500); // Timeout for obtaining permission is configurable. Set before opening.
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
+        webcam.setMillisecondsPermissionTimeout(2500) // Timeout for obtaining permission is configurable. Set before opening.
+        webcam.openCameraDeviceAsync(object : AsyncCameraOpenListener {
+            override fun onOpened() {
                 /*
                  * Tell the webcam to start streaming images to us! Note that you must make sure
                  * the resolution you specify is supported by the camera. If it is not, an exception
@@ -87,59 +87,58 @@ public abstract class AutonomousTemplate extends LinearOpMode {
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
                  */
-                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT)
             }
 
-            @Override
-            public void onError(int errorCode) {
+            override fun onError(errorCode: Int) {
                 /*
                  * This will be called if the camera could not be opened
                  */
-                telemetry.addData("Camera", "Could not open camera. Will park in Position 2.");
+                telemetry.addData("Camera", "Could not open camera. Will park in Position 2.")
             }
-        });
-
-        liftInternals.grab();
-
-        telemetry.addData("Status", "Initialized");
-
+        })
+        liftInternals.drop() // makes sure that grab doesn't fail
+        liftInternals.grab()
+        telemetry.addData("Status", "Initialized")
         while (opModeInInit()) { // TODO remove some of this stuff when no longer needed
             if (System.currentTimeMillis() - startTime <= 3500) {
-                pipeline.snapshot();
-                parkPosition = pipeline.getParkPosition();
+                pipeline.snapshot()
+                detectedColor = pipeline.parkPosition
             }
-            telemetry.addData("Detected color", parkPosition);
-            telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
-            telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
-            telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
-            telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
-            telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
-
-            telemetry.update(); // TODO what if camera no open.
+            telemetry.addData("Detected color", detectedColor)
+            telemetry.addData("FPS", String.format("%.2f", webcam.fps))
+            telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
+            telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
+            telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
+            telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
+            telemetry.update() // TODO what if camera no open.
         }
     }
 
-    public abstract void main();
-
-    @Override
-    public void runOpMode() {
-        drive = new SampleMecanumDrive(hardwareMap);
-        liftInternals = new LiftInternals(hardwareMap);
-        currentCycle = new Cycle(liftInternals, LiftInternals.Position.HIGH, LiftInternals.Position.STACK_5);
-
-        drive.setPoseEstimate(startPose());
+    abstract fun main()
+    override fun runOpMode() {
+        drive = SampleMecanumDrive(hardwareMap)
+        liftInternals = LiftInternals(this)
+        currentCycle = Cycle(liftInternals, LiftInternals.Position.HIGH, LiftInternals.Position.STACK_5)
+        drive.poseEstimate = startPose
 
         // TODO do we need separate setup and initialize trajectories functions?
-        setup();
-        initializeTrajectories();
-        waitForStart();
-        main();
+        setup()
+        initializeTrajectories()
+        waitForStart()
+        main()
 
         // close camera
-        webcam.stopStreaming();
-        // TODO depending on the pipeline that we use, we may need to call a close method for it here.
+        pipeline.releaseAll()
+        webcam.stopStreaming()
     }
 
-    protected double negateIfReversed(double a) { return reversed() ? -a : a; }
-    protected Cycle createCycle(LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) { return new Cycle(liftInternals, topPosition, bottomPosition); }
+    protected fun negateIfReversed(a: Double) = if (reversed) -a else a
+
+    protected fun createCycle(
+        topPosition: LiftInternals.Position,
+        bottomPosition: LiftInternals.Position
+    ): Cycle {
+        return Cycle(liftInternals, topPosition, bottomPosition)
+    }
 }

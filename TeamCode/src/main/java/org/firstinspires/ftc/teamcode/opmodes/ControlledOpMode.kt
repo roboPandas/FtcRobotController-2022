@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.AsyncLift;
-import org.firstinspires.ftc.teamcode.LiftSubsystem;
-import org.firstinspires.ftc.teamcode.ManualLift;
-import org.firstinspires.ftc.teamcode.hardware.Drivetrain;
-import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import org.firstinspires.ftc.teamcode.Subsystem;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import org.firstinspires.ftc.teamcode.Subsystem
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals
+import org.firstinspires.ftc.teamcode.AsyncLift
+import org.firstinspires.ftc.teamcode.ManualLift
+import org.firstinspires.ftc.teamcode.LiftSubsystem
+import org.firstinspires.ftc.teamcode.hardware.Drivetrain
+import java.util.concurrent.ExecutorService
 
 /**
  * Controls:
@@ -29,42 +29,45 @@ import org.firstinspires.ftc.teamcode.Subsystem;
  * A - start/continue cycle
  */
 @TeleOp
-public class ControlledOpMode extends OpMode { // TODO merge this with auto if needed
-    protected Subsystem[] all;
-    protected LiftInternals liftInternals;
-    protected AsyncLift asyncLift;
-    protected ManualLift manualLift;
-    private boolean manualControl = false;
+open class ControlledOpMode : OpMode(), ExecutorContainer {
+    // TODO merge this with auto if needed
+    protected lateinit var all: Array<Subsystem>
+    protected lateinit var liftInternals: LiftInternals
+    protected lateinit var asyncLift: AsyncLift
+    protected lateinit var manualLift: ManualLift
 
-    private boolean switchButtonCache = false;
+    override lateinit var clawExecutor: ExecutorService
+    override lateinit var liftExecutor: ExecutorService
+    override lateinit var cycleExecutor: ExecutorService
 
-    private void attemptSwitch() {
-        boolean button = gamepad1.guide;
+    protected var manualControl = false
+    private var switchButtonCache = false
+    private fun attemptSwitch() {
+        val button = gamepad1.guide
         if (button) {
-            LiftSubsystem currentLiftSubsystem = (LiftSubsystem) all[1];
+            val currentLiftSubsystem = all[1] as LiftSubsystem
             if (!switchButtonCache && currentLiftSubsystem.canSwitch()) {
-                manualControl = !manualControl;
-                currentLiftSubsystem.prepareForSwitch();
-                all[1] = manualControl ? manualLift : asyncLift;
+                manualControl = !manualControl
+                currentLiftSubsystem.prepareForSwitch()
+                all[1] = if (manualControl) manualLift else asyncLift
             }
         }
-        switchButtonCache = button;
+        switchButtonCache = button
     }
 
-    @Override
-    public void init() {
-        liftInternals = new LiftInternals(hardwareMap);
-        asyncLift = new AsyncLift(liftInternals, gamepad1);
-        manualLift = new ManualLift(liftInternals, gamepad1);
-        all = new Subsystem[] {
-                new Drivetrain(hardwareMap, gamepad1),
-                asyncLift
-        };
+    override fun init() {
+        liftInternals = LiftInternals(this)
+        asyncLift = AsyncLift(liftInternals, this)
+        manualLift = ManualLift(liftInternals, this)
+        all = arrayOf(
+            Drivetrain(this),
+            asyncLift
+        )
     }
 
-    @Override
-    public void loop() {
-        for (Subsystem subsystem : all) subsystem.loop();
-        attemptSwitch();
+    override fun loop() {
+        for (subsystem in all) subsystem.loop()
+        attemptSwitch()
+        telemetry.addData("lift encoder", liftInternals.motor.currentPosition)
     }
 }

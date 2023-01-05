@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -16,8 +17,8 @@ public class AsyncLift implements LiftSubsystem {
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
     private int bottomPositionValue = 1;
 
-    public AsyncLift(LiftInternals liftInternals, @NotNull Gamepad gamepad) {
-        this.gamepad = gamepad;
+    public AsyncLift(LiftInternals liftInternals, OpMode opMode) {
+        this.gamepad = opMode.gamepad1;
         this.liftInternals = liftInternals;
     }
 

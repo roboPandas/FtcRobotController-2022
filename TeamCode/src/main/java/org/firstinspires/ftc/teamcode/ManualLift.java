@@ -1,18 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 
 public class ManualLift implements LiftSubsystem {
     private final LiftInternals liftInternals;
+    private final OpMode opMode;
     private final Gamepad gamepad;
-    private double power;
+    // i have NO IDEA why these can't be local variables, but this WILL break if they aren't fields
+    private volatile double power;
+    private volatile double lastPower;
+    private volatile boolean needsUnlock;
 
-    public ManualLift(LiftInternals liftInternals, Gamepad gamepad) {
+    public ManualLift(LiftInternals liftInternals, OpMode opMode) {
         this.liftInternals = liftInternals;
-        this.gamepad = gamepad;
+        this.opMode = opMode;
+        this.gamepad = opMode.gamepad1;
     }
 
     @Override
@@ -24,21 +31,34 @@ public class ManualLift implements LiftSubsystem {
         liftInternals.rotationServo.setPosition(1 - gamepad.left_trigger);
 
         // slide
+        // TODO in kotlin this will be a Pair<Int, Boolean> and an if expression
         if (gamepad.dpad_up) {
-            liftInternals.lock();
-            power = LiftInternals.SCALE_FACTOR;
+            needsUnlock = false;
+            power = LiftInternals.MOTOR_SCALE_FACTOR;
         } else if (gamepad.dpad_down) {
-            liftInternals.unlock();
-            power = -LiftInternals.SCALE_FACTOR;
+            needsUnlock = true;
+            power = -LiftInternals.MOTOR_SCALE_FACTOR;
         } else {
-            liftInternals.lock();
+            needsUnlock = false;
             power = 0;
         }
 
-        if (liftInternals.motor.getPower() != power) LiftInternals.liftExecutor.submit(() -> {
-            Utils.delay(100);
-            liftInternals.motor.setPower(power);
-        });
+        if (lastPower != power) {
+            LiftInternals.liftExecutor.submit(() -> { // prevent float errors TODO is this comparison for float purposes needed
+                if (needsUnlock) {
+                    liftInternals.motor.setPower(LiftInternals.MOTOR_UNLOCK_POWER);
+                    Utils.delay(100);
+                    liftInternals.unlock();
+                } else {
+                    liftInternals.lock();
+                }
+
+                Utils.delay(100);
+                liftInternals.motor.setPower(power);
+            });
+        }
+
+        lastPower = power;
 
         // claw (closed by default)
         if (gamepad.right_trigger > 0.5) liftInternals.drop();

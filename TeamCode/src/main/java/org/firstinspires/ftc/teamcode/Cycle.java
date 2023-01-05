@@ -5,14 +5,17 @@ import static org.firstinspires.ftc.teamcode.Utils.delay;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /** Represents one intake cycle. */
 public class Cycle {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    public static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final LiftInternals liftInternals;
     public volatile Stage stage = Stage.WAITING;
     private final LiftInternals.Position topPosition;
     private final LiftInternals.Position bottomPosition;
+    public static int GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS + 100;
+    public static int DROP_DELAY_MS = LiftInternals.DROP_DELAY_MS + 100;
 
     public Cycle(LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
         this.liftInternals = liftInternals;
@@ -20,14 +23,16 @@ public class Cycle {
         this.bottomPosition = bottomPosition;
     }
 
-    public void start() { start(false); }
+    public Future<?> start() { return start(false); }
 
-    public void start(boolean reversed) {
+    public Future<?> start(boolean reversed) {
         stage = Stage.GRABBING;
-        executor.submit(() -> {
+        System.out.println("start");
+        return executor.submit(() -> {
             // grab item
             liftInternals.grab();
-            delay(LiftInternals.GRAB_DELAY_MS); // this delay is to make sure it's in there
+            System.out.println("grabbed?");
+            delay(GRAB_DELAY_MS); // this delay is to make sure it's in there
 
             whenGrabbed(reversed);
         });
@@ -52,20 +57,21 @@ public class Cycle {
         stage = Stage.BETWEEN;
     }
 
-    public void finish() { finish(false); }
+    public Future<?> finish() { return finish(false); }
 
     // TODO this is basically the same as start so can it be refactored somehow?
-    public void finish(boolean reversed) {
+    public Future<?> finish(boolean reversed) {
         stage = Stage.DROPPING;
-        executor.submit(() -> {
+        return executor.submit(() -> {
             // drop item
             liftInternals.drop();
-            delay(LiftInternals.DROP_DELAY_MS); // this delay is to make sure it's out of our way
+            delay(DROP_DELAY_MS); // this delay is to make sure it's out of our way
 
             stage = Stage.DROPPED;
 
             // TODO make sure that the slide and servo happen simultaneously
             liftInternals.rotateToGrab(reversed);
+            if (topPosition.value < LiftInternals.Position.MIDDLE.value) delay(600);
 
             // wait until lift is done before finishing
             liftInternals.goToPositionBlocking(bottomPosition, 1);
