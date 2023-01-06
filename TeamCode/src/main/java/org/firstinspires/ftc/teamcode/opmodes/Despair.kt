@@ -15,6 +15,10 @@ import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline.Color
 class Despair : AutonomousTemplate() {
     override val startPose = Pose2d() // dummy
     override fun initializeTrajectories() {}
+    override fun setup() {
+        drive.motors.forEach { it.setMode(DcMotor.RunMode.RUN_USING_ENCODER) } // just in case
+        super.setup()
+    }
     override fun main() {
         // TODO if weighted drive power doesn't work refactor the Drivetrain class to use inputs other than controllers, OR create a dummy controller
         val POWER = 0.5 // TODO tune this
