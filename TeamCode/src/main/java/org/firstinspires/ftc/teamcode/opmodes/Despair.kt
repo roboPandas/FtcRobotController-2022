@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Gamepad
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.hardware.Drivetrain
@@ -27,31 +26,32 @@ class Despair : AutonomousTemplate() {
     override fun initializeTrajectories() {}
     override fun setup() {
         drivetrain = Drivetrain(this, gamepad)
-//        super.setup()
+        super.setup()
     }
+
     override fun main() {
         // TODO if weighted drive power doesn't work refactor the Drivetrain class to use inputs other than controllers, OR create a dummy controller
         // strafe left or right one tile if necessary
-        gamepad.left_stick_y = /*when (detectedColor) {
+        gamepad.left_stick_x = when (detectedColor) {
             Color.MAGENTA -> -1 // left
             Color.GREEN -> 0 // middle
             Color.CYAN -> 1 // right
-        }*/-1 * POWER
+        } * POWER
         drivetrain.loop()
-        sleep(1000) // TODO tune this
+        sleep(2700)
 
-        gamepad.left_stick_y = 0f
+        gamepad.left_stick_x = 0f
         drivetrain.loop()
         @Suppress("ControlFlowWithEmptyBody")
         while (!gamepad1.a);
 
         // move forward one tile
-        gamepad.left_stick_x = POWER
+        gamepad.left_stick_y = POWER
         drivetrain.loop()
-        sleep(1000) // TODO tune this
+        sleep(2200)
 
         // turn robot off
-        gamepad.left_stick_x = 0f
+        gamepad.left_stick_y = 0f
     }
 
     companion object {

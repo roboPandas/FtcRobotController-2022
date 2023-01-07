@@ -17,6 +17,7 @@ import java.util.concurrent.Executors
  * Right stick X - drivetrain rotation
  * Logitech button - swap between async and manual lift controls (it is async at start)
  * Right bumper + left bumper - reset lift encoder
+ * Dpad left/right - move back/forward at half speed
  *
  * Manual lift control:
  * Dpad up/down - raise/lower lift

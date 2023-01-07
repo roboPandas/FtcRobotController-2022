@@ -101,7 +101,7 @@ public class LiftInternals {
     public void goToPositionBlocking(LiftInternals.Position targetPosition, double power) {
         // I didn't reuse as much code as I could have since I want to avoid multithreading unless needed
         boolean needsLock = goToPositionInternal(targetPosition.value, power);
-        while (motor.isBusy()) {
+        while (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) > 50) {
             System.out.println("waiting for motor to finish");
             delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
         }
@@ -118,7 +118,7 @@ public class LiftInternals {
     private void goToPosition(int targetPosition, double power) { // just in case
         liftExecutor.submit(() -> {
             if (goToPositionInternal(targetPosition, power)) {
-                while (motor.isBusy()) {
+                while (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) > 50) {
                     System.out.println("waiting for motor to finish");
                     delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
                 }

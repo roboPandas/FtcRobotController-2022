@@ -27,6 +27,9 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
     }
 
     override fun loop() {
+        if (gamepad.dpad_right) return (0..3).forEach { all[it].power = 0.5 * MULTIPLIERS[it][1] * SCALE_FACTOR }
+        if (gamepad.dpad_left) return (0..3).forEach { all[it].power = -0.5 * MULTIPLIERS[it][1] * SCALE_FACTOR }
+
         val x = -gamepad.left_stick_x.toDouble()
         val y = gamepad.left_stick_y.toDouble()
         val z = -gamepad.right_stick_x.toDouble()
