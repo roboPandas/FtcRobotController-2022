@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import org.firstinspires.ftc.teamcode.opmodes.CycleContainer;
+import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode;
 
 public class ManualLift implements LiftSubsystem {
     private final LiftInternals liftInternals;
@@ -71,6 +71,6 @@ public class ManualLift implements LiftSubsystem {
 
     @Override
     public void prepareForSwitch() {
-        new Cycle((CycleContainer) opMode, liftInternals, LiftInternals.Position.LOW, LiftInternals.Position.STACK_1).finish();
+        new Cycle((CycleUsingOpMode<?>) opMode, liftInternals, LiftInternals.Position.LOW, LiftInternals.Position.STACK_1).finish();
     }
 }

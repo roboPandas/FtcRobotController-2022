@@ -3,13 +3,14 @@ package org.firstinspires.ftc.teamcode.hardware
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.teamcode.Subsystem
 import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorSimple
+import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 
-class Drivetrain(private val opMode: OpMode) : Subsystem {
+class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val all: Array<DcMotor>
-    private val gamepad = opMode.gamepad1
 
     init {
         val hardwareMap = opMode.hardwareMap
@@ -19,6 +20,10 @@ class Drivetrain(private val opMode: OpMode) : Subsystem {
             hardwareMap.dcMotor["backLeft"],
             hardwareMap.dcMotor["backRight"]
         )
+        all.forEach {
+            it.mode = DcMotor.RunMode.RUN_USING_ENCODER
+            it.direction = DcMotorSimple.Direction.FORWARD
+        }
     }
 
     override fun loop() {
@@ -31,8 +36,11 @@ class Drivetrain(private val opMode: OpMode) : Subsystem {
             return
         }
 
-        for (i in 0..3) all[i].power = (MULTIPLIERS[i][0] * x + MULTIPLIERS[i][1] * y + z) *
-                max(hypot(x, y), abs(z)) * SCALE_FACTOR / total // Adjust input to never exceed 1
+        for (i in 0..3) all[i].power = run {
+            println("i $i, x ${MULTIPLIERS[i][0] * x}, y ${MULTIPLIERS[i][1] * y}")
+            (MULTIPLIERS[i][0] * x + MULTIPLIERS[i][1] * y + z) *
+                    max(hypot(x, y), abs(z)) * SCALE_FACTOR / total // Adjust input to never exceed 1
+        }
     }
 
     companion object {

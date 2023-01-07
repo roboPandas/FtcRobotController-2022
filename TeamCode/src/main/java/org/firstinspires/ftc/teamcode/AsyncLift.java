@@ -1,17 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import org.firstinspires.ftc.teamcode.opmodes.CycleContainer;
+import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** The bridge between the Cycle system and the controller input. */
 public class AsyncLift implements LiftSubsystem {
-    private final OpMode opMode;
+    private final CycleUsingOpMode<?> opMode;
     @NotNull private final Gamepad gamepad;
     @Nullable private Cycle currentCycle = null;
     private boolean canSwitch = true;
@@ -19,9 +18,9 @@ public class AsyncLift implements LiftSubsystem {
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
     private int lastBottomPositionValue = 1;
 
-    public AsyncLift(LiftInternals liftInternals, OpMode opMode) {
+    public AsyncLift(LiftInternals liftInternals, CycleUsingOpMode<?> opMode) {
         this.opMode = opMode;
-        this.gamepad = this.opMode.gamepad1;
+        this.gamepad = this.opMode.getSelf().gamepad1;
         this.liftInternals = liftInternals;
     }
 
@@ -52,7 +51,7 @@ public class AsyncLift implements LiftSubsystem {
 
             // create cycle
             if (gamepad.a) {
-                currentCycle = new Cycle((CycleContainer) opMode, liftInternals, topPosition, bottomPosition);
+                currentCycle = new Cycle(opMode, liftInternals, topPosition, bottomPosition);
                 System.out.println("A: start cycle");
                 currentCycle.start();
                 canSwitch = false;

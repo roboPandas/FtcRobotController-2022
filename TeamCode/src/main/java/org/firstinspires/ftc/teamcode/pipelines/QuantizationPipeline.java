@@ -5,7 +5,7 @@ import static org.opencv.core.CvType.CV_8U;
 
 //import androidx.core.graphics.ColorUtils;
 
-//import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -19,11 +19,11 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class QuantizationPipeline extends OpenCvPipeline {
-    public int K = 3;
+    public final int K = 4;
+    public boolean hasInit = false;
     public double FOCUS_HEIGHT = 0.25;
     public double FOCUS_WIDTH = 0.4;
     private Mat data = new Mat();
@@ -34,11 +34,6 @@ public class QuantizationPipeline extends OpenCvPipeline {
     private Mat roi = new Mat();
     private Mat ROI = new Mat();
     private List<Integer> totals = Arrays.asList(0, 0, 0);
-//    Telemetry telemetry;
-//
-//    public QuantizationPipeline(Telemetry telemetry) {
-//        this.telemetry = telemetry;
-//    }
 
     public void releaseAll() {
         data.release();
@@ -51,71 +46,74 @@ public class QuantizationPipeline extends OpenCvPipeline {
     }
 
     public ArrayList<Scalar> snapshot() {
-        data.convertTo(data, CV_32F);
-        TermCriteria criteria = new TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 2, 1.0);
-        Core.kmeans(data, K, bestLabels, criteria, 9, Core.KMEANS_RANDOM_CENTERS, centers);
+        if (!hasInit) return null;
 
-        centers.convertTo(centers, CV_8U);
+        try {
+            data.convertTo(data, CV_32F);
+            TermCriteria criteria = new TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 2, 1.0);
+            Core.kmeans(data, K, bestLabels, criteria, 15, Core.KMEANS_PP_CENTERS, centers);
 
-        ArrayList<Scalar> colors = new ArrayList<>();
-        for (int k = 0; k < K; k++) {
-            colors.add(new Scalar(centers.get(k,0)[0], centers.get(k,1)[0], centers.get(k,2)[0]));
-        }
+            centers.convertTo(centers, CV_8U);
 
-        draw = new Mat((int) roi.total(),1, CvType.CV_32FC3);
-        for (int i = 0; i < K; i++) {
-            Mat mask = new Mat();
-            Core.compare(bestLabels, new Scalar(i), mask, Core.CMP_EQ);
-            draw.setTo(colors.get(i), mask);
-            mask.release();
-        }
-
-        List<Integer> counts = Arrays.asList(0, 0, 0);
-        for (int i = 0; i < K; i++) {
-            float[] hsv = {0, 0, 0};
-            Scalar color = colors.get(i);
-            //TODO: REPLACE THIS WITH COLORUTILS.RGBTOHSL
-            RGBToHSL((int) color.val[0], (int) color.val[1], (int) color.val[2], hsv);
-//            telemetry.addData("color" + i, String.valueOf(Arrays.asList(hsv[0], hsv[1], hsv[2])));
-            Mat temp = new Mat();
-
-            // TODO: UPPER CLAMP FOR HSV[2]?
-            for (Color c : Color.values()) {
-                hsv[1] = (hsv[1] * 100 >= 15) ? 100 : 0;
-                hsv[2] = (hsv[2] * 100 >= 15) ? 100 : 0;
-                if (colorInRange(new Scalar(hsv[0], hsv[1], hsv[2]), c.lower, c.upper)) {
-                    Core.inRange(draw, color, color, temp);
-                    counts.set(c.idx, counts.get(c.idx) + Core.countNonZero(temp));
-                }
+            ArrayList<Scalar> colors = new ArrayList<>();
+            for (int k = 0; k < K; k++) {
+                colors.add(new Scalar(centers.get(k, 0)[0], centers.get(k, 1)[0], centers.get(k, 2)[0]));
             }
 
-            temp.release();
+            draw = new Mat((int) roi.total(), 1, CvType.CV_32FC3);
+            for (int i = 0; i < K; i++) {
+                Mat mask = new Mat();
+                Core.compare(bestLabels, new Scalar(i), mask, Core.CMP_EQ);
+                draw.setTo(colors.get(i), mask);
+                mask.release();
+            }
+
+            List<Integer> counts = Arrays.asList(0, 0, 0);
+            for (int i = 0; i < K; i++) {
+                float[] hsv = {0, 0, 0};
+                Scalar color = colors.get(i);
+                RGBToHSL((int) color.val[0], (int) color.val[1], (int) color.val[2], hsv);
+//            telemetry.addData("color" + i, String.valueOf(Arrays.asList(hsv[0], hsv[1], hsv[2])));
+                Mat temp = new Mat();
+
+                // TODO: UPPER CLAMP FOR HSV[2]?
+                for (Color c : Color.values()) {
+                    hsv[1] = (hsv[1] * 100 >= 15) ? 100 : 0;
+                    hsv[2] = (hsv[2] * 100 >= 15) ? 100 : 0;
+                    if (colorInRange(new Scalar(hsv[0], hsv[1], hsv[2]), c.lower, c.upper)) {
+                        Core.inRange(draw, color, color, temp);
+                        int ord = c.ordinal();
+                        counts.set(ord, counts.get(ord) + Core.countNonZero(temp));
+                    }
+                }
+
+                temp.release();
+            }
+            draw.release();
+
+            int idx;
+            double[] color = {0, 0, 0};
+            if (Collections.frequency(counts, 0) != 3) {
+                idx = counts.indexOf(Collections.max(counts));
+                totals.set(idx, totals.get(idx) + 1);
+                color[idx] = 255;
+            }
+            colors.add(new Scalar(color));
+
+            return colors;
+        } catch (Exception e) {
+            return null;
         }
-        draw.release();
-
-        int idx;
-        double[] color = {0, 0, 0};
-        if (Collections.frequency(counts, 0) != 3) {
-            idx = counts.indexOf(Collections.max(counts));
-            totals.set(idx, totals.get(idx) + 1);
-            color[idx] = 255;
-//            telemetry.addData("idx", idx);
-        }
-        colors.add(new Scalar(color));
-
-//        telemetry.addData("counts", String.valueOf(counts));
-//        telemetry.update();
-
-        return colors;
     }
 
-    public Color getParkPosition() {
-        if (Collections.frequency(totals, 0) == 3) return null;
+    public Color getDetectedColor() {
+        if (Collections.frequency(totals, 0) == 3)
+            return Color.GREEN; // if no color is seen we just go straight
         return Color.values()[totals.indexOf(Collections.max(totals))];
     }
 
     private Point[] focus(double width, double height) {
-        return new Point[] {
+        return new Point[]{
                 new Point(width * FOCUS_WIDTH, height * FOCUS_HEIGHT),
                 new Point(width - (width * FOCUS_WIDTH), height - (height * FOCUS_HEIGHT)),
         };
@@ -164,6 +162,7 @@ public class QuantizationPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        hasInit = true;
         Size size = input.size();
         double height = size.height;
         double width = size.width;
@@ -177,13 +176,14 @@ public class QuantizationPipeline extends OpenCvPipeline {
         data = roi.reshape(1, (int) roi.total());
 
         ArrayList<Scalar> snapshot = snapshot();
-//        telemetry.addData("park position", String.valueOf(getParkPosition()));
+        if (snapshot == null) return input;
+
         for (int i = 0; i < K; i++) {
             Scalar result = snapshot.get(i);
             float[] hsv = {0, 0, 0};
-            Imgproc.rectangle(input, new Point(30 * i, 0), new Point(30 * (i+1), 30), result, -1);
+            Imgproc.rectangle(input, new Point(30 * i, 0), new Point(30 * (i + 1), 30), result, -1);
         }
-        Imgproc.rectangle(input, new Point(0, 30), new Point(30, 60), snapshot.get(3), -1);
+        Imgproc.rectangle(input, new Point(0, 30), new Point(30, 60), snapshot.get(snapshot.size() - 1), -1);
 
         Imgproc.rectangle(input, foci[0], foci[1], new Scalar(0, 0, 0), 2);
         releaseAll();
@@ -202,6 +202,7 @@ public class QuantizationPipeline extends OpenCvPipeline {
         );
     }
 
+    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
     private static Scalar rangeHSV(int[] hsv) {
         return new Scalar(
                 ((int) hsv[0]) / 2 - 1,
@@ -211,17 +212,15 @@ public class QuantizationPipeline extends OpenCvPipeline {
     }
 
     public enum Color {
-        MAGENTA(0, new Scalar(300, 100, 100), new Scalar(350, 100, 100)),
-        GREEN(1, new Scalar(90, 100, 100), new Scalar(160, 100, 100)),
-        CYAN(2, new Scalar(180, 100, 100), new Scalar(210, 100, 100));
+        MAGENTA(new Scalar(300, 100, 100), new Scalar(350, 100, 100)),
+        GREEN(new Scalar(90, 100, 100), new Scalar(160, 100, 100)),
+        CYAN(new Scalar(180, 100, 100), new Scalar(210, 100, 100));
 
-        public final int idx;
         private final Scalar lower;
         private final Scalar upper;
 
         // NOTE: the mask parameter breaks things if you create more than one of these pipelines
-        Color(int idx, Scalar lower, Scalar upper) {
-            this.idx = idx;
+        Color(Scalar lower, Scalar upper) {
             this.lower = lower;
             this.upper = upper;
         }

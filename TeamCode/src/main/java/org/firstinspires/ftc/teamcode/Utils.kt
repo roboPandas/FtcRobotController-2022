@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.PwmControl
 import java.lang.RuntimeException
 
+@Suppress("ControlFlowWithEmptyBody")
 fun delay(millis: Long) {
     try {
         Thread.sleep(millis)

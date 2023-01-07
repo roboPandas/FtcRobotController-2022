@@ -11,16 +11,17 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive
 import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
 import org.openftc.easyopencv.OpenCvCameraRotation
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 // FIXME refactor this once more info on auto becomes available
-abstract class AutonomousTemplate : LinearOpMode(), CycleContainer<AutonomousTemplate> {
-    override val cycleExecutor = Executors.newSingleThreadExecutor()
+abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousTemplate> {
+    override val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     protected lateinit var drive: SampleMecanumDrive
     protected lateinit var currentCycle: Cycle
     protected lateinit var pipeline: QuantizationPipeline
     private lateinit var liftInternals: LiftInternals
-    private lateinit var webcam: OpenCvWebcam
+    protected lateinit var webcam: OpenCvWebcam
     protected lateinit var detectedColor: QuantizationPipeline.Color
     protected open val reversed = false
 
@@ -98,17 +99,17 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleContainer<AutonomousTem
         liftInternals.grab()
         telemetry.addData("Status", "Initialized")
         while (opModeInInit()) { // TODO remove some of this stuff when no longer needed
-            if (System.currentTimeMillis() - startTime <= 3500) {
+            if (System.currentTimeMillis() - startTime in 3000..6000) {
                 pipeline.snapshot()
-                detectedColor = pipeline.parkPosition
+                detectedColor = pipeline.detectedColor
+                telemetry.addData("Detected color", detectedColor)
+                telemetry.addData("FPS", String.format("%.2f", webcam.fps))
+                telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
+                telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
+                telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
+                telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
+                telemetry.update() // TODO what if camera no open.
             }
-            telemetry.addData("Detected color", detectedColor)
-            telemetry.addData("FPS", String.format("%.2f", webcam.fps))
-            telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
-            telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
-            telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
-            telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
-            telemetry.update() // TODO what if camera no open.
         }
     }
 

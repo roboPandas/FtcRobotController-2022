@@ -53,7 +53,7 @@ public class Left extends AutonomousTemplate { // TODO uncomment actual cycle co
                 .strafeRight(negateIfReversed(24))
                 .build();
         if (detectedColor != null) finalMovement = drive.trajectoryBuilder(deliverPreload.end())
-                .forward(negateIfReversed(detectedColor.idx))
+                .forward(negateIfReversed(detectedColor.ordinal()))
                 .build();
     }
 

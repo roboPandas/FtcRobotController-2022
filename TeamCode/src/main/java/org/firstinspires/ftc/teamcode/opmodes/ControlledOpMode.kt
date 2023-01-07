@@ -30,7 +30,7 @@ import java.util.concurrent.Executors
  * A - start/continue cycle
  */
 @TeleOp
-open class ControlledOpMode : OpMode(), CycleContainer<ControlledOpMode> {
+open class ControlledOpMode : OpMode(), CycleUsingOpMode<ControlledOpMode> {
     // TODO merge this with auto if needed
     override val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     protected lateinit var all: Array<Subsystem>
