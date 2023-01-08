@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.Gamepad
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
-import java.lang.reflect.Field
 
 /**
  * A replacement for a default controller which will record all inputs, making them available
@@ -68,22 +67,17 @@ class InputRecordingController(private val opMode: OpMode, gamepadToReplace: Gam
     /**
      * Clears the gamepad and any recordings.
      */
-    fun clear() {
-        super.copy(Gamepad())
+    override fun reset() {
+        super.reset()
         inputs.clear()
     }
 
     /**
-     * Export the recorded inputs to the default file.
+     * Export the recorded inputs to the file of the given name,
+     * or to the default file if none is provided.
      */
-    fun export() {
-        export(RecordingConstants.DEFAULT_OUTPUT_FILE_NAME)
-    }
-
-    /**
-     * Export the recorded inputs to the file of the given name.
-     */
-    fun export(fileName: String) {
+    @JvmOverloads
+    fun export(fileName: String = RecordingConstants.DEFAULT_OUTPUT_FILE_NAME) {
         val file = File(fileName)
         file.delete()
         file.createNewFile()

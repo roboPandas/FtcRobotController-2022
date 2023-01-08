@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.recording
 import com.qualcomm.robotcore.hardware.Gamepad
 import java.lang.reflect.Field
 
-internal object RecordingConstants {
+object RecordingConstants {
     /**
      * The default file name of the exported recording.
      */
@@ -12,7 +12,8 @@ internal object RecordingConstants {
     /**
      * The fields of controllers which are tracked for changes
      */
-    val RECORDED_FIELDS = listOf(
+    @JvmSynthetic @JvmField
+    internal val RECORDED_FIELDS = listOf(
         "left_stick_x",
         "left_stick_y",
         "right_stick_x",

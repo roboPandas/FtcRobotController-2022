@@ -17,16 +17,27 @@ class InputReplayingController(val opMode: OpMode, input: InputStream) : Gamepad
     init {
         sequence.read(String(input.readBytes()))
     }
-    
+
+    /**
+     * Replay inputs saved via an InputRecordingController.
+     * @param opMode the OpMode using this controller
+     * @param file a File providing the controller input to replay
+     */
     constructor(opMode: OpMode, file: File) : this(opMode, FileInputStream(file))
-    constructor(opMode: OpMode, fileName: String) : this(opMode, File(fileName))
-    constructor(opMode: OpMode) : this(opMode, RecordingConstants.DEFAULT_OUTPUT_FILE_NAME)
+    /**
+     * Replay inputs saved via an InputRecordingController.
+     * @param opMode the OpMode using this controller
+     * @param fileName the name of the file providing the controller input to replay
+     */
+    @JvmOverloads
+    constructor(opMode: OpMode, fileName: String = RecordingConstants.DEFAULT_OUTPUT_FILE_NAME)
+            : this(opMode, File(fileName))
 
     /**
      * Update the state of this controller based on the recorded inputs.
      * Should be called from an OpMode loop.
      */
-    fun loop() {
+    fun update() {
         sequence.update(this, opMode.runtime)
     }
 }
