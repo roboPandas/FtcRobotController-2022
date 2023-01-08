@@ -43,15 +43,18 @@ internal class InputSequence {
             output.append("$time, ${input.field.name}, ${input.value}\n")
         }
         out.write(output.toString().toByteArray())
+        out.flush()
     }
 
     /**
      * Read data for this sequence from the given string of inputs.
      */
     fun read(data: String) {
-        val inputs = data.split("\n")
+        val inputs = data.trim().split("\n")
+        println(inputs)
         for (inputStr in inputs) {
             val split = inputStr.split(", ")
+            println(split)
             if (split.size != 3)
                 throw IllegalArgumentException("Expected 3 elements in input entry, got ${split.size}")
             val time = split[0].toDouble()

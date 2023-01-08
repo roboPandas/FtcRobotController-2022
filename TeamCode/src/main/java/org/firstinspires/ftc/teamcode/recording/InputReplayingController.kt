@@ -7,23 +7,28 @@ import java.io.FileInputStream
 import java.io.InputStream
 
 /**
- * Replay inputs saved via an InputRecordingController.
- * @param opMode the OpMode using this controller
- * @param input an InputStream providing the controller input to replay
+ * Replays inputs saved via an InputRecordingController.
  */
-class InputReplayingController(val opMode: OpMode, input: InputStream) : Gamepad() {
+class InputReplayingController private constructor(val opMode: OpMode, input: InputStream, needsClose: Boolean) : Gamepad() {
     private val sequence = InputSequence()
     
     init {
         sequence.read(String(input.readBytes()))
+        if (needsClose) input.close()
     }
+
+    /**
+     * @param opMode the OpMode using this controller
+     * @param input an InputStream providing the controller input to replay
+     */
+    constructor(opMode: OpMode, input: InputStream) : this(opMode, input, false)
 
     /**
      * Replay inputs saved via an InputRecordingController.
      * @param opMode the OpMode using this controller
      * @param file a File providing the controller input to replay
      */
-    constructor(opMode: OpMode, file: File) : this(opMode, FileInputStream(file))
+    constructor(opMode: OpMode, file: File) : this(opMode, FileInputStream(file), true)
     /**
      * Replay inputs saved via an InputRecordingController.
      * @param opMode the OpMode using this controller

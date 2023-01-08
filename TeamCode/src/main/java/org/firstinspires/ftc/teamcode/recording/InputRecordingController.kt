@@ -88,7 +88,9 @@ class InputRecordingController(private val opMode: OpMode, gamepadToReplace: Gam
      * Export the recorded inputs to the given file.
      */
     fun export(file: File) {
-        export(FileOutputStream(file))
+        FileOutputStream(file).use {
+            export(it)
+        }
     }
 
     /**
