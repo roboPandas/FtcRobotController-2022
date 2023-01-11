@@ -28,7 +28,6 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
     abstract val startPose: Pose2d
     abstract fun initializeTrajectories()
     open fun setup() {
-        val startTime = System.currentTimeMillis()
         /*
          * Instantiate an OpenCvCamera object for the camera we'll be using.
          * In this sample, we're using a webcam. Note that you will need to
@@ -98,17 +97,21 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
         liftInternals.drop() // makes sure that grab doesn't fail
         liftInternals.grab()
         telemetry.addData("Status", "Initialized")
-        while (opModeInInit()) { // TODO remove some of this stuff when no longer needed
-            if (System.currentTimeMillis() - startTime in 3000..6000) {
-                pipeline.snapshot()
+        while (opModeInInit()) {
+            if (pipeline.hasInit) {
+                val currentColor = pipeline.current
                 detectedColor = pipeline.detectedColor
+                telemetry.addData("Current color", currentColor)
                 telemetry.addData("Detected color", detectedColor)
+                telemetry.addData("totals", pipeline.totals)
                 telemetry.addData("FPS", String.format("%.2f", webcam.fps))
                 telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
                 telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
                 telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
                 telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
-                telemetry.update() // TODO what if camera no open.
+                telemetry.update()
+            } else {
+                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
             }
         }
     }

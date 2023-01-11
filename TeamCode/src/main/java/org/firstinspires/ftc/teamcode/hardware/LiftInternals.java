@@ -159,7 +159,7 @@ public class LiftInternals {
         // the lowest position that allows rotation
         CAN_ROTATE(1600),
         // junction heights
-        LOW(1600), MIDDLE(2200), HIGH(2900);
+        LOW(1600), MIDDLE(2200), HIGH(2770);
 
         public static final Position GROUND = STACK_1;
 

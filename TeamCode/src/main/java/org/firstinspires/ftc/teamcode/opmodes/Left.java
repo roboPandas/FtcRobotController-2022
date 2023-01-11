@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Cycle;
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.jetbrains.annotations.NotNull;
 
 @Autonomous
+@Disabled
 public class Left extends AutonomousTemplate { // TODO uncomment actual cycle code AFTER this gets tested
     protected TrajectorySequence deliverPreload;
     protected TrajectorySequence intake;

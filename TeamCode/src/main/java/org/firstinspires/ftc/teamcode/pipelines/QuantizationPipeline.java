@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.pipelines;
 import static org.opencv.core.CvType.CV_32F;
 import static org.opencv.core.CvType.CV_8U;
 
-//import androidx.core.graphics.ColorUtils;
+import androidx.core.graphics.ColorUtils;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -24,8 +23,9 @@ import java.util.List;
 public class QuantizationPipeline extends OpenCvPipeline {
     public final int K = 4;
     public boolean hasInit = false;
-    public double FOCUS_HEIGHT = 0.25;
-    public double FOCUS_WIDTH = 0.4;
+    public double FOCUS_HEIGHT = 0.3;
+    public double FOCUS_WIDTH = 0.3;
+    public double FOCUS_OFFSET = 0.0;
     private Mat data = new Mat();
     private Mat centers = new Mat();
     private Mat draw = new Mat();
@@ -33,7 +33,8 @@ public class QuantizationPipeline extends OpenCvPipeline {
     private Mat bestLabels = new Mat();
     private Mat roi = new Mat();
     private Mat ROI = new Mat();
-    private List<Integer> totals = Arrays.asList(0, 0, 0);
+    public List<Integer> totals = Arrays.asList(0, 0, 0);
+    public Color current = Color.GREEN;
 
     public void releaseAll() {
         data.release();
@@ -72,7 +73,7 @@ public class QuantizationPipeline extends OpenCvPipeline {
             for (int i = 0; i < K; i++) {
                 float[] hsv = {0, 0, 0};
                 Scalar color = colors.get(i);
-                RGBToHSL((int) color.val[0], (int) color.val[1], (int) color.val[2], hsv);
+                ColorUtils.RGBToHSL((int) color.val[0], (int) color.val[1], (int) color.val[2], hsv);
 //            telemetry.addData("color" + i, String.valueOf(Arrays.asList(hsv[0], hsv[1], hsv[2])));
                 Mat temp = new Mat();
 
@@ -96,7 +97,10 @@ public class QuantizationPipeline extends OpenCvPipeline {
             if (Collections.frequency(counts, 0) != 3) {
                 idx = counts.indexOf(Collections.max(counts));
                 totals.set(idx, totals.get(idx) + 1);
+                current = Color.values()[idx];
                 color[idx] = 255;
+            } else {
+                current = null;
             }
             colors.add(new Scalar(color));
 
@@ -113,52 +117,53 @@ public class QuantizationPipeline extends OpenCvPipeline {
     }
 
     private Point[] focus(double width, double height) {
+        double off = height * FOCUS_OFFSET;
         return new Point[]{
-                new Point(width * FOCUS_WIDTH, height * FOCUS_HEIGHT),
-                new Point(width - (width * FOCUS_WIDTH), height - (height * FOCUS_HEIGHT)),
+                new Point(width * FOCUS_WIDTH, height * FOCUS_HEIGHT + off),
+                new Point(width - (width * FOCUS_WIDTH), height - (height * FOCUS_HEIGHT) + off),
         };
     }
 
-    public static void RGBToHSL(int r, int g, int b, float[] outHsl) {
-        final float rf = r / 255f;
-        final float gf = g / 255f;
-        final float bf = b / 255f;
-
-        final float max = Math.max(rf, Math.max(gf, bf));
-        final float min = Math.min(rf, Math.min(gf, bf));
-        final float deltaMaxMin = max - min;
-
-        float h, s;
-        float l = (max + min) / 2f;
-
-        if (max == min) {
-            // Monochromatic
-            h = s = 0f;
-        } else {
-            if (max == rf) {
-                h = ((gf - bf) / deltaMaxMin) % 6f;
-            } else if (max == gf) {
-                h = ((bf - rf) / deltaMaxMin) + 2f;
-            } else {
-                h = ((rf - gf) / deltaMaxMin) + 4f;
-            }
-
-            s = deltaMaxMin / (1f - Math.abs(2f * l - 1f));
-        }
-
-        h = (h * 60f) % 360f;
-        if (h < 0) {
-            h += 360f;
-        }
-
-        outHsl[0] = constrain(h, 0f, 360f);
-        outHsl[1] = constrain(s, 0f, 1f);
-        outHsl[2] = constrain(l, 0f, 1f);
-    }
-
-    private static float constrain(float amount, float low, float high) {
-        return amount < low ? low : Math.min(amount, high);
-    }
+//    public static void RGBToHSL(int r, int g, int b, float[] outHsl) {
+//        final float rf = r / 255f;
+//        final float gf = g / 255f;
+//        final float bf = b / 255f;
+//
+//        final float max = Math.max(rf, Math.max(gf, bf));
+//        final float min = Math.min(rf, Math.min(gf, bf));
+//        final float deltaMaxMin = max - min;
+//
+//        float h, s;
+//        float l = (max + min) / 2f;
+//
+//        if (max == min) {
+//            // Monochromatic
+//            h = s = 0f;
+//        } else {
+//            if (max == rf) {
+//                h = ((gf - bf) / deltaMaxMin) % 6f;
+//            } else if (max == gf) {
+//                h = ((bf - rf) / deltaMaxMin) + 2f;
+//            } else {
+//                h = ((rf - gf) / deltaMaxMin) + 4f;
+//            }
+//
+//            s = deltaMaxMin / (1f - Math.abs(2f * l - 1f));
+//        }
+//
+//        h = (h * 60f) % 360f;
+//        if (h < 0) {
+//            h += 360f;
+//        }
+//
+//        outHsl[0] = constrain(h, 0f, 360f);
+//        outHsl[1] = constrain(s, 0f, 1f);
+//        outHsl[2] = constrain(l, 0f, 1f);
+//    }
+//
+//    private static float constrain(float amount, float low, float high) {
+//        return amount < low ? low : Math.min(amount, high);
+//    }
 
     @Override
     public Mat processFrame(Mat input) {
@@ -205,9 +210,9 @@ public class QuantizationPipeline extends OpenCvPipeline {
     @SuppressWarnings("IntegerDivisionInFloatingPointContext")
     private static Scalar rangeHSV(int[] hsv) {
         return new Scalar(
-                ((int) hsv[0]) / 2 - 1,
-                255 * (((int) hsv[1]) / 100),
-                255 * (((int) hsv[2]) / 100)
+                hsv[0] / 2 - 1,
+                255 * (hsv[1] / 100),
+                255 * (hsv[2] / 100)
         );
     }
 
