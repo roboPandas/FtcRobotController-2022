@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /** The bridge between the Cycle system and the controller input. */
 public class AsyncLift implements LiftSubsystem {
@@ -16,6 +14,7 @@ public class AsyncLift implements LiftSubsystem {
     private boolean canSwitch = true;
     private final LiftInternals liftInternals;
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
+    private LiftInternals.Position queuedPosition = null;
     private int lastBottomPositionValue = 1;
 
     public AsyncLift(LiftInternals liftInternals, CycleUsingOpMode<?> opMode) {
@@ -63,8 +62,20 @@ public class AsyncLift implements LiftSubsystem {
         canSwitch = false;
 
         // cycle is already present
+
+        // do not allow setting the position while in a cycle.
+        // any changes will be queued to be applied after it finishes.
+        if (gamepad.b) queuedPosition = LiftInternals.Position.HIGH;
+        else if (gamepad.y) queuedPosition = LiftInternals.Position.MIDDLE;
+        else if (gamepad.x) queuedPosition = LiftInternals.Position.LOW;
+
+        // check if the current cycle is done and reset if so
         if (currentCycle.stage == Cycle.Stage.COMPLETE) {
             currentCycle = null;
+            if (queuedPosition != null) {
+                topPosition = queuedPosition;
+                queuedPosition = null;
+            }
             return;
         }
         if (currentCycle.isBusy()) return;
