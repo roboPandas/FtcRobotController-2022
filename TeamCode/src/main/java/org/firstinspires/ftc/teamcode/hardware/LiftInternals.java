@@ -42,6 +42,7 @@ public class LiftInternals {
         rotationServo.scaleRange(0.17, 0.845);
         clawServo.scaleRange(0.08, 0.195);
         lockServo.scaleRange(0, 0.12);
+        uncheckedDrop();
     }
 
     // TODO for kotlin refactor grab, drop, lock, unlock, rotate into boolean vals (locked, grabbed, etc.)
@@ -52,16 +53,26 @@ public class LiftInternals {
     public static final int DROP_DELAY_MS = 750;
     public void grab() {
         internalSetClaw(0, GRAB_DELAY_MS); // TODO does 550 work??
-        System.out.println("grab finished");
     }
 
     public void drop() {
         internalSetClaw(1, DROP_DELAY_MS);
     }
 
+    // This function is NOT safe to call in a loop.
+    // It is used to guarantee that the claw is ALWAYS commanded to open.
+    public void uncheckedDrop() {
+        setUnchecked(1, DROP_DELAY_MS);
+    }
+
     private void internalSetClaw(int pos, long delayMillis) {
         int currentPos = (int) clawServo.getPosition();
         if (currentPos == pos) return;
+        setUnchecked(pos, delayMillis);
+    }
+
+    // NOT safe for a loop
+    private void setUnchecked(int pos, long delayMillis) {
         Utils.setPwm(clawServo, true);
         clawServo.setPosition(pos);
         System.out.println("position set " + clawServo.getPosition());
@@ -71,7 +82,8 @@ public class LiftInternals {
         });
     }
 
-    // Rotation TODO test these numbers
+    // Rotation
+    // Grab is 1; drop is 0
     public void rotateToDrop(boolean reversed) {
         rotationServo.setPosition(reversed ? 1 : 0);
     }
@@ -103,7 +115,7 @@ public class LiftInternals {
         boolean needsLock = goToPositionInternal(targetPosition.value, power);
         while (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) > 50) {
             System.out.println("waiting for motor to finish");
-            delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
+            delay(10); // TODO i changed this from a manual position check to isBusy - should I change it back?
         }
         System.out.println("motor finished moving to " + targetPosition);
         if (needsLock) lock();
@@ -120,7 +132,7 @@ public class LiftInternals {
             if (goToPositionInternal(targetPosition, power)) {
                 while (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) > 50) {
                     System.out.println("waiting for motor to finish");
-                    delay(50); // TODO i changed this from a manual position check to isBusy - should I change it back?
+                    delay(10); // TODO i changed this from a manual position check to isBusy - should I change it back?
                 }
                 System.out.println("motor finished moving to " + targetPosition);
                 lock();

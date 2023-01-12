@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 /** The bridge between the Cycle system and the controller input. */
 public class AsyncLift implements LiftSubsystem {
     private final CycleUsingOpMode<?> opMode;
-    @NotNull private final Gamepad gamepad;
-    @Nullable private Cycle currentCycle = null;
+    private final Gamepad gamepad;
+    private Cycle currentCycle = null;
     private boolean canSwitch = true;
     private final LiftInternals liftInternals;
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;

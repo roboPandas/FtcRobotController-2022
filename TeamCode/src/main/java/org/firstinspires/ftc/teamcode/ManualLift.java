@@ -33,7 +33,7 @@ public class ManualLift implements LiftSubsystem {
         // TODO in kotlin this will be a Pair<Int, Boolean> and an if expression
         if (gamepad.dpad_up) {
             needsUnlock = false;
-            power = (liftInternals.motor.getCurrentPosition() < LiftInternals.Position.HIGH.value + 50) ? 0 : LiftInternals.MOTOR_SCALE_FACTOR;
+            power = (liftInternals.motor.getCurrentPosition() > LiftInternals.Position.HIGH.value + 50) ? 0 : LiftInternals.MOTOR_SCALE_FACTOR;
         } else if (gamepad.dpad_down) {
             needsUnlock = true;
             power = -LiftInternals.MOTOR_SCALE_FACTOR;
@@ -66,7 +66,7 @@ public class ManualLift implements LiftSubsystem {
 
     @Override
     public boolean canSwitch() {
-        return liftInternals.motor.getCurrentPosition() > LiftInternals.Position.CAN_ROTATE.value;
+        return liftInternals.rotationServo.getPosition() >= 0.9 || liftInternals.motor.getCurrentPosition() > LiftInternals.Position.CAN_ROTATE.value;
     }
 
     @Override

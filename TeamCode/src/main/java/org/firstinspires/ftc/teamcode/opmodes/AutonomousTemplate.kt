@@ -94,8 +94,7 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
                 telemetry.addData("Camera", "Could not open camera. Will park in Position 2.")
             }
         })
-        liftInternals.drop() // makes sure that grab doesn't fail
-        liftInternals.grab()
+        liftInternals.uncheckedDrop() // makes sure that grab doesn't fail
         telemetry.addData("Status", "Initialized")
         while (opModeInInit()) {
             if (pipeline.hasInit) {

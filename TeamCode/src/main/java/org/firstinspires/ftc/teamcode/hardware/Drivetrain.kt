@@ -14,7 +14,7 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
 
     init {
         val hardwareMap = opMode.hardwareMap
-        multiplierMap = mapOf(
+        multiplierMap = hashMapOf(
             hardwareMap.dcMotor["frontLeft"] to intArrayOf(+1, +1),
             hardwareMap.dcMotor["frontRight"] to intArrayOf(+1, -1),
             hardwareMap.dcMotor["backLeft"] to intArrayOf(-1, +1),
@@ -43,7 +43,7 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         }
 
         multiplierMap.forEach { (motor, mults) ->
-           motor.power = (mults[0] * x + mults[1] * y + z) *
+            motor.power = (mults[0] * x + mults[1] * y + z) *
                     max(hypot(x, y), abs(z)) * SCALE_FACTOR / total // Adjust input to never exceed 1
         }
     }
