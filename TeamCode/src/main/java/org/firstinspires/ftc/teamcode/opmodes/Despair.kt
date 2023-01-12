@@ -25,20 +25,24 @@ class Despair : AutonomousTemplate() {
     }
 
     override fun main() {
-        // TODO if weighted drive power doesn't work refactor the Drivetrain class to use inputs other than controllers, OR create a dummy controller
+        gamepad.left_stick_y = POWER / 2
+        drivetrain.loop()
+        sleep(400)
+
+        gamepad.left_stick_y = 0f
+        drivetrain.loop()
+
         // strafe left or right one tile if necessary
         gamepad.left_stick_x = when (detectedColor) {
-            Color.MAGENTA -> -1 // left
+            Color.MAGENTA -> 1 // left
             Color.GREEN -> 0 // middle
-            Color.CYAN -> 1 // right
+            Color.CYAN -> -1 // right
         } * POWER
         drivetrain.loop()
-        sleep(2700)
+        sleep(2300)
 
         gamepad.left_stick_x = 0f
         drivetrain.loop()
-        @Suppress("ControlFlowWithEmptyBody")
-        while (!gamepad1.a);
 
         // move forward one tile
         gamepad.left_stick_y = POWER
@@ -47,9 +51,10 @@ class Despair : AutonomousTemplate() {
 
         // turn robot off
         gamepad.left_stick_y = 0f
+        drivetrain.loop()
     }
 
     companion object {
-        const val POWER = -0.5f // robot is backwards
+        const val POWER = 0.5f // +y is forward on the controller
     }
 }

@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 
 @Autonomous
+@Disabled
 class MoveClaw : LinearOpMode() {
     override fun runOpMode() {
         val claw = hardwareMap.servo["clawServo"]

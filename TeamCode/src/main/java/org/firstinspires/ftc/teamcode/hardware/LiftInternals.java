@@ -157,9 +157,9 @@ public class LiftInternals {
         // STACK_1 is for a single cone, and should be the default bottom position
         STACK_1(0), STACK_2(300), STACK_3(300), STACK_4(450), STACK_5(450),
         // the lowest position that allows rotation
-        CAN_ROTATE(1600),
+        CAN_ROTATE(1400),
         // junction heights
-        LOW(1600), MIDDLE(2200), HIGH(2770);
+        LOW(1400), MIDDLE(2200), HIGH(3100);
 
         public static final Position GROUND = STACK_1;
 

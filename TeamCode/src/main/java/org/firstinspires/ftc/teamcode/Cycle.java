@@ -18,8 +18,8 @@ public class Cycle {
     public volatile Stage stage = Stage.WAITING;
     private final LiftInternals.Position topPosition;
     private final LiftInternals.Position bottomPosition;
-    public static int GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS + 100;
-    public static int DROP_DELAY_MS = LiftInternals.DROP_DELAY_MS + 100;
+    public static int GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
+    public static int DROP_DELAY_MS = LiftInternals.DROP_DELAY_MS;
 
     public Cycle(CycleUsingOpMode<?> opMode, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
         this.opMode = opMode.getSelf();
