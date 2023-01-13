@@ -39,7 +39,7 @@ class Despair : AutonomousTemplate() {
             Color.CYAN -> -1 // right
         } * POWER
         drivetrain.loop()
-        sleep(1800)
+        sleep(2000)
 
         gamepad.left_stick_x = 0f
         drivetrain.loop()
