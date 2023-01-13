@@ -39,7 +39,7 @@ class Despair : AutonomousTemplate() {
             Color.CYAN -> -1 // right
         } * POWER
         drivetrain.loop()
-        sleep(2300)
+        sleep(1800)
 
         gamepad.left_stick_x = 0f
         drivetrain.loop()
@@ -47,7 +47,7 @@ class Despair : AutonomousTemplate() {
         // move forward one tile
         gamepad.left_stick_y = POWER
         drivetrain.loop()
-        sleep(2200)
+        sleep(1800)
 
         // turn robot off
         gamepad.left_stick_y = 0f
