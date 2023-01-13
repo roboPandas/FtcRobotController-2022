@@ -16,6 +16,7 @@ public class AsyncLift implements LiftSubsystem {
     private LiftInternals.Position topPosition = LiftInternals.Position.HIGH;
     private LiftInternals.Position queuedPosition = null;
     private int lastBottomPositionValue = 1;
+    private DpadState lastDpadState = DpadState.NEUTRAL;
 
     public AsyncLift(LiftInternals liftInternals, CycleUsingOpMode<?> opMode) {
         this.opMode = opMode;
@@ -34,14 +35,31 @@ public class AsyncLift implements LiftSubsystem {
             else if (gamepad.y) topPosition = LiftInternals.Position.MIDDLE;
             else if (gamepad.x) topPosition = LiftInternals.Position.LOW;
 
-            int bottomPositionValue = gamepad.dpad_down ? Math.max(lastBottomPositionValue - 1, 1)
-                    : gamepad.dpad_up ? Math.min(lastBottomPositionValue + 1, 5) : lastBottomPositionValue;
-            canSwitch = false;
-            LiftInternals.Position bottomPosition = LiftInternals.Position.fromStackHeight(lastBottomPositionValue);
+            DpadState state = getDpadState();
+            int bottomPositionValue;
+            if (state != lastDpadState) {
+                switch (state) {
+                    case DOWN:
+                        bottomPositionValue = Math.max(lastBottomPositionValue - 2, 1);
+                        break;
+                    case UP:
+                        bottomPositionValue = Math.min(lastBottomPositionValue + 2, 5);
+                        break;
+                    default:
+                        bottomPositionValue = lastBottomPositionValue;
+                        break;
+                }
+                canSwitch = false;
+            } else {
+                bottomPositionValue = lastBottomPositionValue;
+            }
+
+            LiftInternals.Position bottomPosition = LiftInternals.Position.fromStackHeight(bottomPositionValue);
             if (bottomPositionValue != lastBottomPositionValue) {
                 liftInternals.goToPosition(bottomPosition, 1);
                 System.out.println("going to position " + bottomPosition);
             }
+
             if (liftInternals.motor.isBusy()) {
                 System.out.println("motor is busy; cycles not being created");
                 return; // do not create cycles while lift is moving
@@ -57,6 +75,7 @@ public class AsyncLift implements LiftSubsystem {
             }
 
             lastBottomPositionValue = bottomPositionValue;
+            lastDpadState = state;
             return;
         }
         canSwitch = false;
@@ -94,5 +113,13 @@ public class AsyncLift implements LiftSubsystem {
     public void prepareForSwitch() {
         liftInternals.motor.setPower(0);
         liftInternals.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private enum DpadState {
+        DOWN, UP, NEUTRAL
+    }
+
+    private DpadState getDpadState() {
+        return gamepad.dpad_down ? DpadState.DOWN : gamepad.dpad_up ? DpadState.UP : DpadState.NEUTRAL;
     }
 }
