@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -21,7 +17,7 @@ public class AsyncLift implements LiftSubsystem {
     private LiftInternals.Position queuedTopPosition = null;
     private LiftInternals.Position bottomPosition = LiftInternals.Position.STACK_1;
     private LiftInternals.Position queuedBottomPosition = null;
-    private TriggerState lastTriggerState = TriggerState.NEUTRAL;
+    private BottomPosChange lastBottomPosChange = BottomPosChange.NONE;
 
     public AsyncLift(LiftInternals liftInternals, CycleUsingOpMode<?> opMode) {
         this.opMode = opMode;
@@ -104,11 +100,11 @@ public class AsyncLift implements LiftSubsystem {
     }
 
     private LiftInternals.Position getBottomPosition(LiftInternals.Position current) {
-        TriggerState state = getDpadState();
-        if (state == lastTriggerState)
+        BottomPosChange change = getChangeFromTriggers();
+        if (change == lastBottomPosChange)
             return current;
         LiftInternals.Position newPos;
-        switch (state) {
+        switch (change) {
             case DOWN:
                 newPos = LiftInternals.Position.getBelow(current);
                 break;
@@ -119,7 +115,7 @@ public class AsyncLift implements LiftSubsystem {
                 newPos = current;
                 break;
         }
-        lastTriggerState = state;
+        lastBottomPosChange = change;
         canSwitch = false;
         return newPos;
     }
@@ -133,11 +129,11 @@ public class AsyncLift implements LiftSubsystem {
         liftInternals.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    private enum TriggerState {
-        DOWN, UP, NEUTRAL
+    private enum BottomPosChange {
+        DOWN, UP, NONE
     }
 
-    private TriggerState getDpadState() {
-        return gamepad.left_trigger > 0.5 ? TriggerState.DOWN : gamepad.right_trigger > 0.5 ? TriggerState.UP : TriggerState.NEUTRAL;
+    private BottomPosChange getChangeFromTriggers() {
+        return gamepad.left_trigger > 0.5 ? BottomPosChange.DOWN : gamepad.right_trigger > 0.5 ? BottomPosChange.UP : BottomPosChange.NONE;
     }
 }
