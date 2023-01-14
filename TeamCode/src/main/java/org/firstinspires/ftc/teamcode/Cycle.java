@@ -60,7 +60,25 @@ public class Cycle {
         liftInternals.rotateToDrop(reversed);
         liftInternals.awaitSlide();
 
-        stage = Stage.BETWEEN;
+        stage = Stage.WAITING_FOR_TEST;
+    }
+
+    public Future<?> test() {
+        stage = Stage.TEST_DROP;
+        return executor.submit(() -> {
+            liftInternals.goToPositionBlocking(topPosition.value - 350, 1);
+            stage = Stage.TEST_WAITING;
+            while (stage == Stage.TEST_WAITING) {
+                if (opMode.gamepad1.start) {
+                    stage = Stage.TEST_REVERTING;
+                    liftInternals.goToPositionBlocking(topPosition, 1);
+                    stage = Stage.WAITING_FOR_TEST;
+                } else if (opMode.gamepad1.a) {
+                    liftInternals.goToPositionBlocking(topPosition, 1);
+                    finish();
+                }
+            }
+        });
     }
 
     public Future<?> finish() { return finish(false); }
@@ -90,7 +108,7 @@ public class Cycle {
     }
 
     public boolean isBusy() {
-        return !(stage == Stage.WAITING || stage == Stage.BETWEEN || stage == Stage.COMPLETE);
+        return !(stage == Stage.WAITING || stage == Stage.WAITING_FOR_TEST || stage == Stage.TEST_WAITING || stage == Stage.COMPLETE);
     }
 
     /**
@@ -108,6 +126,9 @@ public class Cycle {
     }
 
     public enum Stage {
-        WAITING, GRABBING, GRABBED, BETWEEN, DROPPING, DROPPED, COMPLETE
+        WAITING, GRABBING, GRABBED,
+        WAITING_FOR_TEST,
+        TEST_DROP, TEST_WAITING, TEST_REVERTING,
+        DROPPING, DROPPED, COMPLETE
     }
 }

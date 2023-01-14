@@ -111,10 +111,14 @@ public class LiftInternals {
     }
 
     public void goToPositionBlocking(LiftInternals.Position targetPosition, double power) {
+        goToPositionBlocking(targetPosition.value, power);
+    }
+
+    public void goToPositionBlocking(int pos, double power) {
         // I didn't reuse as much code as I could have since I want to avoid multithreading unless needed
-        boolean needsLock = goToPositionInternal(targetPosition.value, power);
+        boolean needsLock = goToPositionInternal(pos, power);
         awaitSlide();
-        System.out.println("motor finished moving to " + targetPosition);
+        System.out.println("motor finished moving to " + pos);
         if (needsLock) lock();
     }
 
@@ -165,7 +169,7 @@ public class LiftInternals {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(0), STACK_2(170), STACK_3(300), STACK_4(400), STACK_5(510),
+        STACK_1(0), STACK_2(330), STACK_3(430), STACK_4(500), STACK_5(640),
         // the lowest position that allows rotation
         CAN_ROTATE(1400),
         // junction heights

@@ -85,10 +85,11 @@ public class AsyncLift implements LiftSubsystem {
         }
         if (currentCycle.isBusy()) return;
 
-        // stage cannot be WAITING, so must be BETWEEN
         if (gamepad.a) {
-            System.out.println("A: finish cycle");
-            currentCycle.finish();
+            if (currentCycle.stage == Cycle.Stage.WAITING_FOR_TEST) {
+                currentCycle.test();
+            }
+            // test will follow into finish
         }
     }
 
