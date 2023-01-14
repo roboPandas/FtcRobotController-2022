@@ -19,7 +19,7 @@ public class Cycle {
     private final LiftInternals.Position topPosition;
     private final LiftInternals.Position bottomPosition;
     public static int GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
-    public static int DROP_DELAY_MS = LiftInternals.DROP_DELAY_MS;
+    public static int DROP_DELAY_MS = 300;
 
     public Cycle(CycleUsingOpMode<?> opMode, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
         this.opMode = opMode.getSelf();
@@ -27,6 +27,10 @@ public class Cycle {
         this.liftInternals = liftInternals;
         this.topPosition = topPosition;
         this.bottomPosition = bottomPosition;
+
+        // validate positions
+        if (topPosition.value < LiftInternals.Position.CAN_ROTATE.value) throw new IllegalArgumentException("invalid top position: " + topPosition.value);
+        if (bottomPosition.value > LiftInternals.Position.CAN_ROTATE.value) throw new IllegalArgumentException("invalid bottom position: " + bottomPosition.value);
     }
 
     public Future<?> start() { return start(false); }
@@ -51,18 +55,10 @@ public class Cycle {
     private void whenGrabbed(boolean reversed) {
         stage = Stage.GRABBED;
 
-        // don't rotate until safe to do so
-        System.out.println("go to CAN_ROTATE");
-        liftInternals.goToPositionBlocking(LiftInternals.Position.CAN_ROTATE, 1);
-        System.out.println("CAN_ROTATE finished: " + liftInternals.motor.getCurrentPosition());
-
-        // TODO make sure that the slide and servo happen simultaneously
-        System.out.println("start rotating");
+        liftInternals.goToPosition(topPosition, 1);
+        Utils.waitUntil(() -> liftInternals.motor.getCurrentPosition() >= LiftInternals.Position.CAN_ROTATE.value - 50);
         liftInternals.rotateToDrop(reversed);
-
-        // wait until lift is done before finishing
-        System.out.println("go to final position");
-        liftInternals.goToPositionBlocking(topPosition, 1);
+        liftInternals.awaitSlide();
 
         stage = Stage.BETWEEN;
     }

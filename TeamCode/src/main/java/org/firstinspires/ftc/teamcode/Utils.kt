@@ -21,3 +21,8 @@ var Servo.pwm: Boolean
         if (enabled) setPwmEnable() else setPwmDisable()
     }
     get() = (this as PwmControl).isPwmEnabled
+
+@JvmOverloads
+inline fun waitUntil(delayMillis: Long = 10, block: () -> Boolean) {
+    while (!block()) delay(delayMillis)
+}

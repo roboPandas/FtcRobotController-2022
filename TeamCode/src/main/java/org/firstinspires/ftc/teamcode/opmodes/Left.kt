@@ -64,7 +64,7 @@ open class Left : AutonomousTemplate() {
             if (!currentCycle.await()) throw RuntimeException("A cycle should have finished by now, but it did not.")
             currentCycle = createCycle(
                 LiftInternals.Position.HIGH,
-                LiftInternals.Position.fromStackHeight(Math.max(4 - i, 1))
+                LiftInternals.Position.values()[4 - i]
             )
             currentCycle.start()
             currentCycle.waitUntil(Cycle.Stage.GRABBED)

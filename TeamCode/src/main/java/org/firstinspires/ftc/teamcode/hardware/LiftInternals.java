@@ -40,7 +40,7 @@ public class LiftInternals {
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.17, 0.845);
-        clawServo.scaleRange(0.08, 0.195);
+        clawServo.scaleRange(0.06, 0.195);
         lockServo.scaleRange(0, 0.12);
         uncheckedDrop();
     }
@@ -49,10 +49,10 @@ public class LiftInternals {
     // TODO also remove the reverse functions during said refactor
     // Claw
     // Grab is 0; drop is 1
-    public static final int GRAB_DELAY_MS = 600;
+    public static final int GRAB_DELAY_MS = 700;
     public static final int DROP_DELAY_MS = 750;
     public void grab() {
-        internalSetClaw(0, GRAB_DELAY_MS); // TODO does 550 work??
+        internalSetClaw(0, GRAB_DELAY_MS);
     }
 
     public void drop() {
@@ -61,7 +61,7 @@ public class LiftInternals {
 
     // This function is NOT safe to call in a loop.
     // It is used to guarantee that the claw is ALWAYS commanded to open.
-    public void uncheckedDrop() {
+    private void uncheckedDrop() {
         setUnchecked(1, DROP_DELAY_MS);
     }
 
@@ -113,10 +113,7 @@ public class LiftInternals {
     public void goToPositionBlocking(LiftInternals.Position targetPosition, double power) {
         // I didn't reuse as much code as I could have since I want to avoid multithreading unless needed
         boolean needsLock = goToPositionInternal(targetPosition.value, power);
-        while (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) > 50) {
-            System.out.println("waiting for motor to finish");
-            delay(10); // TODO i changed this from a manual position check to isBusy - should I change it back?
-        }
+        awaitSlide();
         System.out.println("motor finished moving to " + targetPosition);
         if (needsLock) lock();
     }
@@ -130,10 +127,7 @@ public class LiftInternals {
     private void goToPosition(int targetPosition, double power) { // just in case
         liftExecutor.submit(() -> {
             if (goToPositionInternal(targetPosition, power)) {
-                while (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) > 50) {
-                    System.out.println("waiting for motor to finish");
-                    delay(10); // TODO i changed this from a manual position check to isBusy - should I change it back?
-                }
+                awaitSlide();
                 System.out.println("motor finished moving to " + targetPosition);
                 lock();
             }
@@ -157,6 +151,10 @@ public class LiftInternals {
         return needsLock;
     }
 
+    public void awaitSlide() {
+        Utils.waitUntil(() -> Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) < 50);
+    }
+
     public void resetEncoder() {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(mode);
@@ -167,7 +165,7 @@ public class LiftInternals {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(0), STACK_2(300), STACK_3(300), STACK_4(450), STACK_5(450),
+        STACK_1(0), STACK_2(170), STACK_3(300), STACK_4(400), STACK_5(510),
         // the lowest position that allows rotation
         CAN_ROTATE(1400),
         // junction heights
@@ -180,8 +178,20 @@ public class LiftInternals {
             this.value = value;
         }
 
-        public static Position fromStackHeight(int height) {
-            return valueOf("STACK_" + height);
+        public static Position getBelow(Position pos) {
+            int ordinal = pos.ordinal();
+            if (ordinal > 0 && ordinal < 5) { // only allow stack ones, except bottom
+                return Position.values()[ordinal - 1];
+            }
+            return pos;
+        }
+
+        public static Position getAbove(Position pos) {
+            int ordinal = pos.ordinal();
+            if (ordinal < 4) { // only allow stack ones, except top
+                return Position.values()[ordinal + 1];
+            }
+            return pos; // how did we get here?
         }
     }
 }

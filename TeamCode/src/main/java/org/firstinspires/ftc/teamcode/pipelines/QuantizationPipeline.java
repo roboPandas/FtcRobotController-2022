@@ -113,7 +113,11 @@ public class QuantizationPipeline extends OpenCvPipeline {
     public Color getDetectedColor() {
         if (Collections.frequency(totals, 0) == 3)
             return Color.GREEN; // if no color is seen we just go straight
-        return Color.values()[totals.indexOf(Collections.max(totals))];
+        int i = totals.indexOf(Collections.max(totals));
+        if (i == -1)
+            return Color.GREEN; // this is caused by totals being modified in a thread-unsafe way.
+            // TODO this bodge is extremely temporary and should be fixed immediately after comp.
+        return Color.values()[i];
     }
 
     private Point[] focus(double width, double height) {
