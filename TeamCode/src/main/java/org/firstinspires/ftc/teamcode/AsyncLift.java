@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
 import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode;
 
 /** The bridge between the Cycle system and the controller input. */
-@RequiresApi(api = Build.VERSION_CODES.N)
 public class AsyncLift implements LiftSubsystem {
     private final CycleUsingOpMode<?> opMode;
     private final Gamepad gamepad;
@@ -22,7 +21,7 @@ public class AsyncLift implements LiftSubsystem {
     private LiftInternals.Position queuedTopPosition = null;
     private LiftInternals.Position bottomPosition = LiftInternals.Position.STACK_1;
     private LiftInternals.Position queuedBottomPosition = null;
-    private DpadState lastDpadState = DpadState.NEUTRAL;
+    private TriggerState lastTriggerState = TriggerState.NEUTRAL;
 
     public AsyncLift(LiftInternals liftInternals, CycleUsingOpMode<?> opMode) {
         this.opMode = opMode;
@@ -105,8 +104,8 @@ public class AsyncLift implements LiftSubsystem {
     }
 
     private LiftInternals.Position getBottomPosition(LiftInternals.Position current) {
-        DpadState state = getDpadState();
-        if (state == lastDpadState)
+        TriggerState state = getDpadState();
+        if (state == lastTriggerState)
             return current;
         LiftInternals.Position newPos;
         switch (state) {
@@ -120,7 +119,7 @@ public class AsyncLift implements LiftSubsystem {
                 newPos = current;
                 break;
         }
-        lastDpadState = state;
+        lastTriggerState = state;
         canSwitch = false;
         return newPos;
     }
@@ -134,11 +133,11 @@ public class AsyncLift implements LiftSubsystem {
         liftInternals.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    private enum DpadState {
+    private enum TriggerState {
         DOWN, UP, NEUTRAL
     }
 
-    private DpadState getDpadState() {
-        return gamepad.dpad_down ? DpadState.DOWN : gamepad.dpad_up ? DpadState.UP : DpadState.NEUTRAL;
+    private TriggerState getDpadState() {
+        return gamepad.left_trigger > 0.5 ? TriggerState.DOWN : gamepad.right_trigger > 0.5 ? TriggerState.UP : TriggerState.NEUTRAL;
     }
 }

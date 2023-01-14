@@ -26,7 +26,7 @@ import java.util.concurrent.Executors
  * Right trigger - open/close claw
  *
  * Async lift control:
- * Dpad up/down - change bottom position; default is the lowest setting
+ * Left/right trigger - change bottom position (left is down, right is up); default is the lowest setting
  * B/Y/X - set top position to high/medium/low (respectively); default is high
  * A - start/continue cycle
  */
