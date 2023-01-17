@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor
 class ManualStart : ControlledOpMode() {
     override fun init() {
         super.init()
-        liftInternals.setMode(DcMotor.RunMode.RUN_USING_ENCODER)
-        all[1] = manualLift
+        liftInternals.motorMode = DcMotor.RunMode.RUN_USING_ENCODER
+        currentLiftSubsystem = manualLift
         manualControl = true
     }
 }

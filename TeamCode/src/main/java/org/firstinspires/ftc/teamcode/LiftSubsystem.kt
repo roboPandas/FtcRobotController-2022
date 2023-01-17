@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
 interface LiftSubsystem : Subsystem {
-    fun canSwitch(): Boolean
+    val canSwitch: Boolean
     fun prepareForSwitch()
 }

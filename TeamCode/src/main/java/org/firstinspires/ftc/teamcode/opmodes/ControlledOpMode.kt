@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
-import org.firstinspires.ftc.teamcode.Subsystem
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 import org.firstinspires.ftc.teamcode.AsyncLift
 import org.firstinspires.ftc.teamcode.ManualLift
@@ -34,8 +33,9 @@ import java.util.concurrent.Executors
 open class ControlledOpMode : OpMode(), CycleUsingOpMode<ControlledOpMode> {
     // TODO merge this with auto if needed
     override val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
-    protected lateinit var all: Array<Subsystem>
     protected lateinit var liftInternals: LiftInternals
+    protected lateinit var drivetrain: Drivetrain
+    protected lateinit var currentLiftSubsystem: LiftSubsystem
     protected lateinit var asyncLift: AsyncLift
     protected lateinit var manualLift: ManualLift
 
@@ -44,11 +44,10 @@ open class ControlledOpMode : OpMode(), CycleUsingOpMode<ControlledOpMode> {
     private fun attemptSwitch() {
         val button = gamepad1.guide
         if (button) {
-            val currentLiftSubsystem = all[1] as LiftSubsystem
-            if (!switchButtonCache && currentLiftSubsystem.canSwitch()) {
+            if (!switchButtonCache && currentLiftSubsystem.canSwitch) {
                 manualControl = !manualControl
                 currentLiftSubsystem.prepareForSwitch()
-                all[1] = if (manualControl) manualLift else asyncLift
+                currentLiftSubsystem = if (manualControl) manualLift else asyncLift
             }
         }
         switchButtonCache = button
@@ -58,14 +57,13 @@ open class ControlledOpMode : OpMode(), CycleUsingOpMode<ControlledOpMode> {
         liftInternals = LiftInternals(this)
         asyncLift = AsyncLift(liftInternals, this)
         manualLift = ManualLift(liftInternals, this)
-        all = arrayOf(
-            Drivetrain(this),
-            asyncLift
-        )
+        drivetrain = Drivetrain(this)
+        currentLiftSubsystem = asyncLift
     }
 
     override fun loop() {
-        for (subsystem in all) subsystem.loop()
+        drivetrain.loop()
+        currentLiftSubsystem.loop()
         attemptSwitch()
         telemetry.addData("lift encoder", liftInternals.motor.currentPosition)
     }
