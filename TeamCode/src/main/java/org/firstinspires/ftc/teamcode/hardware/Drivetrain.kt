@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
+import kotlin.math.pow
 
 class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val multiplierMap: Map<DcMotor, IntArray>
@@ -43,12 +44,14 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         }
 
         multiplierMap.forEach { (motor, mults) ->
-            motor.power = (mults[0] * x + mults[1] * y + z) *
-                    max(hypot(x, y), abs(z)) * SCALE_FACTOR / total // Adjust input to never exceed 1
+            val basePower = max(0.2 , max(hypot(x, y), abs(z)).pow(2f).toDouble())
+            val power = (mults[0] * x + mults[1] * y + z) * basePower * SCALE_FACTOR / total
+//            opMode.telemetry.addData("power", power)
+            motor.power = power // Adjust input to never exceed 1
         }
     }
 
     companion object {
-        private const val SCALE_FACTOR = 0.8
+        private const val SCALE_FACTOR = 1.0
     }
 }
