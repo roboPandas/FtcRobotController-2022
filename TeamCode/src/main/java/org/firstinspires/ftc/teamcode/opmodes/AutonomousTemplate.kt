@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.Cycle
 import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
+import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline.Color
 import org.openftc.easyopencv.OpenCvWebcam
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
@@ -22,7 +23,7 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
     protected lateinit var pipeline: QuantizationPipeline
     private lateinit var liftInternals: LiftInternals
     protected lateinit var webcam: OpenCvWebcam
-    protected lateinit var detectedColor: QuantizationPipeline.Color
+    protected lateinit var detectedColor: Color
     protected open val reversed = false
 
     abstract val startPose: Pose2d
@@ -95,23 +96,27 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
             }
         })
         telemetry.addData("Status", "Initialized")
+        val colors = ArrayDeque(arrayOfNulls<Color>(6).asList())
         while (opModeInInit()) {
-            if (pipeline.hasInit) {
-                val currentColor = pipeline.current
-                detectedColor = pipeline.detectedColor
-                telemetry.addData("Current color", currentColor)
-                telemetry.addData("Detected color", detectedColor)
-                telemetry.addData("totals", pipeline.totals)
-                telemetry.addData("FPS", String.format("%.2f", webcam.fps))
-                telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
-                telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
-                telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
-                telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
-                telemetry.update()
-            } else {
+            if (!pipeline.hasInit) {
                 telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
+                telemetry.update()
+                continue
             }
+            colors += pipeline.current ?: continue
+            colors.removeFirst()
+            telemetry.addData("Detected color", pipeline.current)
+            telemetry.addData("FPS", String.format("%.2f", webcam.fps))
+            telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
+            telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
+            telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
+            telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
+            telemetry.update()
         }
+        // on start
+        val totals = IntArray(3)
+        colors.forEach { it?.run { totals[ordinal]++ } }
+        detectedColor = if (totals contentEquals IntArray(3)) Color.GREEN else Color.values()[totals.indexOf(totals.max())]
     }
 
     abstract fun main()

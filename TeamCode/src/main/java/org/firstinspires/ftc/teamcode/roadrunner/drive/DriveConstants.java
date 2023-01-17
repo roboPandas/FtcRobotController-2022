@@ -44,7 +44,7 @@ public class DriveConstants {
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
     public static double WHEEL_RADIUS = 2; // in
-    public static double GEAR_RATIO = 20; // output (wheel) speed / input (motor) speed
+    public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
     public static double TRACK_WIDTH = 13; // in
 
     /*
@@ -69,7 +69,6 @@ public class DriveConstants {
     public static double MAX_ACCEL = 36;
     public static double MAX_ANG_VEL = Math.PI;
     public static double MAX_ANG_ACCEL = Math.PI;
-
 
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;

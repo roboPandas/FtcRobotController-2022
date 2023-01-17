@@ -36,10 +36,8 @@ class CameraTest : AutonomousTemplate() {
         while (opModeInInit()) {
             if (pipeline.hasInit) {
                 val currentColor = pipeline.current
-                detectedColor = pipeline.detectedColor
                 telemetry.addData("Current color", currentColor)
                 telemetry.addData("Detected color", detectedColor)
-                telemetry.addData("totals", pipeline.totals)
                 telemetry.addData("FPS", String.format("%.2f", webcam.fps))
                 telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
                 telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
