@@ -22,7 +22,6 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Cy
             loopWithoutCycle()
         }
     }
-//    override fun loop() = currentCycle?.run { loopWithCycle() } ?: loopWithoutCycle()
 
     private fun loopWithoutCycle() {
         // reset encoder
@@ -67,10 +66,6 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Cy
                 topPosition = queuedTopPosition!!
                 queuedTopPosition = null
             }
-//            queuedTopPosition?.run {
-//                topPosition = queuedTopPosition!!
-//                queuedTopPosition = null
-//            }
             @Suppress("KotlinConstantConditions") // seems like a compiler bug
             if (queuedBottomPosition != null) {
                 bottomPosition = queuedBottomPosition!!

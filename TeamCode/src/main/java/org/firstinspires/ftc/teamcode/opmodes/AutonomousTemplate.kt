@@ -105,7 +105,9 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
             }
             colors += pipeline.current ?: continue
             colors.removeFirst()
+
             telemetry.addData("Detected color", pipeline.current)
+            telemetry.addData("Recent colors", colors)
             telemetry.addData("FPS", String.format("%.2f", webcam.fps))
             telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
             telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)

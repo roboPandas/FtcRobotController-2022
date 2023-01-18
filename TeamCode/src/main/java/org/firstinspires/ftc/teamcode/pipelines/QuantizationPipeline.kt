@@ -134,9 +134,9 @@ class QuantizationPipeline : OpenCvPipeline() {
         return input
     }
 
-    private fun colorInRange(color: Scalar, lowerBound: Scalar, upperBound: Scalar): Boolean {
-        return (0..2).fold(true) { output, i -> output && color.`val`[i] in lowerBound.`val`[i]..upperBound.`val`[i] }
-    }
+    // the worst "refactor" ever
+    private fun colorInRange(color: Scalar, lowerBound: Scalar, upperBound: Scalar) =
+        (0..2).all { color.`val`[it] in lowerBound.`val`[it]..upperBound.`val`[it] }
 
     enum class Color(val lower: Scalar, val upper: Scalar) {
         MAGENTA(Scalar(300.0, 100.0, 100.0), Scalar(350.0, 100.0, 100.0)),
