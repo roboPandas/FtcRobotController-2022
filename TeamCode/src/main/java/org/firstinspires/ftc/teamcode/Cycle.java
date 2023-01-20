@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
-import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode;
 
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
@@ -21,9 +20,9 @@ public class Cycle {
     public static long GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
     public static long DROP_DELAY_MS = 350;
 
-    public Cycle(CycleUsingOpMode<?> opMode, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
-        this.opMode = opMode.getSelf();
-        this.executor = opMode.getCycleExecutor();
+    public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
+        this.opMode = opMode;
+        this.executor = executor;
         this.liftInternals = liftInternals;
         this.topPosition = topPosition;
         this.bottomPosition = bottomPosition;

@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.hardware.Gamepad
-import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode
+import java.util.concurrent.ExecutorService
 
-class ManualLift(private val liftInternals: LiftInternals, private val opMode: OpMode) : LiftSubsystem {
+class ManualLift(private val liftInternals: LiftInternals, private val opMode: OpMode, private val cycleExecutor: ExecutorService) : LiftSubsystem {
     private val gamepad: Gamepad = opMode.gamepad1
 
     private var lastPower = 0.0
@@ -51,7 +51,8 @@ class ManualLift(private val liftInternals: LiftInternals, private val opMode: O
 
     override fun prepareForSwitch() {
         Cycle(
-            opMode as CycleUsingOpMode<*>,
+            opMode,
+            cycleExecutor,
             liftInternals,
             LiftInternals.Position.LOW,
             LiftInternals.Position.STACK_1

@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
-import org.firstinspires.ftc.teamcode.opmodes.CycleUsingOpMode
 import com.qualcomm.robotcore.hardware.DcMotor
+import java.util.concurrent.ExecutorService
 
 /** The bridge between the Cycle system and the controller input.  */
-class AsyncLift(private val liftInternals: LiftInternals, private val opMode: CycleUsingOpMode<*>) : LiftSubsystem {
-    private val gamepad = opMode.self.gamepad1
+class AsyncLift(private val liftInternals: LiftInternals, private val opMode: OpMode, private val cycleExecutor: ExecutorService) : LiftSubsystem {
+    private val gamepad = opMode.gamepad1
     private var currentCycle: Cycle? = null
     override var canSwitch = true
     private var topPosition = LiftInternals.Position.HIGH
@@ -42,7 +43,7 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Cy
 
         // create cycle
         if (gamepad.a) {
-            currentCycle = Cycle(opMode, liftInternals, topPosition, bottomPosition)
+            currentCycle = Cycle(opMode, cycleExecutor, liftInternals, topPosition, bottomPosition)
             println("A: start cycle")
             currentCycle!!.start()
             canSwitch = false

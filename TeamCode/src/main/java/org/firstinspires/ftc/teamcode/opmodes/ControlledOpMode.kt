@@ -30,9 +30,9 @@ import java.util.concurrent.Executors
  * A - start/continue cycle
  */
 @TeleOp
-open class ControlledOpMode : OpMode(), CycleUsingOpMode<ControlledOpMode> {
+open class ControlledOpMode : OpMode() {
     // TODO merge this with auto if needed
-    override val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     protected lateinit var liftInternals: LiftInternals
     protected lateinit var drivetrain: Drivetrain
     protected lateinit var currentLiftSubsystem: LiftSubsystem
@@ -55,8 +55,8 @@ open class ControlledOpMode : OpMode(), CycleUsingOpMode<ControlledOpMode> {
 
     override fun init() {
         liftInternals = LiftInternals(this)
-        asyncLift = AsyncLift(liftInternals, this)
-        manualLift = ManualLift(liftInternals, this)
+        asyncLift = AsyncLift(liftInternals, this, cycleExecutor)
+        manualLift = ManualLift(liftInternals, this, cycleExecutor)
         drivetrain = Drivetrain(this)
         currentLiftSubsystem = asyncLift
     }

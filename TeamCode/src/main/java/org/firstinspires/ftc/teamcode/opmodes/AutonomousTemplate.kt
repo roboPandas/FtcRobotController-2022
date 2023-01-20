@@ -16,8 +16,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 // FIXME refactor this once more info on auto becomes available
-abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousTemplate> {
-    override val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+abstract class AutonomousTemplate : LinearOpMode() {
+    val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     protected lateinit var drive: SampleMecanumDrive
     protected lateinit var currentCycle: Cycle
     protected lateinit var pipeline: QuantizationPipeline
@@ -127,6 +127,7 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
         liftInternals = LiftInternals(this)
         currentCycle = Cycle(
             this,
+            cycleExecutor,
             liftInternals,
             LiftInternals.Position.HIGH,
             LiftInternals.Position.STACK_5
@@ -150,6 +151,6 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
         topPosition: LiftInternals.Position,
         bottomPosition: LiftInternals.Position
     ): Cycle {
-        return Cycle(this, liftInternals, topPosition, bottomPosition)
+        return Cycle(this, cycleExecutor, liftInternals, topPosition, bottomPosition)
     }
 }
