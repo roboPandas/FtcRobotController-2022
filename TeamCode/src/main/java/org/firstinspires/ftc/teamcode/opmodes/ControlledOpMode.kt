@@ -32,7 +32,7 @@ import java.util.concurrent.Executors
 @TeleOp
 open class ControlledOpMode : OpMode() {
     // TODO merge this with auto if needed
-    val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val cycleExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     protected lateinit var liftInternals: LiftInternals
     protected lateinit var drivetrain: Drivetrain
     protected lateinit var currentLiftSubsystem: LiftSubsystem
