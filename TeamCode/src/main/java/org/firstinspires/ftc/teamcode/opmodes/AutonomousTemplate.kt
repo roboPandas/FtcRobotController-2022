@@ -26,8 +26,8 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
     protected lateinit var detectedColor: Color
     protected open val reversed = false
 
-    abstract val startPose: Pose2d
-    abstract fun initializeTrajectories()
+    open val startPose: Pose2d? = null
+    open fun initializeTrajectories() {}
     open fun setup() {
         /*
          * Instantiate an OpenCvCamera object for the camera we'll be using.
@@ -131,11 +131,11 @@ abstract class AutonomousTemplate : LinearOpMode(), CycleUsingOpMode<AutonomousT
             LiftInternals.Position.HIGH,
             LiftInternals.Position.STACK_5
         )
-        drive.poseEstimate = startPose
+        if (startPose != null) drive.poseEstimate = startPose!!
 
         // TODO do we need separate setup and initialize trajectories functions?
-        setup()
         initializeTrajectories()
+        setup()
         waitForStart()
         main()
 

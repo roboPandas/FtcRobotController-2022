@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline.Color
  * A backup OpMode that only detects a color from the camera and parks.
  * 20 points
  * This is only meant for extenuating circumstances where a better OpMode is not available.
- * basically gg queue next we screwed
  */
 @Autonomous
 class Despair : AutonomousTemplate() {

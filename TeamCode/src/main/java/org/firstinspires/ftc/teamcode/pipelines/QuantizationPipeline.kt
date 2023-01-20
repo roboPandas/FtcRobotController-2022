@@ -9,9 +9,6 @@ import java.util.*
 
 class QuantizationPipeline : OpenCvPipeline() {
     var hasInit = false
-    var FOCUS_HEIGHT = 0.3
-    var FOCUS_WIDTH = 0.3
-    var FOCUS_OFFSET = 0.0
     private var data = Mat()
     private val centers = Mat()
     private var draw = Mat()
@@ -146,5 +143,8 @@ class QuantizationPipeline : OpenCvPipeline() {
 
     companion object {
         const val K = 4
+        const val FOCUS_HEIGHT = 0.3
+        const val FOCUS_WIDTH = 0.3
+        const val FOCUS_OFFSET = 0.0
     }
 }
