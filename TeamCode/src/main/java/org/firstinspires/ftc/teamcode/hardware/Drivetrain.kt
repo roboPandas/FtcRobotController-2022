@@ -46,14 +46,14 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         multiplierMap.forEach { (motor, mults) ->
             val basePower = max(0.2 , max(hypot(x, y), abs(z)).pow(2f).toDouble())
             val power = (mults.x * x + mults.y * y + z) * basePower * SCALE_FACTOR / total
-//            opMode.telemetry.addData("power", power)
+
             motor.power = power // Adjust input to never exceed 1
         }
     }
 
-    data class MotorMultipliers(val x: Int, val y: Int)
+    private data class MotorMultipliers(val x: Int, val y: Int)
 
     companion object {
-        private const val SCALE_FACTOR = 1.0
+        private const val SCALE_FACTOR = 0.9
     }
 }
