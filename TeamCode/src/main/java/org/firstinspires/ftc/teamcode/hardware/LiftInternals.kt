@@ -83,12 +83,13 @@ class LiftInternals(private val opMode: OpMode) {
 
     // Rotation
     // Grab is 1; drop is 0
-    fun rotateToDrop(reversed: Boolean) {
+    /** @param reversed if true, enables drop-off from the pickup side */
+    fun rotateToDrop(reversed: Boolean = false) {
         rotationServo.position = if (reversed) 1.0 else 0.0
     }
 
-    fun rotateToGrab(reversed: Boolean) {
-        rotationServo.position = if (reversed) 0.0 else 1.0
+    fun rotateToGrab() {
+        rotationServo.position = 1.0
     }
 
     // Lock
@@ -198,7 +199,6 @@ class LiftInternals(private val opMode: OpMode) {
         const val MOTOR_UNLOCK_POWER = 0.1
 
         // TODO for kotlin refactor grab, drop, lock, unlock, rotate into boolean vals (locked, grabbed, etc.)
-        // TODO also remove the reverse functions during said refactor
         // Claw
         // Grab is 0; drop is 1
         const val GRAB_DELAY_MS = 700L

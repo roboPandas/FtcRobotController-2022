@@ -19,7 +19,12 @@ class QuantizationPipeline : OpenCvPipeline() {
 
     private var _current: Color? = null
     private var hasNewData = false
-    val current: Color? get() = if (hasNewData) _current else null
+    val current: Color? get() {
+        return if (hasNewData) {
+            hasNewData = false
+            _current
+        } else null
+    }
 
     fun releaseAll() {
         data.release()
@@ -31,23 +36,40 @@ class QuantizationPipeline : OpenCvPipeline() {
         roi.release()
     }
 
+    private fun focus(width: Double, height: Double): Array<Point> {
+        val off = height * FOCUS_OFFSET
+        return arrayOf(
+            Point(width * FOCUS_WIDTH, height * FOCUS_HEIGHT + off),
+            Point(width - width * FOCUS_WIDTH, height - height * FOCUS_HEIGHT + off)
+        )
+    }
+
+    private fun colorInRange(color: Scalar, lowerBound: Scalar, upperBound: Scalar) =
+        (0..2).all { color.`val`[it] in lowerBound.`val`[it]..upperBound.`val`[it] }
+
     private fun snapshot(): ArrayList<Scalar>? {
         return if (!hasInit) null else try {
             data.convertTo(data, CvType.CV_32F)
+
             val criteria = TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 2, 1.0)
+
             Core.kmeans(data, K, bestLabels, criteria, 15, Core.KMEANS_PP_CENTERS, centers)
             centers.convertTo(centers, CvType.CV_8U)
+
             val colors = ArrayList<Scalar>()
             for (k in 0 until K) {
                 colors.add(Scalar(centers[k, 0][0], centers[k, 1][0], centers[k, 2][0]))
             }
+
             draw = Mat(roi.total().toInt(), 1, CvType.CV_32FC3)
+
             for (i in 0 until K) {
                 val mask = Mat()
                 Core.compare(bestLabels, Scalar(i.toDouble()), mask, Core.CMP_EQ)
                 draw.setTo(colors[i], mask)
                 mask.release()
             }
+
             val counts = mutableListOf(0, 0, 0)
             for (i in 0 until K) {
                 val hsv = floatArrayOf(0f, 0f, 0f)
@@ -58,13 +80,13 @@ class QuantizationPipeline : OpenCvPipeline() {
                     color.`val`[2].toInt(),
                     hsv
                 )
-//                telemetry.addData("color" + i, String.valueOf(Arrays.asList(hsv[0], hsv[1], hsv[2])));
+
                 val temp = Mat()
 
-                // TODO: UPPER CLAMP FOR HSV[2]?
                 for (c in Color.values()) {
                     hsv[1] = if (hsv[1] * 100 >= 15) 100f else 0f
                     hsv[2] = if (hsv[2] * 100 >= 15) 100f else 0f
+
                     if (colorInRange(
                             Scalar(
                                 hsv[0].toDouble(), hsv[1].toDouble(), hsv[2].toDouble()
@@ -76,33 +98,28 @@ class QuantizationPipeline : OpenCvPipeline() {
                         counts[ord] = counts[ord] + Core.countNonZero(temp)
                     }
                 }
+
                 temp.release()
             }
+
             draw.release()
-            val idx: Int
+
             val color = doubleArrayOf(0.0, 0.0, 0.0)
             if (Collections.frequency(counts, 0) != 3) {
-                idx = counts.indexOf(Collections.max(counts))
+                val idx = counts.indexOf(Collections.max(counts))
                 _current = Color.values()[idx]
                 color[idx] = 255.0
             } else {
                 _current = null
             }
+
             colors.add(Scalar(color))
             hasNewData = true
+
             colors
         } catch (e: Exception) {
             null
         }
-    }
-
-
-    private fun focus(width: Double, height: Double): Array<Point> {
-        val off = height * FOCUS_OFFSET
-        return arrayOf(
-            Point(width * FOCUS_WIDTH, height * FOCUS_HEIGHT + off),
-            Point(width - width * FOCUS_WIDTH, height - height * FOCUS_HEIGHT + off)
-        )
     }
 
     override fun processFrame(input: Mat): Mat {
@@ -130,10 +147,6 @@ class QuantizationPipeline : OpenCvPipeline() {
         releaseAll()
         return input
     }
-
-    // the worst "refactor" ever
-    private fun colorInRange(color: Scalar, lowerBound: Scalar, upperBound: Scalar) =
-        (0..2).all { color.`val`[it] in lowerBound.`val`[it]..upperBound.`val`[it] }
 
     enum class Color(val lower: Scalar, val upper: Scalar) {
         MAGENTA(Scalar(300.0, 100.0, 100.0), Scalar(350.0, 100.0, 100.0)),

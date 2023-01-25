@@ -85,8 +85,6 @@ abstract class AutonomousTemplate : LinearOpMode() {
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
                  */
-                telemetry.addData("e", "e")
-                telemetry.update()
                 webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT)
             }
 
@@ -99,12 +97,11 @@ abstract class AutonomousTemplate : LinearOpMode() {
         })
         telemetry.addData("Status", "Initialized")
         val colors = ArrayDeque(arrayOfNulls<Color>(6).asList())
-        while (opModeInInit()) {
-//            if (!pipeline.hasInit) {
-//                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
-//                telemetry.update()
-//                continue
-//            }
+        while (run { telemetry.update(); opModeInInit() }) {
+            if (!pipeline.hasInit) {
+                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
+                continue
+            }
             colors += pipeline.current ?: continue
             colors.removeFirst()
 
@@ -115,7 +112,6 @@ abstract class AutonomousTemplate : LinearOpMode() {
             telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
             telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
             telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
-            telemetry.update()
         }
         // on start
         val totals = IntArray(3)
@@ -136,7 +132,6 @@ abstract class AutonomousTemplate : LinearOpMode() {
         )
         if (startPose != null) drive.poseEstimate = startPose!!
 
-        // TODO do we need separate setup and initialize trajectories functions?
         initializeTrajectories()
         setup()
         waitForStart()
