@@ -64,7 +64,39 @@ open class ControlledOpMode : OpMode() {
     override fun loop() {
         drivetrain.loop()
         currentLiftSubsystem.loop()
+
         attemptSwitch()
+
+        val measurements = drivetrain.measurements
+
+        val yaw = measurements.yaw
+        val pitch = measurements.pitch
+        val roll = measurements.roll
+
+        val predicted = drivetrain.predictedAngle
+
+        val x = gamepad1.left_stick_x
+        val y = -gamepad1.left_stick_y // for some atrocious reason, down is positive
+        val z = gamepad1.right_stick_x
+
         telemetry.addData("lift encoder", liftInternals.motor.currentPosition)
+
+        telemetry.addData("yaw", yaw)
+        telemetry.addData("pitch", pitch)
+        telemetry.addData("roll", roll)
+
+        telemetry.addData("predicted", predicted)
+        telemetry.addData("actual", yaw)
+        telemetry.addData("difference", predicted - yaw)
+
+        telemetry.addData("x", x)
+        telemetry.addData("y", y)
+        telemetry.addData("z", z)
+
+        telemetry.addData("target", drivetrain.target)
+
+        drivetrain.currents().forEach {
+            telemetry.addData(it.first.toString(), "@ ${it.second} amps")
+        }
     }
 }

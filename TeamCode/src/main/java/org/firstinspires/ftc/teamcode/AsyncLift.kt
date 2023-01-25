@@ -63,15 +63,10 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         if (currentCycle!!.stage == Cycle.Stage.COMPLETE) {
             currentCycle = null
             // when a cycle ends, we set our new targets from the queues
-            if (queuedTopPosition != null) {
-                topPosition = queuedTopPosition!!
-                queuedTopPosition = null
-            }
-            @Suppress("KotlinConstantConditions") // seems like a compiler bug
-            if (queuedBottomPosition != null) {
-                bottomPosition = queuedBottomPosition!!
-                queuedBottomPosition = null
-            }
+            topPosition = queuedTopPosition!!
+            queuedTopPosition = null
+            bottomPosition = queuedBottomPosition!!
+            queuedBottomPosition = null
             return
         }
         if (currentCycle!!.isBusy) return
@@ -83,15 +78,16 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         }
     }
 
-    private fun getTopPosition(current: LiftInternals.Position): LiftInternals.Position {
-        if (gamepad.b) return LiftInternals.Position.HIGH else if (gamepad.y) return LiftInternals.Position.MIDDLE else if (gamepad.x) return LiftInternals.Position.LOW
-        return current
-    }
+    private fun getTopPosition(current: LiftInternals.Position): LiftInternals.Position =
+        if (gamepad.b) LiftInternals.Position.HIGH
+        else if (gamepad.y) LiftInternals.Position.MIDDLE
+        else if (gamepad.x) LiftInternals.Position.LOW
+        else current
 
     private fun getBottomPosition(current: LiftInternals.Position): LiftInternals.Position {
         val change = changeFromTriggers
         if (change == lastBottomPosChange) return current
-        val newPos: LiftInternals.Position = when (change) {
+        val newPos = when (change) {
             BottomPosChange.DOWN -> current.dec()
             BottomPosChange.UP -> current.inc()
             else -> current

@@ -18,12 +18,17 @@ class ManualLift(private val liftInternals: LiftInternals, private val opMode: O
         liftInternals.rotationServo.position = 1.0 - gamepad.left_trigger
 
         // slide
+        liftInternals.checkLimitSwitch()
+
         val (needsUnlock, power) = when {
             gamepad.dpad_up -> Pair(false,
-                if (liftInternals.motor.currentPosition > LiftInternals.Position.HIGH.value + 50) 0.0
+                if (liftInternals.motor.currentPosition > LiftInternals.Position.HIGH.value) 0.0
                 else LiftInternals.MOTOR_SCALE_FACTOR
             )
-            gamepad.dpad_down -> Pair(true, -LiftInternals.MOTOR_SCALE_FACTOR)
+            gamepad.dpad_down -> Pair(true,
+                if (liftInternals.motor.currentPosition < 0) 0.0
+                else -LiftInternals.MOTOR_SCALE_FACTOR
+            )
             else -> Pair(false, 0.0)
         }
 

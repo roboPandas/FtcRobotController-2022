@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode
+import com.qualcomm.robotcore.hardware.TouchSensor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
@@ -14,8 +15,11 @@ import kotlin.math.abs
 class LiftInternals(private val opMode: OpMode) {
     @JvmField val liftExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private val clawExecutor: ExecutorService = Executors.newSingleThreadExecutor()
-    @JvmField val motor: DcMotor
+
     @JvmField val rotationServo: Servo
+    @JvmField val motor: DcMotor
+
+    private val limitSwitch: TouchSensor
     private val clawServo: Servo
     private val lockServo: Servo
 
@@ -28,12 +32,14 @@ class LiftInternals(private val opMode: OpMode) {
 
     init {
         val hardwareMap = opMode.hardwareMap
+
         motor = hardwareMap.dcMotor["liftMotor"]
         rotationServo = hardwareMap.servo["rotationServo"]
         clawServo = hardwareMap.servo["clawServo"]
         lockServo = hardwareMap.servo["lockServo"]
+        limitSwitch = hardwareMap.touchSensor["limitSwitch"]
+
         motor.targetPosition = Position.STACK_1.value
-        resetEncoder() // TODO do we need this?
         motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         // Set an auto-clamp for the servo
@@ -95,6 +101,10 @@ class LiftInternals(private val opMode: OpMode) {
         lockServo.position = 1.0
     }
 
+    fun checkLimitSwitch() {
+        if (limitSwitch.isPressed) resetEncoder()
+    }
+
     // motor
     fun goToPositionBlocking(targetPosition: Position, power: Double) {
         goToPositionBlocking(targetPosition.value, power)
@@ -133,16 +143,22 @@ class LiftInternals(private val opMode: OpMode) {
             delay(100)
             unlock()
         }
+
         delay(100)
+
         motor.targetPosition = targetPosition
         motorMode = RunMode.RUN_TO_POSITION
         motor.power = power * MOTOR_SCALE_FACTOR
+
         println("power set: " + motor.power)
         return needsLock
     }
 
     fun awaitSlide() {
-        waitUntil { abs(motor.currentPosition - motor.targetPosition) < 50 }
+        waitUntil {
+            checkLimitSwitch()
+            abs(motor.currentPosition - motor.targetPosition) < 50
+        }
     }
 
     fun resetEncoder() {
@@ -155,9 +171,8 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(0), STACK_2(330), STACK_3(430), STACK_4(500), STACK_5(640),  // the lowest position that allows rotation
-        CAN_ROTATE(1400),  // junction heights
-        LOW(1400), MIDDLE(2200), HIGH(3100);
+        STACK_1(145), STACK_2(285), STACK_3(285), STACK_4(430), STACK_5(570),  // the lowest position that allows rotation
+        LOW(1140), MIDDLE(1990), HIGH(2850);
 
         operator fun inc(): Position {
             val ordinal = ordinal
@@ -171,6 +186,10 @@ class LiftInternals(private val opMode: OpMode) {
             return if (ordinal in 1..4) { // only allow stack ones, except bottom
                 values()[ordinal - 1]
             } else this
+        }
+
+        companion object {
+            @JvmField val CAN_ROTATE = LOW
         }
     }
 

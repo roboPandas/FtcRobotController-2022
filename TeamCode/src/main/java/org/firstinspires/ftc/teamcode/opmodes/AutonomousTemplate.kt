@@ -85,6 +85,8 @@ abstract class AutonomousTemplate : LinearOpMode() {
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
                  */
+                telemetry.addData("e", "e")
+                telemetry.update()
                 webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT)
             }
 
@@ -98,11 +100,11 @@ abstract class AutonomousTemplate : LinearOpMode() {
         telemetry.addData("Status", "Initialized")
         val colors = ArrayDeque(arrayOfNulls<Color>(6).asList())
         while (opModeInInit()) {
-            if (!pipeline.hasInit) {
-                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
-                telemetry.update()
-                continue
-            }
+//            if (!pipeline.hasInit) {
+//                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
+//                telemetry.update()
+//                continue
+//            }
             colors += pipeline.current ?: continue
             colors.removeFirst()
 
