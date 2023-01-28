@@ -20,6 +20,7 @@ public class Cycle {
     public static long GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
     public static long DROP_DELAY_MS = 350;
 
+    // TODO refactor the reversed code same as the kotlin was
     public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
         this.opMode = opMode;
         this.executor = executor;
@@ -57,45 +58,52 @@ public class Cycle {
         liftInternals.goToPosition(topPosition, 1);
         Utils.waitUntil(() -> liftInternals.motor.getCurrentPosition() >= LiftInternals.Position.CAN_ROTATE.value - 50);
         liftInternals.rotateToDrop(reversed);
-        liftInternals.awaitSlide();
+        liftInternals.awaitTargetHit();
 
         stage = Stage.WAITING_FOR_TEST;
     }
 
     public Future<?> test() {
+        System.out.println("test start");
         stage = Stage.TEST_DROP;
         return executor.submit(() -> {
+            System.out.println("going just below " + topPosition.value);
             liftInternals.goToPositionBlocking(topPosition.value - 350, 1);
             stage = Stage.TEST_WAITING;
             while (stage == Stage.TEST_WAITING) {
                 if (opMode.gamepad1.start) {
                     stage = Stage.TEST_REVERTING;
+                    System.out.println("reverting to " + topPosition);
                     liftInternals.goToPositionBlocking(topPosition, 1);
                     stage = Stage.WAITING_FOR_TEST;
                 } else if (opMode.gamepad1.a) {
+                    System.out.println("continuing to " + topPosition);
+                    liftInternals.drop();
                     liftInternals.goToPositionBlocking(topPosition, 1);
-                    finish();
+                    internalFinish(true);
                 }
             }
         });
     }
 
-    public Future<?> finish() { return finish(false); }
+    public Future<?> finish() { return internalFinish(false); }
 
-    // TODO this is basically the same as start so can it be refactored somehow?
-    public Future<?> finish(boolean reversed) {
+    private Future<?> internalFinish(boolean dropOptimized) {
         stage = Stage.DROPPING;
-        System.out.println("finish");
+        System.out.println("finishing");
         return executor.submit(() -> {
             // drop item
-            System.out.println("drop");
-            liftInternals.drop();
-            delay(DROP_DELAY_MS); // this delay is to make sure it's out of our way
+            if (!dropOptimized) {
+                System.out.println("drop");
+                liftInternals.drop();
+                delay(DROP_DELAY_MS); // this delay is to make sure it's out of our way
+            }
 
             stage = Stage.DROPPED;
 
             System.out.println("start rotating");
-            liftInternals.rotateToGrab(reversed);
+            liftInternals.rotateToGrab();
+            // if lift is too far down, we need to wait for rotation to finish before dropping more
             if (topPosition.value < LiftInternals.Position.MIDDLE.value) delay(600);
 
             // wait until lift is done before finishing

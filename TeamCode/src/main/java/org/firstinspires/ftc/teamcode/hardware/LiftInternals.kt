@@ -85,8 +85,8 @@ class LiftInternals(private val opMode: OpMode) {
         rotationServo.position = if (reversed) 1.0 else 0.0
     }
 
-    fun rotateToGrab(reversed: Boolean = false) {
-        rotationServo.position = if (reversed) 0.0 else 1.0
+    fun rotateToGrab() {
+        rotationServo.position = 1.0
     }
 
     // Lock
@@ -100,14 +100,15 @@ class LiftInternals(private val opMode: OpMode) {
     }
 
     // motor
-    fun goToPositionBlocking(targetPosition: Position, power: Double) {
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun goToPositionBlocking(targetPosition: Position, power: Double) {
         goToPositionBlocking(targetPosition.value, power)
     }
 
     fun goToPositionBlocking(pos: Int, power: Double) {
         // I didn't reuse as much code as I could have since I want to avoid multithreading unless needed
         val needsLock = goToPositionInternal(pos, power)
-        awaitSlide()
+        awaitTargetHit()
         println("motor finished moving to $pos")
         if (needsLock) lock()
     }
@@ -121,7 +122,7 @@ class LiftInternals(private val opMode: OpMode) {
     private fun goToPosition(targetPosition: Int, power: Double) { // just in case
         liftExecutor.submit {
             if (goToPositionInternal(targetPosition, power)) {
-                awaitSlide()
+                awaitTargetHit()
                 println("motor finished moving to $targetPosition")
                 lock()
             }
@@ -145,7 +146,8 @@ class LiftInternals(private val opMode: OpMode) {
         return needsLock
     }
 
-    fun awaitSlide() {
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun awaitTargetHit() {
         waitUntil { abs(motor.currentPosition - motor.targetPosition) < 50 }
     }
 
@@ -159,9 +161,9 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(120), STACK_2(230), STACK_3(360), STACK_4(360), STACK_5(510),  // the lowest position that allows rotation
-        CAN_ROTATE(1360),  // junction heights
-        LOW(1360), MIDDLE(2100), HIGH(2800);
+        STACK_1(210), STACK_2(360), STACK_3(420), STACK_4(500), STACK_5(650),  // the lowest position that allows rotation
+        CAN_ROTATE(1530),  // junction heights
+        LOW(1530), MIDDLE(2250), HIGH(3100);
 
         operator fun inc(): Position {
             val ordinal = ordinal
@@ -180,14 +182,14 @@ class LiftInternals(private val opMode: OpMode) {
 
     companion object {
         const val MOTOR_SCALE_FACTOR = 0.8
-        const val MOTOR_UNLOCK_POWER = 0.1
+        const val MOTOR_UNLOCK_POWER = 0.2
         const val LOCK_DELAY_MS = 200L
 
         // TODO for kotlin refactor grab, drop, lock, unlock, rotate into boolean vals (locked, grabbed, etc.)
         // TODO also remove the reverse functions during said refactor
         // Claw
         // Grab is 0; drop is 1
-        const val GRAB_DELAY_MS = 1000L
-        const val DROP_DELAY_MS = 700L
+        const val GRAB_DELAY_MS = 1200L
+        const val DROP_DELAY_MS = 900L
     }
 }
