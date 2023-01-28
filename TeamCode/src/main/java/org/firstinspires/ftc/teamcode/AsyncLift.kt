@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorImpl
 import java.util.concurrent.ExecutorService
 
 /** The bridge between the Cycle system and the controller input.  */
@@ -44,6 +45,7 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         // create cycle
         if (gamepad.a) {
             currentCycle = Cycle(opMode, cycleExecutor, liftInternals, topPosition, bottomPosition)
+            opMode.telemetry.addData("top position", topPosition)
             println("A: start cycle")
             currentCycle!!.start()
             canSwitch = false
@@ -63,15 +65,10 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         if (currentCycle!!.stage == Cycle.Stage.COMPLETE) {
             currentCycle = null
             // when a cycle ends, we set our new targets from the queues
-            if (queuedTopPosition != null) {
-                topPosition = queuedTopPosition!!
-                queuedTopPosition = null
-            }
-            @Suppress("KotlinConstantConditions") // seems like a compiler bug
-            if (queuedBottomPosition != null) {
-                bottomPosition = queuedBottomPosition!!
-                queuedBottomPosition = null
-            }
+            topPosition = queuedTopPosition!!
+            queuedTopPosition = null
+            bottomPosition = queuedBottomPosition!!
+            queuedBottomPosition = null
             return
         }
         if (currentCycle!!.isBusy) return
@@ -79,7 +76,6 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
             if (currentCycle!!.stage == Cycle.Stage.WAITING_FOR_TEST) {
                 currentCycle!!.test()
             }
-            // test will follow into finish
         }
     }
 

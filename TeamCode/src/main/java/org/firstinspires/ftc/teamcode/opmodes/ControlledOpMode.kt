@@ -59,6 +59,13 @@ open class ControlledOpMode : OpMode() {
         manualLift = ManualLift(liftInternals, this, cycleExecutor)
         drivetrain = Drivetrain(this)
         currentLiftSubsystem = asyncLift
+        initLift()
+    }
+
+    open fun initLift() {
+        // must give the lift some power to move to the start pos or else it gets stuck busy forever
+        // power is set to 0 on auto -> manual, and is set with every go-to command.
+        liftInternals.goToPosition(LiftInternals.Position.STACK_1, 0.25)
     }
 
     override fun loop() {

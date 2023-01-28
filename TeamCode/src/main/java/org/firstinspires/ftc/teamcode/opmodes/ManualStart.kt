@@ -11,4 +11,8 @@ class ManualStart : ControlledOpMode() {
         currentLiftSubsystem = manualLift
         manualControl = true
     }
+
+    override fun initLift() {
+        // don't
+    }
 }

@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor.RunMode
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class LiftInternals(private val opMode: OpMode) {
     @JvmField val liftExecutor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -22,6 +23,7 @@ class LiftInternals(private val opMode: OpMode) {
     var motorMode = RunMode.RUN_TO_POSITION
         set(newMode) {
             if (field == newMode) return
+            println("changing mode from $field to $newMode")
             field = newMode
             motor.mode = field
         }
@@ -32,15 +34,17 @@ class LiftInternals(private val opMode: OpMode) {
         rotationServo = hardwareMap.servo["rotationServo"]
         clawServo = hardwareMap.servo["clawServo"]
         lockServo = hardwareMap.servo["lockServo"]
-        motor.targetPosition = Position.STACK_1.value
-        resetEncoder() // TODO do we need this?
+        motor.targetPosition = Position.STACK_1.value // need to have a pos set before mode is set (by resetEncoder)
+        resetEncoder()
         motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.17, 0.845)
-        clawServo.scaleRange(0.06, 0.195)
+        clawServo.scaleRange(0.35, 0.55)
         lockServo.scaleRange(0.0, 0.12)
+
+        rotateToGrab()
         uncheckedDrop()
     }
 
@@ -59,7 +63,7 @@ class LiftInternals(private val opMode: OpMode) {
     }
 
     private fun internalSetClaw(pos: Int, delayMillis: Long) {
-        val currentPos = clawServo.position.toInt()
+        val currentPos = clawServo.position.roundToInt()
         if (currentPos == pos) return
         setUnchecked(pos, delayMillis)
     }
@@ -81,7 +85,7 @@ class LiftInternals(private val opMode: OpMode) {
         rotationServo.position = if (reversed) 1.0 else 0.0
     }
 
-    fun rotateToGrab(reversed: Boolean) {
+    fun rotateToGrab(reversed: Boolean = false) {
         rotationServo.position = if (reversed) 0.0 else 1.0
     }
 
@@ -130,7 +134,7 @@ class LiftInternals(private val opMode: OpMode) {
         if (needsLock) {
             motorMode = RunMode.RUN_USING_ENCODER
             motor.power = MOTOR_UNLOCK_POWER
-            delay(100)
+            delay(LOCK_DELAY_MS)
             unlock()
         }
         delay(100)
@@ -155,9 +159,9 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(0), STACK_2(330), STACK_3(430), STACK_4(500), STACK_5(640),  // the lowest position that allows rotation
-        CAN_ROTATE(1400),  // junction heights
-        LOW(1400), MIDDLE(2200), HIGH(3100);
+        STACK_1(120), STACK_2(230), STACK_3(360), STACK_4(360), STACK_5(510),  // the lowest position that allows rotation
+        CAN_ROTATE(1360),  // junction heights
+        LOW(1360), MIDDLE(2100), HIGH(2800);
 
         operator fun inc(): Position {
             val ordinal = ordinal
@@ -177,12 +181,13 @@ class LiftInternals(private val opMode: OpMode) {
     companion object {
         const val MOTOR_SCALE_FACTOR = 0.8
         const val MOTOR_UNLOCK_POWER = 0.1
+        const val LOCK_DELAY_MS = 200L
 
         // TODO for kotlin refactor grab, drop, lock, unlock, rotate into boolean vals (locked, grabbed, etc.)
         // TODO also remove the reverse functions during said refactor
         // Claw
         // Grab is 0; drop is 1
-        const val GRAB_DELAY_MS = 700L
-        const val DROP_DELAY_MS = 750L
+        const val GRAB_DELAY_MS = 1000L
+        const val DROP_DELAY_MS = 700L
     }
 }

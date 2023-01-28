@@ -31,7 +31,7 @@ class ManualLift(private val liftInternals: LiftInternals, private val opMode: O
             liftInternals.liftExecutor.submit {
                 if (needsUnlock) {
                     liftInternals.motor.power = LiftInternals.MOTOR_UNLOCK_POWER
-                    delay(100)
+                    delay(LiftInternals.LOCK_DELAY_MS)
                     liftInternals.unlock()
                 } else {
                     liftInternals.lock()
