@@ -19,7 +19,10 @@ class QuantizationPipeline : OpenCvPipeline() {
 
     private var _current: Color? = null
     private var hasNewData = false
-    val current: Color? get() = if (hasNewData) _current else null
+    val current: Color? get() = if (hasNewData) {
+        hasNewData = false
+        _current
+    } else null
 
     fun releaseAll() {
         data.release()

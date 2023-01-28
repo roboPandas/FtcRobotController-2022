@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import com.qualcomm.robotcore.hardware.Gamepad
 import org.firstinspires.ftc.teamcode.hardware.Drivetrain
 import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline.Color
 
@@ -14,46 +13,43 @@ import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline.Color
 @Autonomous
 class Despair : AutonomousTemplate() {
     lateinit var drivetrain: Drivetrain
-    val gamepad = Gamepad()
 
     override val startPose = Pose2d() // dummy
     override fun initializeTrajectories() {}
     override fun setup() {
-        drivetrain = Drivetrain(this, gamepad)
+        drivetrain = Drivetrain(this)
         super.setup()
     }
 
     override fun main() {
-        gamepad.left_stick_y = POWER / 2
-        drivetrain.loop()
+        move(y = -POWER / 2)
         sleep(400)
 
-        gamepad.left_stick_y = 0f
-        drivetrain.loop()
+        drivetrain.stop()
 
         // strafe left or right one tile if necessary
-        gamepad.left_stick_x = when (detectedColor) {
+        move(x = when (detectedColor) {
             Color.MAGENTA -> 1 // left
             Color.GREEN -> 0 // middle
             Color.CYAN -> -1 // right
-        } * POWER
-        drivetrain.loop()
+        } * POWER)
         sleep(2000)
 
-        gamepad.left_stick_x = 0f
-        drivetrain.loop()
+        drivetrain.stop()
 
         // move forward one tile
-        gamepad.left_stick_y = POWER
-        drivetrain.loop()
+        move(y = -POWER)
         sleep(1800)
 
         // turn robot off
-        gamepad.left_stick_y = 0f
-        drivetrain.loop()
+        drivetrain.stop()
     }
 
+    @Suppress("NAME_SHADOWING")
+    private fun move(x: Float = 0f, y: Float = 0f, z: Float = 0f) =
+        drivetrain.move(x, y, z, Drivetrain.LINEAR_SCALING)
+
     companion object {
-        const val POWER = 0.5f // +y is forward on the controller
+        const val POWER = 0.4f // +y is forward on the controller
     }
 }

@@ -97,10 +97,9 @@ abstract class AutonomousTemplate : LinearOpMode() {
         })
         telemetry.addData("Status", "Initialized")
         val colors = ArrayDeque(arrayOfNulls<Color>(6).asList())
-        while (opModeInInit()) {
+        while (run { telemetry.update(); opModeInInit() }) {
             if (!pipeline.hasInit) {
                 telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
-                telemetry.update()
                 continue
             }
             colors += pipeline.current ?: continue
@@ -113,7 +112,6 @@ abstract class AutonomousTemplate : LinearOpMode() {
             telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
             telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
             telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
-            telemetry.update()
         }
         // on start
         val totals = IntArray(3)

@@ -10,6 +10,8 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.pow
 
+private typealias Scaling =  (Float, Float, Float) -> Double
+
 class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
 
@@ -28,32 +30,40 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         }
     }
 
-    override fun loop() {
-        if (gamepad.dpad_right) return multiplierMap.forEach { (motor, mults) -> motor.power = 0.5 * mults.y * SCALE_FACTOR }
-        if (gamepad.dpad_left) return multiplierMap.forEach { (motor, mults) -> motor.power = -0.5 * mults.y * SCALE_FACTOR }
-
-        val x = gamepad.left_stick_x
-        val y = -gamepad.left_stick_y // for some atrocious reason, down is positive
-        val z = gamepad.right_stick_x
-
+    @Suppress("NAME_SHADOWING")
+    fun move(x: Float = 0f, y: Float = 0f, z: Float = 0f,
+             scaleFunction: Scaling = TELEOP_SCALING) {
         val total = abs(x) + abs(y) + abs(z)
 
-        if (total == 0f) { // prevent division by 0
-            multiplierMap.keys.forEach { it.power = 0.0 }
-            return
-        }
+        if (total == 0f) return stop() // prevent division by 0
 
-        multiplierMap.forEach { (motor, mults) ->
-            val basePower = max(0.2 , max(hypot(x, y), abs(z)).pow(2f).toDouble())
-            val power = (mults.x * x + mults.y * y + z) * basePower * SCALE_FACTOR / total
-//            opMode.telemetry.addData("power", power)
-            motor.power = power // Adjust input to never exceed 1
-        }
+        setMotorPowers { _, mults -> (mults.x * x + mults.y * y + z) * scaleFunction(x, y, z) * SCALE_FACTOR / total }
+    }
+
+    fun stop() = multiplierMap.keys.forEach { it.power = 0.0 }
+
+    override fun loop() {
+        if (gamepad.dpad_right) return setMotorPowers { _, mults -> 0.5 * mults.y * SCALE_FACTOR }
+        if (gamepad.dpad_left) return setMotorPowers { _, mults -> -0.5 * mults.y * SCALE_FACTOR }
+
+        move(
+            x = gamepad.left_stick_x,
+            y = -gamepad.left_stick_y, // for some atrocious reason, down is positive
+            z = gamepad.right_stick_x
+        )
     }
 
     data class MotorMultipliers(val x: Int, val y: Int)
 
+    private inline fun setMotorPowers(powerGetter: (DcMotor, MotorMultipliers) -> Double) {
+        multiplierMap.forEach { (motor, mults) ->
+            motor.power = powerGetter(motor, mults)
+        }
+    }
+
     companion object {
         private const val SCALE_FACTOR = 1.0
+        val TELEOP_SCALING: Scaling = { x, y, z -> max(0.2 , max(hypot(x, y), abs(z)).pow(2f).toDouble()) }
+        val LINEAR_SCALING: Scaling = { x, y, z -> max(hypot(x, y), abs(z)).toDouble() }
     }
 }
