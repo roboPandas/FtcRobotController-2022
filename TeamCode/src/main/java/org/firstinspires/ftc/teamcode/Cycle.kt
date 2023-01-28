@@ -18,7 +18,7 @@ class Cycle(
 
     init {
         // validate position
-        require(reversedDropoff || topPosition.value > LiftInternals.Position.CAN_ROTATE.value) { "invalid top position: ${topPosition.value}" }
+        require(reversedDropoff || topPosition.value >= LiftInternals.Position.CAN_ROTATE.value) { "invalid top position: ${topPosition.value}" }
     }
 
     fun start(): Future<*> {

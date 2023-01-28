@@ -25,10 +25,12 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
     private val multiplierMap: Map<DcMotorEx, MotorMultipliers>
     private val RADIANS_TO_DEGREES = 180 / Math.PI
 
-    private val inputs: ArrayList<Reading> = arrayListOf(Reading(Point(0.0f, 0.0f, 0.0f), 0))
-    private val lastInput: Reading
-        get() = inputs[inputs.size - 1]
+    private val EMPTY_READING = Reading(Point(0.0f, 0.0f, 0.0f), 0)
+    private val readings: ArrayList<Reading> = arrayListOf(EMPTY_READING, EMPTY_READING)
+    private val lastReading: Reading
+        get() = readings[readings.size - 1]
 
+    var shouldCorrect = true
     var target = 0
 
     val predictedAngle
@@ -71,11 +73,11 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
             measurements.yaw
         )
 
-        if (lastInput != reading) {
-            inputs.add(reading)
+        if (lastReading != reading) {
+            readings.add(reading)
         }
 
-//        opMode.telemetry.addData("cryingn rn", inputs.map { Pair(it.point.z, it.heading) })
+        opMode.telemetry.addData("cryingn rn", readings.map { Pair(it.point.z, it.heading) })
 
         if (gamepad.dpad_right) return multiplierMap.forEach { (motor, mults) ->
             motor.power = 0.5 * mults.y * SCALE_FACTOR
@@ -83,11 +85,18 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         if (gamepad.dpad_left) return multiplierMap.forEach { (motor, mults) ->
             motor.power = -0.5 * mults.y * SCALE_FACTOR
         }
-        if (gamepad.back) imu.resetYaw()
+        if (gamepad.back) {
+            imu.resetYaw()
+            readings.clear()
+            readings.add(EMPTY_READING)
+            readings.add(EMPTY_READING)
+        }
 
         val (x, y, z) = reading.point
 
         val total = abs(x) + abs(y) + abs(z)
+
+        if (z != 0.0f) imu.resetYaw()
 
         if (total == 0f) { // prevent division by 0
 //            if (lastInput == Point(0.0f, 0.0f)) {
@@ -96,15 +105,22 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
 //                }
 //            }
 
-            return when (correct()) {
-                CORRECTED -> brake()
-                CORRECTING -> {
-                    opMode.telemetry.addLine("attempted to correct")
-                    Unit
+            brake()
+
+            shouldCorrect = lastReading.point.z != 0.0f
+
+            if (shouldCorrect) {
+                return when (correct()) {
+                    CORRECTED -> brake()
+                    CORRECTING -> {
+                        opMode.telemetry.addLine("attempted to correct")
+                        Unit
+                    }
                 }
+            } else {
+                return imu.resetYaw()
             }
         }
-
 
         multiplierMap.forEach { (motor, mults) ->
             val basePower = max(0.2, max(hypot(x, y), abs(z)).pow(2f).toDouble())
@@ -130,10 +146,10 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
     }
 
     private fun correct(): CorrectionState {
-//        if (lastInput.point.z != 0.0f) {
-//            imu.resetYaw()
-//            return CORRECTED
-//        }
+        if (readings[readings.size - 2].point.z != 0.0f) {
+            imu.resetYaw()
+            return CORRECTED
+        }
 
         val error = (target - measurements.yaw)
         val correctionFactor = -error.sign * sqrt((abs(error.toDouble()) / 180.0))
