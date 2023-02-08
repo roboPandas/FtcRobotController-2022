@@ -60,6 +60,7 @@ open class ControlledOpMode : OpMode() {
         drivetrain = Drivetrain(this)
         currentLiftSubsystem = asyncLift
         initLift()
+        telemetry.speak("The robot uprising has begun")
     }
 
     open fun initLift() {

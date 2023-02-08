@@ -17,7 +17,7 @@ class LiftInternals(private val opMode: OpMode) {
     private val clawExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     @JvmField val motor: DcMotor
     @JvmField val rotationServo: Servo
-    private val clawServo: Servo
+    val clawServo: Servo
     private val lockServo: Servo
 
     var motorMode = RunMode.RUN_TO_POSITION
@@ -40,8 +40,8 @@ class LiftInternals(private val opMode: OpMode) {
 
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
-        rotationServo.scaleRange(0.17, 0.845)
-        clawServo.scaleRange(0.35, 0.55)
+        rotationServo.scaleRange(0.14, 0.809) // (+)
+        clawServo.scaleRange(0.45, 0.65)
         lockServo.scaleRange(0.0, 0.12)
 
         rotateToGrab()
@@ -49,17 +49,17 @@ class LiftInternals(private val opMode: OpMode) {
     }
 
     fun grab() {
-        internalSetClaw(0, GRAB_DELAY_MS)
+        internalSetClaw(1, GRAB_DELAY_MS)
     }
 
     fun drop() {
-        internalSetClaw(1, DROP_DELAY_MS)
+        internalSetClaw(0, DROP_DELAY_MS)
     }
 
     // This function is NOT safe to call in a loop.
     // It is used to guarantee that the claw is ALWAYS commanded to open.
     private fun uncheckedDrop() {
-        setUnchecked(1, DROP_DELAY_MS)
+        setUnchecked(0, DROP_DELAY_MS)
     }
 
     private fun internalSetClaw(pos: Int, delayMillis: Long) {

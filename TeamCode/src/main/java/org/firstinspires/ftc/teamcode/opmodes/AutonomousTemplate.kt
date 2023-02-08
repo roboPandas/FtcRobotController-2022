@@ -107,11 +107,16 @@ abstract class AutonomousTemplate : LinearOpMode() {
 
             telemetry.addData("Detected color", pipeline.current)
             telemetry.addData("Recent colors", colors)
+            telemetry.addLine()
+
             telemetry.addData("FPS", String.format("%.2f", webcam.fps))
             telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
             telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
             telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
             telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
+            telemetry.addLine()
+
+//            telemetry.addData("Detected hue", pipeline.current.)
         }
         // on start
         val totals = IntArray(3)

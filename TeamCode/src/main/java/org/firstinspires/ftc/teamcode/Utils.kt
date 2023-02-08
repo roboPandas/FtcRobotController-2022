@@ -26,3 +26,12 @@ var Servo.pwm: Boolean
 inline fun waitUntil(delayMillis: Long = 10, block: () -> Boolean) {
     while (!block()) delay(delayMillis)
 }
+
+@JvmOverloads
+inline fun whileWatingFor(time: Long, delayMillis: Long = 10, block: () -> Unit) {
+    val startTime = System.currentTimeMillis()
+    while (System.currentTimeMillis() - startTime < time) {
+        block()
+        delay(delayMillis)
+    }
+}

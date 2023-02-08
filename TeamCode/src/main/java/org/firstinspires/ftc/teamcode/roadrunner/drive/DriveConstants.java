@@ -34,7 +34,7 @@ public class DriveConstants {
      * from DriveVelocityPIDTuner.
      */
     public static final boolean RUN_USING_ENCODER = true;
-    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(0, 0, 0, 14.089); // f default: getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV)
+    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(15, 0, 1, 13.5); // f default: getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV)
 
     /*
      * These are physical constants that can be determined from your robot (including the track
@@ -46,7 +46,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // in
     public static double GEAR_RATIO = 0.05; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 12.5; // in
+    public static double TRACK_WIDTH = 14.25; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -88,7 +88,7 @@ public class DriveConstants {
      */
     public static double MAX_VEL = 48.45 * 0.95; // 95% of tuned max
     public static double MAX_ACCEL = 50.46434527240892;
-    public static double MAX_ANG_VEL = Math.toRadians(231.31151999999997);
+    public static double MAX_ANG_VEL = 3.25; // true max 4
     public static double MAX_ANG_ACCEL = Math.toRadians(231.31151999999997);
 
     public static double encoderTicksToInches(double ticks) {

@@ -5,6 +5,8 @@ import org.firstinspires.ftc.teamcode.Subsystem
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.Gamepad
+import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.teamcode.recording.InputSequence
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
@@ -14,6 +16,8 @@ private typealias Scaling =  (Float, Float, Float) -> Double
 
 class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
+    private val sequence: InputSequence = InputSequence()
+    private val timer = ElapsedTime()
 
     init {
         val hardwareMap = opMode.hardwareMap
@@ -61,8 +65,12 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         }
     }
 
+    fun setPower(x: Double, y: Double, z: Double, scaling: Scaling = TELEOP_SCALING) {
+        move(x.toFloat(), y.toFloat(), z.toFloat(), scaling)
+    }
+
     companion object {
-        private const val SCALE_FACTOR = 1.0
+        const val SCALE_FACTOR = 1.0
         val TELEOP_SCALING: Scaling = { x, y, z -> max(0.2 , max(hypot(x, y), abs(z)).pow(2f).toDouble()) }
         val LINEAR_SCALING: Scaling = { x, y, z -> max(hypot(x, y), abs(z)).toDouble() }
     }

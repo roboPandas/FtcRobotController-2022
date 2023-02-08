@@ -16,6 +16,7 @@ class ManualLift(private val liftInternals: LiftInternals, private val opMode: O
 
         // rotation
         liftInternals.rotationServo.position = 1.0 - gamepad.left_trigger
+        opMode.telemetry.addData("Claw", liftInternals.clawServo.position);
 
         // slide
         val (needsUnlock, power) = when {
