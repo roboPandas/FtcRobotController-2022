@@ -60,8 +60,8 @@ open class FainterLightLeft : AutonomousTemplate() {
 
         // FIXME this ONLY works for left.
         when (detectedColor) {
-            QuantizationPipeline.Color.MAGENTA -> {}
-            QuantizationPipeline.Color.GREEN -> drive.followTrajectory(drive.trajectoryBuilder(drive.poseEstimate).forward(20.0).build())
+            QuantizationPipeline.Color.GREEN -> {}
+            QuantizationPipeline.Color.MAGENTA -> drive.followTrajectory(drive.trajectoryBuilder(drive.poseEstimate).forward(20.0).build())
             QuantizationPipeline.Color.CYAN -> drive.followTrajectory(drive.trajectoryBuilder(drive.poseEstimate).back(20.0).build())
         }
     }
