@@ -10,7 +10,7 @@ class MoveClaw : LinearOpMode() {
     override fun runOpMode() {
         val claw = hardwareMap.servo["clawServo"]
         claw.scaleRange(
-            0.45, // out
+            0.415, // 0.42, // out
             0.65 // in
         )
         waitForStart()

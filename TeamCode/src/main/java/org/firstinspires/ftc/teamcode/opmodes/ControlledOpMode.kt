@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 import org.firstinspires.ftc.teamcode.AsyncLift
 import org.firstinspires.ftc.teamcode.ManualLift
@@ -38,6 +40,7 @@ open class ControlledOpMode : OpMode() {
     protected lateinit var currentLiftSubsystem: LiftSubsystem
     protected lateinit var asyncLift: AsyncLift
     protected lateinit var manualLift: ManualLift
+    protected lateinit var modules: List<LynxModule>
 
     protected var manualControl = false
     private var switchButtonCache = false
@@ -54,19 +57,17 @@ open class ControlledOpMode : OpMode() {
     }
 
     override fun init() {
-        liftInternals = LiftInternals(this)
+        liftInternals = LiftInternals(this).apply { init() }
         asyncLift = AsyncLift(liftInternals, this, cycleExecutor)
         manualLift = ManualLift(liftInternals, this, cycleExecutor)
         drivetrain = Drivetrain(this)
         currentLiftSubsystem = asyncLift
-        initLift()
+        modules = hardwareMap.getAll(LynxModule::class.java)
         telemetry.speak("The robot uprising has begun")
     }
 
-    open fun initLift() {
-        // must give the lift some power to move to the start pos or else it gets stuck busy forever
-        // power is set to 0 on auto -> manual, and is set with every go-to command.
-        liftInternals.goToPosition(LiftInternals.Position.STACK_1, 0.25)
+    open fun LiftInternals.init() {
+        initAuto().get()
     }
 
     override fun loop() {
@@ -74,5 +75,9 @@ open class ControlledOpMode : OpMode() {
         currentLiftSubsystem.loop()
         attemptSwitch()
         telemetry.addData("lift encoder", liftInternals.motor.currentPosition)
+        modules.forEach {
+            telemetry.addData("module is control hub", it.isParent)
+            telemetry.addData("module current draw", it.getCurrent(CurrentUnit.AMPS))
+        }
     }
 }

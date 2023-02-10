@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 
 @TeleOp
 class ManualStart : ControlledOpMode() {
@@ -12,7 +13,7 @@ class ManualStart : ControlledOpMode() {
         manualControl = true
     }
 
-    override fun initLift() {
+    override fun LiftInternals.init() {
         // don't
     }
 }

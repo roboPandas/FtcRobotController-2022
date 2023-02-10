@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -41,12 +42,16 @@ class LiftInternals(private val opMode: OpMode) {
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.14, 0.809) // (+)
-        clawServo.scaleRange(0.45, 0.65)
+        clawServo.scaleRange(0.415, 0.65)
         lockServo.scaleRange(0.0, 0.12)
 
+        lock() // needed to fix a bug where unlocking fails on the first cycle
         rotateToGrab()
         uncheckedDrop()
     }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun initAuto() = goToPosition(Position.STACK_1, 0.25)
 
     fun grab() {
         internalSetClaw(1, GRAB_DELAY_MS)
@@ -114,18 +119,17 @@ class LiftInternals(private val opMode: OpMode) {
     }
 
     /** Power MUST be positive.  */
-    fun goToPosition(targetPosition: Position, power: Double) {
-        goToPosition(targetPosition.value, power)
+    fun goToPosition(targetPosition: Position, power: Double): Future<*> {
+        return goToPosition(targetPosition.value, power)
     }
 
     /** Power MUST be positive.  */
-    private fun goToPosition(targetPosition: Int, power: Double) { // just in case
-        liftExecutor.submit {
-            if (goToPositionInternal(targetPosition, power)) {
-                awaitTargetHit()
-                println("motor finished moving to $targetPosition")
-                lock()
-            }
+    private fun goToPosition(targetPosition: Int, power: Double): Future<*> { // just in case
+        return liftExecutor.submit {
+            val needsLock = goToPositionInternal(targetPosition, power)
+            awaitTargetHit()
+            println("motor finished moving to $targetPosition")
+            if (needsLock) lock()
         }
     }
 

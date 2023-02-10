@@ -18,7 +18,7 @@ public class Cycle {
     private final LiftInternals.Position topPosition;
     private final LiftInternals.Position bottomPosition;
     public static long GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
-    public static long DROP_DELAY_MS = 350;
+    public static long DROP_DELAY_MS = 500;
 
     // TODO refactor the reversed code same as the kotlin was
     public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
@@ -47,10 +47,6 @@ public class Cycle {
             whenGrabbed(reversed);
         });
     }
-
-    public void startPreload() { startPreload(false);}
-
-    public void startPreload(boolean reversed) { executor.submit(() -> whenGrabbed(reversed)); }
 
     private void whenGrabbed(boolean reversed) {
         stage = Stage.GRABBED;
