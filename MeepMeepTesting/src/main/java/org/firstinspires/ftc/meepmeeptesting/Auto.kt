@@ -23,7 +23,7 @@ fun main() {
     val meepMeep = MeepMeep(700)
     val robot = DefaultBotBuilder(meepMeep)
         // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-        .setConstraints(48.45 * 0.95, 50.46434527240892, 3.25, Math.toRadians(231.31152), 14.25)
+        .setConstraints(36.0, 50.46434527240892, 3.25, Math.toRadians(231.31152), 14.25)
         .setDimensions(15.0, 17.0)
         .followTrajectorySequence {
             it.trajectorySequenceBuilder(startPose)
@@ -31,24 +31,34 @@ fun main() {
                 .back(4.0) // move off wall
                 .strafeLeftReversed(25.0) // move left towards pole
                 .back(0.01) // jank to make it spline backwards instead of sideways
-                .splineTo(reversedVector(-5.0, -30.0), reverseAngle(Math.PI / 4)) // spline to pole
+                .splineTo(reversedVector(-4.5, -29.5), reverseAngle(PI / 4)) // spline to pole
 //                .back(3.0)
 //                .forward(5.0)
 
                 // TODO reversing is not rn
                 .setReversed(true)
-                .forward(6.0) // move away from pole
+                .forward(8.0) // move away from pole
                 .turn(Math.toRadians(-42.0))// align with tiles to strafe
                 .strafeRight(21.0) // move in line with cone stack
                 .forward(52.0) // go to cone stack
 
+//                .setReversed(true)
+////                .forward(4.0) // move away from pole
+//                .forward(2.0)
+//                .splineTo(reversedVector(-24.0, -12.0), reverseAngle(PI))
+////                .turn(Math.toRadians(-45.0))// align with tiles to strafe
+//                .strafeRight(23.0) // move in line with cone stack
+//                .forward(52.0) // go to cone stack
+
                 .setReversed(true)
                 .back(10.0) // back up from cones
-                .splineTo(Vector2d(negateIfReversed(-30.5), -5.5), if (reversed) 3 * PI / 4 else PI / 4) // spline to 2nd pole
+                .splineTo(Vector2d(negateIfReversed(-31.0), -6.0), if (reversed) 3 * PI / 4 else PI / 4) // spline to 2nd pole
 
+//                .setReversed(false)
+//                .splineTo(Vector2d(negateIfReversed(-46.0), -12.0), reverseAngle(PI)) // spline back to cones
+//                .forward(17.5) // drive into cones
                 .setReversed(false)
-                .splineTo(Vector2d(negateIfReversed(-46.0), -12.0), reverseAngle(PI)) // spline back to cones
-                .forward(17.5) // drive into cones
+                .splineTo(Vector2d(negateIfReversed(-38.0), -12.0), reverseAngle(PI)) // spline back to cones
                 .build()
         }
 

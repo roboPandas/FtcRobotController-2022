@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import com.acmerobotics.roadrunner.geometry.Vector2d
+import com.acmerobotics.roadrunner.trajectory.Trajectory
 import kotlin.math.PI
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.Cycle
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
+import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
 
 @Autonomous
@@ -15,6 +17,7 @@ open class FainterLightLeft : AutonomousTemplate() {
     private lateinit var toStackInitial: TrajectorySequence
     private lateinit var toJunction: TrajectorySequence
     private lateinit var toStack: TrajectorySequence
+    private lateinit var park: TrajectorySequence
 
     override fun initializeTrajectories() {
         preload = drive.trajectorySequenceBuilder(startPose)
@@ -22,13 +25,13 @@ open class FainterLightLeft : AutonomousTemplate() {
             .back(4.0) // move off wall
             .strafeLeftReversed(25.0) // move left towards pole
             .back(0.01) // jank to make it spline backwards instead of sideways
-            .splineTo(reversedVector(-5.0, -30.0), reverseAngle(Math.PI / 4)) // spline to pole
+            .splineTo(reversedVector(-4.5, -29.5), reverseAngle(PI / 4)) // spline to pole
 //                .back(3.0)
 //                .forward(5.0)
             .build()
         toStackInitial = drive.trajectorySequenceBuilder(preload.end())
             .setReversed(true)
-            .forward(6.0) // move away from pole
+            .forward(8.0) // move away from pole
             .turn(Math.toRadians(-42.0))// align with tiles to strafe
             .strafeRight(21.0) // move in line with cone stack
             .forward(52.0) // go to cone stack
@@ -36,12 +39,15 @@ open class FainterLightLeft : AutonomousTemplate() {
         toJunction = drive.trajectorySequenceBuilder(reversedPose(-63.5, -12.0, -PI)) // manual reset of pose
             .setReversed(true)
             .back(10.0) // back up from cones
-            .splineTo(Vector2d(negateIfReversed(-30.5), -5.5), if (reversed) 3 * PI / 4 else PI / 4) // spline to 2nd pole
+            .splineTo(Vector2d(negateIfReversed(-31.0), -6.0), if (reversed) 3 * PI / 4 else PI / 4) // spline to 2nd pole
             .build()
         toStack = drive.trajectorySequenceBuilder(toJunction.end())
             .setReversed(false)
             .splineTo(Vector2d(negateIfReversed(-46.0), -12.0), reverseAngle(PI)) // spline back to cones
             .forward(17.5) // drive into cones
+            .build()
+        park = drive.trajectorySequenceBuilder(toJunction.end())
+            .splineTo(Vector2d(negateIfReversed(-38.0), -12.0), reverseAngle(PI)) // spline back to cones
             .build()
     }
 
@@ -50,7 +56,14 @@ open class FainterLightLeft : AutonomousTemplate() {
         drive.poseEstimate = toJunction.start()
 
         var bottomPosition = LiftInternals.Position.STACK_4
-        repeat(ADDITIONAL_CYCLES) { runCycle(toJunction, toStack, bottomPosition--) }
+        repeat(ADDITIONAL_CYCLES) { runCycle(toJunction, if (it == ADDITIONAL_CYCLES - 1) park else toStack, bottomPosition--) }
+
+        // FIXME this ONLY works for left.
+        when (detectedColor) {
+            QuantizationPipeline.Color.MAGENTA -> {}
+            QuantizationPipeline.Color.GREEN -> drive.followTrajectory(drive.trajectoryBuilder(drive.poseEstimate).forward(20.0).build())
+            QuantizationPipeline.Color.CYAN -> drive.followTrajectory(drive.trajectoryBuilder(drive.poseEstimate).back(20.0).build())
+        }
     }
 
     private fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence, bottomPosition: LiftInternals.Position) {
@@ -66,7 +79,7 @@ open class FainterLightLeft : AutonomousTemplate() {
     }
 
     companion object {
-        const val ADDITIONAL_CYCLES = 3
+        const val ADDITIONAL_CYCLES = 2
     }
 }
 

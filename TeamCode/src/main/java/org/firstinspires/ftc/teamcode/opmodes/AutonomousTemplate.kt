@@ -52,42 +52,41 @@ abstract class AutonomousTemplate : LinearOpMode() {
         telemetry.addData("Status", "Initialized")
 
         telemetry.addData("f", "x")
-        drive = SampleMecanumDrive(hardwareMap)
         telemetry.addData("drive workie", "yes")
 
-//        val colors = ArrayDeque(arrayOfNulls<Color>(6).asList())
-//        while (run { telemetry.update(); opModeInInit() }) {
-//            if (!pipeline.hasInit) {
-//                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
-//                continue
-//            }
-//            colors += pipeline.current ?: continue
-//            colors.removeFirst()
-//
-//            telemetry.addData("Detected color", pipeline.current)
-//            telemetry.addData("Recent colors", colors)
-//            telemetry.addLine()
-//
-//            telemetry.addData("FPS", String.format("%.2f", webcam.fps))
-//            telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
-//            telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
-//            telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
-//            telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
-//            telemetry.addLine()
-//
-////            telemetry.addData("Detected hue", pipeline.current.)
-//        }
+        val colors = ArrayDeque(arrayOfNulls<Color>(6).asList())
+        while (run { telemetry.update(); opModeInInit() }) {
+            if (!pipeline.hasInit) {
+                telemetry.addLine("Pipeline not yet initialized: DO NOT PRESS START")
+                continue
+            }
+            colors += pipeline.current ?: continue
+            colors.removeFirst()
+
+            telemetry.addData("Detected color", pipeline.current)
+            telemetry.addData("Recent colors", colors)
+            telemetry.addLine()
+
+            telemetry.addData("FPS", String.format("%.2f", webcam.fps))
+            telemetry.addData("Total frame time ms", webcam.totalFrameTimeMs)
+            telemetry.addData("Pipeline time ms", webcam.pipelineTimeMs)
+            telemetry.addData("Overhead time ms", webcam.overheadTimeMs)
+            telemetry.addData("Theoretical max FPS", webcam.currentPipelineMaxFps)
+            telemetry.addLine()
+
+//            telemetry.addData("Detected hue", pipeline.current.)
+        }
         // on start
-//        val totals = IntArray(3)
-//        colors.forEach { it?.run { totals[ordinal]++ } }
-//        detectedColor = if (totals contentEquals IntArray(3)) Color.GREEN else Color.values()[totals.indexOf(totals.max())]
+        val totals = IntArray(3)
+        colors.forEach { it?.run { totals[ordinal]++ } }
+        detectedColor = if (totals contentEquals IntArray(3)) Color.GREEN else Color.values()[totals.indexOf(totals.max())]
     }
 
     abstract fun main()
     override fun runOpMode() {
-        telemetry.addData("setting up", "yes")
+        drive = SampleMecanumDrive(hardwareMap)
+        initializeTrajectories()
         setup()
-        telemetry.addData("checking pos", "yes")
         if (startPose != null) drive.poseEstimate = startPose!!
 
         liftInternals = LiftInternals(this).apply { initAuto().get() }
@@ -99,8 +98,7 @@ abstract class AutonomousTemplate : LinearOpMode() {
             LiftInternals.Position.STACK_5
         )
 
-        telemetry.addData("initing", "yes")
-        initializeTrajectories()
+        telemetry.addData("Status", "initialized")
 
         waitForStart()
         main()
