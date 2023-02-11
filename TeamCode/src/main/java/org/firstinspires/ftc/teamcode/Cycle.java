@@ -19,6 +19,7 @@ public class Cycle {
     private final LiftInternals.Position bottomPosition;
     public static long GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
     public static long DROP_DELAY_MS = 500;
+    public volatile boolean forceTestPass = false;
 
     // TODO refactor the reversed code same as the kotlin was
     public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
@@ -40,7 +41,7 @@ public class Cycle {
         System.out.println("start");
         return executor.submit(() -> {
             // grab item
-            liftInternals.grab();
+            liftInternals.uncheckedGrab();
             System.out.println("grabbed?");
             delay(GRAB_DELAY_MS); // this delay is to make sure it's in there
 
@@ -72,11 +73,11 @@ public class Cycle {
                     System.out.println("reverting to " + topPosition);
                     liftInternals.goToPositionBlocking(topPosition, 1);
                     stage = Stage.WAITING_FOR_TEST;
-                } else if (opMode.gamepad1.a) {
+                } else if (opMode.gamepad1.a || forceTestPass) {
                     System.out.println("continuing to " + topPosition);
                     liftInternals.drop();
                     liftInternals.goToPositionBlocking(topPosition, 1);
-                    internalFinish(true);
+                    internalFinish(true); // TODO for the future we probably want to call get() here
                 }
             }
         });

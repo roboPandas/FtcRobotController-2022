@@ -66,6 +66,9 @@ class LiftInternals(private val opMode: OpMode) {
     private fun uncheckedDrop() {
         setUnchecked(0, DROP_DELAY_MS)
     }
+    fun uncheckedGrab() {
+        setUnchecked(1, GRAB_DELAY_MS)
+    }
 
     private fun internalSetClaw(pos: Int, delayMillis: Long) {
         val currentPos = clawServo.position.roundToInt()
@@ -167,7 +170,8 @@ class LiftInternals(private val opMode: OpMode) {
         // STACK_1 is for a single cone, and should be the default bottom position
         STACK_1(210), STACK_2(360), STACK_3(420), STACK_4(500), STACK_5(650),  // the lowest position that allows rotation
         CAN_ROTATE(1530),  // junction heights
-        LOW(1530), MIDDLE(2250), HIGH(3100);
+        LOW(1530), MIDDLE(2250), HIGH(3100),
+        ZERO(0);
 
         operator fun inc(): Position {
             val ordinal = ordinal

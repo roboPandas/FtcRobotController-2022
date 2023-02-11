@@ -23,7 +23,7 @@ abstract class AutonomousTemplate : LinearOpMode() {
     protected lateinit var drive: SampleMecanumDrive
     protected lateinit var currentCycle: Cycle
     protected lateinit var pipeline: QuantizationPipeline
-    private lateinit var liftInternals: LiftInternals
+    protected lateinit var liftInternals: LiftInternals
     protected lateinit var webcam: OpenCvWebcam
     protected lateinit var detectedColor: Color
     protected open val reversed = false

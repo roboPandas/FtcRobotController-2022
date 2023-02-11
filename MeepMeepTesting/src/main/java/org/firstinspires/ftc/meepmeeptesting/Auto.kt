@@ -29,36 +29,26 @@ fun main() {
             it.trajectorySequenceBuilder(startPose)
                 .setReversed(true) // robot starts backwards
                 .back(4.0) // move off wall
-                .strafeLeftReversed(25.0) // move left towards pole
+                .strafeLeftReversed(26.0) // move left towards pole
                 .back(0.01) // jank to make it spline backwards instead of sideways
-                .splineTo(reversedVector(-4.5, -29.5), reverseAngle(PI / 4)) // spline to pole
+                .splineTo(reversedVector(-6.0, -32.0), reverseAngle(PI / 4)) // spline to pole
 //                .back(3.0)
 //                .forward(5.0)
 
-                // TODO reversing is not rn
                 .setReversed(true)
                 .forward(8.0) // move away from pole
                 .turn(Math.toRadians(-42.0))// align with tiles to strafe
                 .strafeRight(21.0) // move in line with cone stack
-                .forward(52.0) // go to cone stack
-
-//                .setReversed(true)
-////                .forward(4.0) // move away from pole
-//                .forward(2.0)
-//                .splineTo(reversedVector(-24.0, -12.0), reverseAngle(PI))
-////                .turn(Math.toRadians(-45.0))// align with tiles to strafe
-//                .strafeRight(23.0) // move in line with cone stack
-//                .forward(52.0) // go to cone stack
+                .forward(48.5) // go to cone stack
 
                 .setReversed(true)
                 .back(10.0) // back up from cones
-                .splineTo(Vector2d(negateIfReversed(-31.0), -6.0), if (reversed) 3 * PI / 4 else PI / 4) // spline to 2nd pole
+                .splineTo(Vector2d(negateIfReversed(-30.1), -3.0), if (reversed) 3 * PI / 4 else PI / 4) // spline to 2nd pole
 
-//                .setReversed(false)
-//                .splineTo(Vector2d(negateIfReversed(-46.0), -12.0), reverseAngle(PI)) // spline back to cones
-//                .forward(17.5) // drive into cones
                 .setReversed(false)
-                .splineTo(Vector2d(negateIfReversed(-38.0), -12.0), reverseAngle(PI)) // spline back to cones
+                .splineTo(Vector2d(negateIfReversed(-46.0), -12.0), reverseAngle(PI)) // spline back to cones
+                .forward(17.5) // drive into cones
+
                 .build()
         }
 

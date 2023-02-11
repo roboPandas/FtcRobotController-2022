@@ -40,7 +40,7 @@ class QuantizationPipeline : OpenCvPipeline() {
         return if (!hasInit) null else try {
             data.convertTo(data, CvType.CV_32F)
             val criteria = TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 2, 1.0)
-            Core.kmeans(data, K, bestLabels, criteria, 7, Core.KMEANS_PP_CENTERS, centers)
+            Core.kmeans(data, K, bestLabels, criteria, 15, Core.KMEANS_PP_CENTERS, centers)
             centers.convertTo(centers, CvType.CV_8U)
 
             val colors = ArrayList<Scalar>()
