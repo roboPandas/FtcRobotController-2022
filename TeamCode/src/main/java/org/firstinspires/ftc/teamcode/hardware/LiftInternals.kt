@@ -42,7 +42,7 @@ class LiftInternals(private val opMode: OpMode) {
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
         rotationServo.scaleRange(0.14, 0.809) // (+)
-        clawServo.scaleRange(0.415, 0.65)
+        clawServo.scaleRange(0.415, 0.66)
         lockServo.scaleRange(0.0, 0.12)
 
         lock() // needed to fix a bug where unlocking fails on the first cycle

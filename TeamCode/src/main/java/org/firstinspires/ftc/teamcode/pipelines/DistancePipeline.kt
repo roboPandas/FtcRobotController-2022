@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.pipelines
 
-import org.openftc.easyopencv.OpenCvPipeline
 import androidx.core.graphics.ColorUtils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import org.openftc.easyopencv.OpenCvPipeline
 import java.lang.Exception
 import java.util.*
 
-class QuantizationPipeline : OpenCvPipeline() {
+class DistancePipeline : OpenCvPipeline() {
     private var data = Mat()
     private val centers = Mat()
     private var draw = Mat()
@@ -23,7 +23,7 @@ class QuantizationPipeline : OpenCvPipeline() {
     val current: Color?
         get() = if (hasNewData) {
             hasNewData = false
-           _current
+            _current
         } else null
 
     fun releaseAll() {
@@ -160,7 +160,7 @@ class QuantizationPipeline : OpenCvPipeline() {
 
 
     enum class Color(val lower: Scalar, val upper: Scalar) {
-        MAGENTA(Scalar(300.0, 100.0, 100.0), Scalar(350.0, 100.0, 100.0)),
+        YELLOW(Scalar(300.0, 100.0, 100.0), Scalar(350.0, 100.0, 100.0)),
         GREEN(Scalar(90.0, 100.0, 100.0), Scalar(160.0, 100.0, 100.0)),
         CYAN(Scalar(180.0, 100.0, 100.0), Scalar(210.0, 100.0, 100.0));
     }

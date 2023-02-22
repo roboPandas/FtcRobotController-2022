@@ -63,7 +63,6 @@ open class ControlledOpMode : OpMode() {
         drivetrain = Drivetrain(this)
         currentLiftSubsystem = asyncLift
         modules = hardwareMap.getAll(LynxModule::class.java)
-        telemetry.speak("The robot uprising has begun")
     }
 
     open fun LiftInternals.init() {
