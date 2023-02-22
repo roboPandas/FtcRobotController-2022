@@ -28,14 +28,13 @@ abstract class AutonomousTemplate : OpMode() {
     protected lateinit var detectedColor: Color
     protected open val reversed = false
 
-    open val startPose: Pose2d? = null
-    open fun initializeTrajectories() {}
+    open fun initializeTrajectories(): Pose2d? { return null }
     abstract fun main()
 
     override fun init() {
         drive = SampleMecanumDrive(hardwareMap)
-        initializeTrajectories()
-        if (startPose != null) drive.poseEstimate = startPose!!
+        var start = initializeTrajectories()
+        if (start != null) drive.poseEstimate = start
 
         webcam = OpenCvCameraFactory.getInstance().createWebcam(
             hardwareMap[WebcamName::class.java, "Webcam 1"]

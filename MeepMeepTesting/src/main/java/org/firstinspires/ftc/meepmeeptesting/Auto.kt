@@ -6,6 +6,8 @@ import com.noahbres.meepmeep.MeepMeep
 import com.noahbres.meepmeep.MeepMeep.Background
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder
+import org.firstinspires.ftc.teamcode.trajectories.Trajectories
+import org.firstinspires.ftc.teamcode.trajectories.Trajectories.FainterLight
 import kotlin.math.PI
 
 val startPose = reversedPose(-36.0, -65.5, -PI / 2)
@@ -26,29 +28,19 @@ fun main() {
         .setConstraints(45.0, 60.0, 4.25, Math.toRadians(360.0), 13.43)
         .setDimensions(15.0, 17.0)
         .followTrajectorySequence {
-            it.trajectorySequenceBuilder(startPose)
-                .setReversed(true) // robot starts backwards
-//                .back(2.0) // back up from wall to not hit when rotating
-//                .splineToSplineHeading(reversedPose(startPose.x, startPose.y + 12, PI), PI / 2) // rotate and move up a bit
-//                .splineToSplineHeading(reversedPose(startPose.x - 2, startPose.y + 42, 9 * PI / 8), PI / 2)
-////                .strafeRight(30.0) // strafe up to pole
-//                .splineToSplineHeading(reversedPose(-31.0, -4.0, 5 * PI / 4), PI / 4) // finish and spline to pole
-                .back(2.0) // back up from wall to not hit when rotating
-                .splineToSplineHeading(reversedPose(startPose.x, startPose.y + 12, PI), PI / 2) // rotate and move up a bit
-                .splineToSplineHeading(reversedPose(startPose.x - 2, startPose.y + 42, 11 * PI / 8), PI / 2)
-//                .strafeRight(30.0) // strafe up to pole
-                .splineToSplineHeading(reversedPose(-31.0, -4.0, 5 * PI / 4), PI / 4) // finish and spline to pole
-
-                .setReversed(false)
-                .splineTo(Vector2d(negateIfReversed(-38.0), -16.0), reverseAngle(PI)) // spline towards cones
-                .forward(22.0) // drive into cones
-
-                .setReversed(true)
-                .back(20.5) // back up from cones
-                .splineToSplineHeading(reversedPose(-25.5, -5.0, 5 * PI / 4), PI / 4)
-
-//                .splineTo(Vector2d(negateIfReversed(-38.0), -12.0), reverseAngle(PI)) // spline back to cones
-                .build()
+            MeepMeepTrajectories.apply(
+                it,
+                FainterLight.PRELOAD,
+                FainterLight.TO_STACK,
+//
+//                FainterLight.TO_JUNCTION,
+//                FainterLight.TO_STACK,
+//                FainterLight.TO_JUNCTION,
+//                FainterLight.TO_STACK,
+//                FainterLight.TO_JUNCTION,
+//
+//                FainterLight.PARK
+            ).build()
         }
 
 

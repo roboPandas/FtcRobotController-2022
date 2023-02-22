@@ -14,5 +14,6 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":Trajectories"))
     implementation 'com.github.NoahBres:MeepMeep:2.0.2'
 }
