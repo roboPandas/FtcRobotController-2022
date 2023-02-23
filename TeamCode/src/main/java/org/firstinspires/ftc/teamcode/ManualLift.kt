@@ -56,7 +56,6 @@ class ManualLift(private val liftInternals: LiftInternals, private val opMode: O
             cycleExecutor,
             liftInternals,
             LiftInternals.Position.LOW,
-            LiftInternals.Position.STACK_1
-        ).finish()
+        ) { LiftInternals.Position.STACK_1 }.finish()
     }
 }

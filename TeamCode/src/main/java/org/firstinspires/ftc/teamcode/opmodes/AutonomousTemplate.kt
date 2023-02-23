@@ -59,9 +59,8 @@ abstract class AutonomousTemplate : OpMode() {
             this,
             cycleExecutor,
             liftInternals,
-            LiftInternals.Position.HIGH,
-            LiftInternals.Position.STACK_5
-        )
+            LiftInternals.Position.HIGH
+        ) { LiftInternals.Position.STACK_5 }
 
         telemetry.addData("Status", "initialized")
     }
@@ -114,6 +113,6 @@ abstract class AutonomousTemplate : OpMode() {
         topPosition: LiftInternals.Position,
         bottomPosition: LiftInternals.Position
     ): Cycle {
-        return Cycle(this, cycleExecutor, liftInternals, topPosition, bottomPosition)
+        return Cycle(this, cycleExecutor, liftInternals, topPosition) { bottomPosition }
     }
 }

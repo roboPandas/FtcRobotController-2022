@@ -14,7 +14,6 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
     private var topPosition = LiftInternals.Position.HIGH
     private var queuedTopPosition: LiftInternals.Position? = null
     private var bottomPosition = LiftInternals.Position.STACK_1
-    private var queuedBottomPosition: LiftInternals.Position? = null
     private var lastBottomPosChange = BottomPosChange.NONE
 
     override fun loop() {
@@ -32,7 +31,7 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         // set target
         topPosition = getTopPosition(topPosition)
         val oldBottomPosition = bottomPosition
-        bottomPosition = getBottomPosition(oldBottomPosition)
+        bottomPosition = getBottomPosition()
         if (oldBottomPosition != bottomPosition) {
             liftInternals.goToPosition(bottomPosition, 1.0)
         }
@@ -44,7 +43,7 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
 
         // create cycle
         if (gamepad.a) {
-            currentCycle = Cycle(opMode, cycleExecutor, liftInternals, topPosition, bottomPosition)
+            currentCycle = Cycle(opMode, cycleExecutor, liftInternals, topPosition) { bottomPosition }
             opMode.telemetry.addData("top position", topPosition)
             println("A: start cycle")
             currentCycle!!.start()
@@ -58,17 +57,15 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         // cycle is already present
         queuedTopPosition =
             getTopPosition(queuedTopPosition ?: topPosition)
-        queuedBottomPosition =
-            getBottomPosition(queuedBottomPosition ?: bottomPosition)
+        bottomPosition =
+            getBottomPosition()
 
         // check if the current cycle is done and reset if so
         if (currentCycle!!.stage == Cycle.Stage.COMPLETE) {
             currentCycle = null
-            // when a cycle ends, we set our new targets from the queues
+            // when a cycle ends, we set our new target from the queue
             topPosition = queuedTopPosition!!
             queuedTopPosition = null
-            bottomPosition = queuedBottomPosition!!
-            queuedBottomPosition = null
             return
         }
         if (currentCycle!!.isBusy) return
@@ -84,13 +81,13 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
         return current
     }
 
-    private fun getBottomPosition(current: LiftInternals.Position): LiftInternals.Position {
+    private fun getBottomPosition(): LiftInternals.Position {
         val change = changeFromTriggers
-        if (change == lastBottomPosChange) return current
+        if (change == lastBottomPosChange) return bottomPosition
         val newPos: LiftInternals.Position = when (change) {
-            BottomPosChange.DOWN -> current.dec()
-            BottomPosChange.UP -> current.inc()
-            else -> current
+            BottomPosChange.DOWN -> bottomPosition.dec()
+            BottomPosChange.UP -> bottomPosition.inc()
+            else -> bottomPosition
         }
         lastBottomPosChange = change
         canSwitch = false

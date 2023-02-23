@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals;
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position;
 
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 /** Represents one intake cycle. */
 public class Cycle {
@@ -16,13 +18,13 @@ public class Cycle {
     private final LiftInternals liftInternals;
     public volatile Stage stage = Stage.WAITING;
     private final LiftInternals.Position topPosition;
-    private final LiftInternals.Position bottomPosition;
+    private final Supplier<Position> bottomPosition;
     public static long GRAB_DELAY_MS = LiftInternals.GRAB_DELAY_MS;
     public static long DROP_DELAY_MS = 500;
     public volatile boolean forceTestPass = false;
 
     // TODO refactor the reversed code same as the kotlin was
-    public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, LiftInternals.Position bottomPosition) {
+    public Cycle(OpMode opMode, ExecutorService executor, LiftInternals liftInternals, LiftInternals.Position topPosition, Supplier<LiftInternals.Position> bottomPosition) {
         this.opMode = opMode;
         this.executor = executor;
         this.liftInternals = liftInternals;
@@ -31,7 +33,6 @@ public class Cycle {
 
         // validate positions
         if (topPosition.value < LiftInternals.Position.CAN_ROTATE.value) throw new IllegalArgumentException("invalid top position: " + topPosition.value);
-        if (bottomPosition.value > LiftInternals.Position.CAN_ROTATE.value) throw new IllegalArgumentException("invalid bottom position: " + bottomPosition.value);
     }
 
     public Future<?> start() { return start(false); }
@@ -105,7 +106,7 @@ public class Cycle {
 
             // wait until lift is done before finishing
             System.out.println("go to final position");
-            liftInternals.goToPositionBlocking(bottomPosition, 1);
+            liftInternals.goToPositionBlocking(bottomPosition.get(), 1);
 
             stage = Stage.COMPLETE;
         });
