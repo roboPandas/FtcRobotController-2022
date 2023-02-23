@@ -33,7 +33,7 @@ abstract class AutonomousTemplate : OpMode() {
 
     override fun init() {
         drive = SampleMecanumDrive(hardwareMap)
-        var start = initializeTrajectories()
+        val start = initializeTrajectories()
         if (start != null) drive.poseEstimate = start
 
         webcam = OpenCvCameraFactory.getInstance().createWebcam(

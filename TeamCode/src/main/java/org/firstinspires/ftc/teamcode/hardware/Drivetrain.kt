@@ -12,7 +12,7 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.pow
 
-private typealias Scaling =  (Float, Float, Float) -> Double
+private typealias Scaling = (Float, Float, Float) -> Double
 
 class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
@@ -33,6 +33,8 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
             it.direction = DcMotorSimple.Direction.FORWARD
         }
     }
+    // Map()
+
 
     @Suppress("NAME_SHADOWING")
     fun move(x: Float = 0f, y: Float = 0f, z: Float = 0f,
@@ -44,7 +46,7 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
         setMotorPowers { _, mults -> (mults.x * x + mults.y * y + z) * scaleFunction(x, y, z) * SCALE_FACTOR / total }
     }
 
-    fun stop() = multiplierMap.keys.forEach { it.power = 0.0 }
+    private fun stop() = multiplierMap.keys.forEach { it.power = 0.0 }
 
     override fun loop() {
         if (gamepad.dpad_right) return setMotorPowers { _, mults -> 0.5 * mults.y * SCALE_FACTOR }
