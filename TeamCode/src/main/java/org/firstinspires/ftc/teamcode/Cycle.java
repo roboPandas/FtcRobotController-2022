@@ -5,6 +5,10 @@ import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position;
 
 import static org.firstinspires.ftc.teamcode.Utils.delay;
 
+import android.os.Build.VERSION_CODES;
+
+import androidx.annotation.RequiresApi;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.util.concurrent.ExecutorService;
@@ -12,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 /** Represents one intake cycle. */
+@RequiresApi(api = VERSION_CODES.N)
 public class Cycle {
     private final OpMode opMode;
     private final ExecutorService executor;
@@ -43,9 +48,7 @@ public class Cycle {
         return executor.submit(() -> {
             // grab item
             liftInternals.uncheckedGrab();
-            System.out.println("grabbed?");
-            delay(GRAB_DELAY_MS); // this delay is to make sure it's in there
-
+            liftInternals.awaitClaw();
             whenGrabbed(reversed);
         });
     }
@@ -77,6 +80,7 @@ public class Cycle {
                 } else if (opMode.gamepad1.a || forceTestPass) {
                     System.out.println("continuing to " + topPosition);
                     liftInternals.drop();
+                    delay(300); // small extra delay to let cone fall
                     liftInternals.goToPositionBlocking(topPosition, 1);
                     internalFinish(true); // TODO for the future we probably want to call get() here
                 }
@@ -94,7 +98,7 @@ public class Cycle {
             if (!dropOptimized) {
                 System.out.println("drop");
                 liftInternals.drop();
-                delay(DROP_DELAY_MS); // this delay is to make sure it's out of our way
+                liftInternals.awaitClaw();
             }
 
             stage = Stage.DROPPED;

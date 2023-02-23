@@ -158,6 +158,10 @@ class LiftInternals(private val opMode: OpMode) {
         waitUntil { abs(motor.currentPosition - motor.targetPosition) < 50 }
     }
 
+    fun awaitClaw() {
+        waitUntil { !clawServo.pwm } // only true while powered
+    }
+
     fun resetEncoder() {
         motor.mode = RunMode.STOP_AND_RESET_ENCODER
         motor.mode = motorMode
@@ -197,7 +201,7 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO also remove the reverse functions during said refactor
         // Claw
         // Grab is 0; drop is 1
-        const val GRAB_DELAY_MS = 1200L
-        const val DROP_DELAY_MS = 900L
+        const val GRAB_DELAY_MS = 700L
+        const val DROP_DELAY_MS = 700L
     }
 }
