@@ -66,7 +66,7 @@ class LiftInternals(private val opMode: OpMode) {
     private fun uncheckedDrop() {
         setUnchecked(0, DROP_DELAY_MS)
     }
-    fun uncheckedGrab() {
+    internal fun uncheckedGrab() {
         setUnchecked(1, GRAB_DELAY_MS)
     }
 

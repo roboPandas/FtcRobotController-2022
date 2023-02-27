@@ -28,8 +28,12 @@ import java.util.concurrent.Executors
  *
  * Async lift control:
  * Left/right trigger - change bottom position (left is down, right is up); default is the lowest setting
+ * The bottom position is the only Cycle attribute that can be modified during a cycle.
+ * All other attributes will apply to the next created cycle.
  * B/Y/X - set top position to high/medium/low (respectively); default is high
- * A - start/continue cycle
+ * A - start/test/continue cycle
+ * Start - cancel cycle from test phase
+ * Back - toggle between rotation and no rotation mode
  */
 @TeleOp
 open class ControlledOpMode : OpMode() {

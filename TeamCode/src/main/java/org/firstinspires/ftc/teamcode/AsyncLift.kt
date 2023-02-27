@@ -16,12 +16,21 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
     private var bottomPosition = LiftInternals.Position.STACK_1
     private var lastBottomPosChange = BottomPosChange.NONE
 
+    private var reversed = false
+    private var reverseCache = false
+    private fun checkReverse() {
+        val button = gamepad.back
+        if (button && !reverseCache) reversed = !reversed
+        reverseCache = button
+    }
+
     override fun loop() {
         if (currentCycle != null) {
             loopWithCycle()
         } else {
             loopWithoutCycle()
         }
+        checkReverse()
     }
 
     private fun loopWithoutCycle() {
@@ -43,7 +52,7 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
 
         // create cycle
         if (gamepad.a) {
-            currentCycle = Cycle(opMode, cycleExecutor, liftInternals, topPosition) { bottomPosition }
+            currentCycle = Cycle(opMode, cycleExecutor, liftInternals, topPosition, reversed) { bottomPosition }
             opMode.telemetry.addData("top position", topPosition)
             println("A: start cycle")
             currentCycle!!.start()
