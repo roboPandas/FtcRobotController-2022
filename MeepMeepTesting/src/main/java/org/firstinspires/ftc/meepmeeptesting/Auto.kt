@@ -6,7 +6,7 @@ import com.noahbres.meepmeep.MeepMeep
 import com.noahbres.meepmeep.MeepMeep.Background
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder
-import org.firstinspires.ftc.teamcode.trajectories.Trajectories
+import org.firstinspires.ftc.meepmeeptesting.MeepMeepTrajectories.apply
 import org.firstinspires.ftc.teamcode.trajectories.Trajectories.FainterLight
 import kotlin.math.PI
 
@@ -28,8 +28,7 @@ fun main() {
         .setConstraints(45.0, 60.0, 4.25, Math.toRadians(360.0), 13.43)
         .setDimensions(15.0, 17.0)
         .followTrajectorySequence {
-            MeepMeepTrajectories.apply(
-                it,
+            it.apply(
                 FainterLight.PRELOAD,
                 FainterLight.TO_STACK,
 //

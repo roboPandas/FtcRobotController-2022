@@ -1,10 +1,3 @@
-package org.firstinspires.ftc.teamcode.trajectories;
+package org.firstinspires.ftc.teamcode.trajectories
 
-public class Vec {
-    public final double x, y;
-
-    public Vec(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+data class Vec(val x: Double, val y: Double)

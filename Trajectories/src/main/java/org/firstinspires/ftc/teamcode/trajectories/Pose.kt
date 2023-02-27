@@ -1,33 +1,11 @@
-package org.firstinspires.ftc.teamcode.trajectories;
+package org.firstinspires.ftc.teamcode.trajectories
 
-public class Pose {
-    public final double x, y;
-    public final double heading;
+data class Pose(val x: Double, val y: Double, val heading: Double) {
+    constructor(vec: Vec, heading: Double) : this(vec.x, vec.y, heading)
 
-    public Pose(double x, double y, double heading) {
-        this.x = x;
-        this.y = y;
-        this.heading = heading;
-    }
+    fun withPos(x: Double, y: Double) = copy(x, y)
 
-    public Pose(Vec vec, double heading) {
-        this(vec.x, vec.y, heading);
-    }
+    fun withPos(vec: Vec) = withPos(vec.x, vec.y)
 
-    public Pose withPos(Vec vec) {
-        return withPos(vec.x, vec.y);
-    }
-
-    public Pose withPos(double x, double y) {
-        return new Pose(x, y, heading);
-    }
-
-    public Pose withHeading(double heading) {
-        return new Pose(x, y, heading);
-    }
-
-    @Override
-    public String toString() {
-        return "(" + x + ", " + y + ")" + " @ " + Math.toDegrees(heading);
-    }
+    override fun toString() = "($x, $y) @ ${Math.toDegrees(heading)}"
 }
