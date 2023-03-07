@@ -18,7 +18,7 @@ public class Main {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(36, 36, Math.PI, Math.PI, 13)
+                .setConstraints(50, 50, Math.PI, Math.PI, 13)
                 .setDimensions(15, 17)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose()) // TODO is this 72-based or 70-based?

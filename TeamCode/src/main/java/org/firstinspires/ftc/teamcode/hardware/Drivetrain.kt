@@ -16,6 +16,7 @@ private typealias Scaling = (Float, Float, Float) -> Double
 
 class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMode.gamepad1) : Subsystem {
     private val multiplierMap: Map<DcMotor, MotorMultipliers>
+//    private val ordometry: Array<DcMotor>
     private val sequence: InputSequence = InputSequence()
     private val timer = ElapsedTime()
 
@@ -27,6 +28,11 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
             hardwareMap.dcMotor["backLeft"] to MotorMultipliers(-1, +1),
             hardwareMap.dcMotor["backRight"] to MotorMultipliers(-1, -1)
         ) // z doesn't need a multiplier since everything is +1
+
+//        ordometry = arrayOf(
+//            hardwareMap.dcMotor["encoderX"],
+//            hardwareMap.dcMotor["encoderY"],
+//        )
 
         multiplierMap.keys.forEach {
             it.mode = DcMotor.RunMode.RUN_USING_ENCODER
@@ -57,6 +63,9 @@ class Drivetrain(private val opMode: OpMode, private val gamepad: Gamepad = opMo
             y = -gamepad.left_stick_y, // for some atrocious reason, down is positive
             z = gamepad.right_stick_x
         )
+
+//        opMode.telemetry.addData("encoderX", odometry[0].currentPosition)
+//        opMode.telemetry.addData("encoderY", odometry[1].currentPosition)
     }
 
     data class MotorMultipliers(val x: Int, val y: Int)

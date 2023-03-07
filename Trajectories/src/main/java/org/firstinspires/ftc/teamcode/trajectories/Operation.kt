@@ -9,7 +9,7 @@ sealed interface Operation {
 
     class ScalarOperation(val type: Type, val value: Double) : Operation {
         enum class Type {
-            FORWARD, STRAFE_LEFT
+            FORWARD, BACK, STRAFE_LEFT
         }
     }
 

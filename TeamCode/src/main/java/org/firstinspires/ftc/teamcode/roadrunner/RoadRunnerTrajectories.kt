@@ -37,6 +37,7 @@ object RoadRunnerTrajectories {
             }
             is ScalarOperation -> when (op.type) {
                 ScalarOperation.Type.FORWARD -> forward(op.value)
+                ScalarOperation.Type.BACK -> back(op.value)
                 ScalarOperation.Type.STRAFE_LEFT -> strafeLeft(op.value)
             }
             is VecOperation -> {

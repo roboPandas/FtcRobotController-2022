@@ -29,6 +29,9 @@ class LiftInternals(private val opMode: OpMode) {
             motor.mode = field
         }
 
+    // 5 3/4, y wheel
+    //
+
     init {
         val hardwareMap = opMode.hardwareMap
         motor = hardwareMap.dcMotor["liftMotor"]
@@ -41,8 +44,8 @@ class LiftInternals(private val opMode: OpMode) {
 
         // Set an auto-clamp for the servo
         // These all assume that the position scaling is linear, and that we are using the center of the servo's range
-        rotationServo.scaleRange(0.14, 0.809) // (+)
-        clawServo.scaleRange(0.415, 0.66)
+        rotationServo.scaleRange(0.1, 0.78) // (+)
+        clawServo.scaleRange(0.38, 0.8)
         lockServo.scaleRange(0.0, 0.12)
 
         lock() // needed to fix a bug where unlocking fails on the first cycle
@@ -51,7 +54,7 @@ class LiftInternals(private val opMode: OpMode) {
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun initAuto() = goToPosition(Position.STACK_1, 0.25)
+    inline fun initSlide() = goToPosition(Position.STACK_1, 0.25)
 
     fun grab() {
         internalSetClaw(1, GRAB_DELAY_MS)
@@ -63,11 +66,12 @@ class LiftInternals(private val opMode: OpMode) {
 
     // This function is NOT safe to call in a loop.
     // It is used to guarantee that the claw is ALWAYS commanded to open.
-    private fun uncheckedDrop() {
-        setUnchecked(0, DROP_DELAY_MS)
-    }
     internal fun uncheckedGrab() {
         setUnchecked(1, GRAB_DELAY_MS)
+    }
+
+    private fun uncheckedDrop() {
+        setUnchecked(0, DROP_DELAY_MS)
     }
 
     private fun internalSetClaw(pos: Int, delayMillis: Long) {
@@ -127,7 +131,7 @@ class LiftInternals(private val opMode: OpMode) {
     }
 
     /** Power MUST be positive.  */
-    private fun goToPosition(targetPosition: Int, power: Double): Future<*> { // just in case
+    fun goToPosition(targetPosition: Int, power: Double): Future<*> { // just in case
         return liftExecutor.submit {
             val needsLock = goToPositionInternal(targetPosition, power)
             awaitTargetHit()
@@ -145,10 +149,13 @@ class LiftInternals(private val opMode: OpMode) {
             delay(LOCK_DELAY_MS)
             unlock()
         }
+
         delay(100)
+
         motor.targetPosition = targetPosition
         motorMode = RunMode.RUN_TO_POSITION
         motor.power = power * MOTOR_SCALE_FACTOR
+
         println("power set: " + motor.power)
         return needsLock
     }
@@ -172,9 +179,13 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO test if we need to explicitly disable locking for the GROUND position
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
-        STACK_1(210), STACK_2(360), STACK_3(420), STACK_4(500), STACK_5(650),  // the lowest position that allows rotation
+
+        STACK_1(210), STACK_2(350), STACK_3(350), STACK_4(490), STACK_5(630),  // the lowest position that allows rotation
+
         CAN_ROTATE(1530),  // junction heights
+
         LOW(1530), MIDDLE(2250), HIGH(3100),
+
         ZERO(0);
 
         operator fun inc(): Position {
@@ -201,7 +212,7 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO also remove the reverse functions during said refactor
         // Claw
         // Grab is 0; drop is 1
-        const val GRAB_DELAY_MS = 700L
+        const val GRAB_DELAY_MS = 500L
         const val DROP_DELAY_MS = 700L
     }
 }

@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.roadrunner.drive;
 
-import android.os.Build;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
@@ -43,12 +40,12 @@ import java.util.List;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.8, 0, 0);
+public class SampleMecanumDrive extends MecanumDrive { // 8, 8
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
     // tuned: expected / actual
-    public static double LATERAL_MULTIPLIER = (51.2 / 46) * (60.51 / 59.25);
+    public static double LATERAL_MULTIPLIER = 60 / 42.75;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -138,6 +135,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
+
+        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }

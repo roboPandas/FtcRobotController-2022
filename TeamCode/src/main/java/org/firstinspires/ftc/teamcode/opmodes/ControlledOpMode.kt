@@ -70,7 +70,7 @@ open class ControlledOpMode : OpMode() {
     }
 
     open fun LiftInternals.init() {
-        initAuto().get()
+        initSlide().get()
     }
 
     override fun loop() {

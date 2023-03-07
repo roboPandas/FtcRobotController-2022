@@ -112,11 +112,14 @@ class QuantizationPipeline : OpenCvPipeline() {
     }
 
     private fun focus(width: Double, height: Double): Array<Point> {
-        val off = height * FOCUS_OFFSET
+        val off = height * -FOCUS_OFFSET
+
+        val xMargin = (1 - FOCUS_WIDTH) / 2
+        val yMargin = (1 - FOCUS_HEIGHT) / 2
 
         return arrayOf(
-            Point(width * FOCUS_WIDTH, height * FOCUS_HEIGHT + off),
-            Point(width - width * FOCUS_WIDTH, height - height * FOCUS_HEIGHT + off)
+            Point(width * xMargin, height * yMargin + off),
+            Point(width - width * xMargin, height - height * yMargin + off)
         )
     }
 
@@ -173,8 +176,8 @@ class QuantizationPipeline : OpenCvPipeline() {
 
     companion object {
         const val K = 4
-        const val FOCUS_HEIGHT = 0.3
-        const val FOCUS_WIDTH = 0.3
-        const val FOCUS_OFFSET = 0.0
+        const val FOCUS_HEIGHT = 0.35
+        const val FOCUS_WIDTH = 0.38
+        const val FOCUS_OFFSET = -0.1
     }
 }

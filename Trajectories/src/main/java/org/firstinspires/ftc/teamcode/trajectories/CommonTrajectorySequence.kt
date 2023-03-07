@@ -5,6 +5,9 @@ import org.firstinspires.ftc.teamcode.trajectories.Operation.ScalarOperation
 import org.firstinspires.ftc.teamcode.trajectories.Operation.VecOperation
 import org.firstinspires.ftc.teamcode.trajectories.Operation.PoseOperation
 import org.firstinspires.ftc.teamcode.trajectories.Operation.PoseAndScalarOperation
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 class CommonTrajectorySequence private constructor(
     val start: Pose,
@@ -78,7 +81,8 @@ class CommonTrajectorySequence private constructor(
         }
 
         fun back(distance: Double): Builder {
-            return forward(-distance)
+            offsetCurrent(current.heading, -distance)
+            return scalar(ScalarOperation.Type.BACK, distance)
         }
 
         fun strafeLeft(distance: Double): Builder {
@@ -87,8 +91,8 @@ class CommonTrajectorySequence private constructor(
         }
 
         private fun offsetCurrent(angle: Double, distance: Double) {
-            val dX = distance * Math.cos(angle)
-            val dY = distance * Math.sin(angle)
+            val dX = distance * cos(angle)
+            val dY = distance * sin(angle)
             current = current.withPos(current.x + dX, current.y + dY)
         }
 

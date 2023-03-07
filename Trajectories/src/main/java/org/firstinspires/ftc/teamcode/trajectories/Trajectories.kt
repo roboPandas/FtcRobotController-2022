@@ -16,32 +16,24 @@ object Trajectories {
     }
 
     object FainterLight {
-        val PRELOAD = CommonTrajectorySequence.builder(pose(-36.0, -65.5, -PI / 2))
-            .setReversed(true) // robot starts backwards
-            .back(2.0) // back up from wall to not hit when rotating
-            .splineToSplineHeading(
-                pose(-36.0, -53.5, PI),
-                PI / 2
-            ) // rotate and move up a bit
-            .splineToSplineHeading(pose(-38.0, -23.5, 11 * PI / 8), PI / 2)
-            .splineToSplineHeading(
-                pose(-31.0, -4.0, 5 * PI / 4),
-                PI / 4
-            ) // finish and spline to pole
+        val PRELOAD = CommonTrajectorySequence.builder(pose(-35.0, -62.5, PI))
+            .setReversed(false)
+            .strafeRight(41.8) // strafe partially to pole
+            .splineToSplineHeading(pose(-29.5, -6.0, 5 * PI / 4), PI / 4) // spline to pole to line up with it
             .build()
         val TO_STACK = CommonTrajectorySequence.builder(PRELOAD.end)
             .setReversed(false)
-            .splineTo(vec(-38.0, -16.0), PI) // spline towards cones
-            .forward(22.0) // drive into cones
+            .splineTo(vec(-40.5, -11.9), PI) // spline towards cones
+            .forward(18.0) // drive into cones
+            .splineToSplineHeading(pose(-62.5, -11.75, PI), PI) // spline to pole to line up with it
             .build()
         val TO_JUNCTION = CommonTrajectorySequence.builder(TO_STACK.end)
-            .setReversed(true)
+            .setReversed(false)
             .back(20.5) // back up from cones
-            .splineToSplineHeading(pose(-25.5, -5.0, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(pose(-29.5, -6.0, 5 * PI / 4), PI / 4)
             .build()
         val PARK = CommonTrajectorySequence.builder(TO_JUNCTION.end)
-            .setReversed(false)
-            .splineTo(vec(-38.0, -12.0), PI) // spline back to cones
+            .splineTo(vec(-38.0, -9.0), PI) // spline back to cones
             .build()
     }
 }

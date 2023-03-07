@@ -6,13 +6,14 @@ import org.openftc.easyopencv.OpenCvPipeline
 import org.opencv.imgproc.Imgproc
 import java.util.ArrayList
 
-class MisalignmentPipeline(var telemetry: Telemetry) : OpenCvPipeline() {
+class MisalignmentPipeline : OpenCvPipeline() {
     private val upper = Scalar(20.0, 150.0, 100.0)
     private val lower = Scalar(40.0, 255.0, 255.0)
     private val res = Mat()
     private val mask = Mat()
     private val hierarchy = Mat()
     private val contours = ArrayList<MatOfPoint>()
+    var dist: Int = 0
 
     override fun processFrame(input: Mat): Mat {
         contours.clear()
@@ -51,9 +52,7 @@ class MisalignmentPipeline(var telemetry: Telemetry) : OpenCvPipeline() {
 
         val boundingBox = Imgproc.boundingRect(contours[contourIdx])
         val centerX = boundingBox.x + boundingBox.width / 2
-        val dist = -(input.width() / 2 - centerX)
-        telemetry.addData("dist", dist)
-        telemetry.update()
+        dist = -(input.width() / 2 - centerX)
 
         Imgproc.line(
             input, Point((input.width() / 2).toDouble(), 0.0), Point(
