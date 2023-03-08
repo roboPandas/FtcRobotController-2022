@@ -4,7 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.Cycle
 import org.firstinspires.ftc.teamcode.delay
-import org.firstinspires.ftc.teamcode.opmodes.AutonomousTemplate
+import org.firstinspires.ftc.teamcode.opmodes.auto.AutonomousTemplate
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
 import org.firstinspires.ftc.teamcode.waitUntil
 

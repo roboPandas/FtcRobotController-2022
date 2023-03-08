@@ -1,17 +1,14 @@
-package org.firstinspires.ftc.teamcode.opmodes
+package org.firstinspires.ftc.teamcode.opmodes.auto
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.Cycle
 import org.firstinspires.ftc.teamcode.delay
-import org.firstinspires.ftc.teamcode.hardware.LiftInternals
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position.*
-import org.firstinspires.ftc.teamcode.roadrunner.RoadRunnerTrajectories.apply
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
-import org.firstinspires.ftc.teamcode.trajectories.Trajectories
 import org.firstinspires.ftc.teamcode.waitUntil
 import java.util.concurrent.Future
 
