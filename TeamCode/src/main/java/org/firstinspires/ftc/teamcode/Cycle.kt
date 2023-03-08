@@ -151,7 +151,7 @@ class Cycle @JvmOverloads constructor(
     }
 
     companion object {
-        const val GRAB_DELAY_MS = 500L
+        const val GRAB_DELAY_MS = 550L
         const val DROP_DELAY_MS = 500L
     }
 }

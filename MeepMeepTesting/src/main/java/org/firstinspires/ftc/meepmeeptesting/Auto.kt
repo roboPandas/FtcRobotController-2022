@@ -27,34 +27,34 @@ fun main() {
         .setConstraints(45.0, 45.0, 3.7, 4.0, 13.43)
         .setDimensions(15.0, 17.0)
         .followTrajectorySequence {
-            it.trajectorySequenceBuilder(Pose2d(-35.0, -62.5, PI))
-                .setReversed(false)
-                .strafeRight(41.8) // strafe partially to pole
-                .splineToSplineHeading(Pose2d(-29.0, -6.0, 5 * PI / 4), PI / 4)
-                .build()
-//            it.apply(
-//                // +1
-//                FainterLight.PRELOAD,
-//
-//                // 1
-//                FainterLight.TO_STACK,
-//                FainterLight.TO_JUNCTION,
-//                // 2
-//                FainterLight.TO_STACK,
-//                FainterLight.TO_JUNCTION,
-//                // 3
-//                FainterLight.TO_STACK,
-//                FainterLight.TO_JUNCTION,
-//                // 4
-//                FainterLight.TO_STACK,
-//                FainterLight.TO_JUNCTION,
-//                // 5
-//                FainterLight.TO_STACK,
-//                FainterLight.TO_JUNCTION,
-//
-//                // park
-//                // FainterLight.PARK
-//            ).build()
+//            it.trajectorySequenceBuilder(Pose2d(-35.0, -62.5, PI))
+//                .setReversed(false)
+//                .strafeRight(41.8) // strafe partially to pole
+//                .splineToSplineHeading(Pose2d(-29.0, -6.0, 5 * PI / 4), PI / 4)
+//                .build()
+            it.apply(
+                // +1
+                FainterLight.PRELOAD,
+
+                // 1
+                FainterLight.TO_STACK,
+                FainterLight.TO_JUNCTION,
+                // 2
+                FainterLight.TO_STACK,
+                FainterLight.TO_JUNCTION,
+                // 3
+                FainterLight.TO_STACK,
+                FainterLight.TO_JUNCTION,
+                // 4
+                FainterLight.TO_STACK,
+                FainterLight.TO_JUNCTION,
+                // 5
+                FainterLight.TO_STACK,
+                FainterLight.TO_JUNCTION,
+
+                // park
+                // FainterLight.PARK
+            ).build()
         }
 
     meepMeep.setBackground(Background.FIELD_POWERPLAY_OFFICIAL)

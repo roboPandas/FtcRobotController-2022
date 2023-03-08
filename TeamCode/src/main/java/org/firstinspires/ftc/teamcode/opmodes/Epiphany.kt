@@ -29,13 +29,13 @@ open class Epiphany : AutonomousTemplate() {
         preload = drive.trajectorySequenceBuilder(Pose2d(-35.0, -62.5, PI))
             .setReversed(false)
             .strafeRight(41.8) // strafe partially to pole
-            .splineToSplineHeading(Pose2d(-29.5, -6.0, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(Pose2d(-28.0, -4.0, 5 * PI / 4), PI / 4)
             .build()
 
         val toStack1 = drive.trajectorySequenceBuilder(preload.end())
             .setReversed(false)
-            .splineTo(Vector2d(-40.5, -11.75), PI) // spline towards cones
-            .forward(16.0) // drive into cones
+            .splineTo(Vector2d(-40.5, -12.0), PI) // spline towards cones
+            .forward(18.0) // drive into cones
             .forward(4.0,
                 SampleMecanumDrive.getVelocityConstraint(10.0, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL),
@@ -44,8 +44,9 @@ open class Epiphany : AutonomousTemplate() {
 
         val toStack2 = drive.trajectorySequenceBuilder(preload.end())
             .setReversed(false)
-            .splineTo(Vector2d(-40.5, -12.0), PI) // spline towards cones
-            .forward(16.0) // drive into cones
+            .splineTo(Vector2d(-40.5, -12.25), PI) // spline towards cones
+            .forward(18.0) // drive into cones
+            .strafeLeft(1.25)
             .forward(4.0,
                 SampleMecanumDrive.getVelocityConstraint(10.0, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL),
@@ -54,8 +55,9 @@ open class Epiphany : AutonomousTemplate() {
 
         val toStack3 = drive.trajectorySequenceBuilder(preload.end())
             .setReversed(false)
-            .splineTo(Vector2d(-40.5, -12.25), PI) // spline towards cones
-            .forward(16.0) // drive into cones
+            .splineTo(Vector2d(-40.5, -12.50), PI) // spline towards cones
+            .forward(18.0) // drive into cones
+            .strafeLeft(2.0)
             .forward(4.0,
                 SampleMecanumDrive.getVelocityConstraint(10.0, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL),
@@ -64,8 +66,9 @@ open class Epiphany : AutonomousTemplate() {
 
         val toStack4 = drive.trajectorySequenceBuilder(preload.end())
             .setReversed(false)
-            .splineTo(Vector2d(-40.5, -12.50), PI) // spline towards cones
-            .forward(16.0) // drive into cones
+            .splineTo(Vector2d(-40.5, -12.75), PI) // spline towards cones
+            .forward(18.0) // drive into cones
+            .strafeLeft(3.0)
             .forward(4.0,
                 SampleMecanumDrive.getVelocityConstraint(10.0, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL),
@@ -74,8 +77,9 @@ open class Epiphany : AutonomousTemplate() {
 
         val toStack5 = drive.trajectorySequenceBuilder(preload.end())
             .setReversed(false)
-            .splineTo(Vector2d(-40.5, -12.75), PI) // spline towards cones
-            .forward(16.0) // drive into cones
+            .splineTo(Vector2d(-40.5, -13.0), PI) // spline towards cones
+            .forward(18.0) // drive into cones
+            .strafeLeft(3.0)
             .forward(4.0,
                 SampleMecanumDrive.getVelocityConstraint(10.0, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL),
@@ -89,34 +93,34 @@ open class Epiphany : AutonomousTemplate() {
         val junction1 = drive.trajectorySequenceBuilder(toStack1.end())
             .setReversed(false)
             .back(20.5) // back up from cones
-            .splineToSplineHeading(Pose2d(-29.0, -6.0, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(Pose2d(-29.0, -5.0, 5 * PI / 4), PI / 4)
             .build()
 
         val junction2 = drive.trajectorySequenceBuilder(toStack2.end())
             .setReversed(false)
             .back(20.5) // back up from cones
-            .splineToSplineHeading(Pose2d(-27.5, -4.5, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(Pose2d(-29.0, -5.0, 5 * PI / 4), PI / 4)
             .build()
 
         val junction3 = drive.trajectorySequenceBuilder(toStack3.end())
             .setReversed(false)
             .back(20.5) // back up from cones
-            .splineToSplineHeading(Pose2d(-27.0, -4.0, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(Pose2d(-29.0, -5.0, 5 * PI / 4), PI / 4)
             .build()
 
         val junction4 = drive.trajectorySequenceBuilder(toStack4.end())
             .setReversed(false)
             .back(20.5) // back up from cones
-            .splineToSplineHeading(Pose2d(-27.0, -4.0, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(Pose2d(-29.0, -5.0, 5 * PI / 4), PI / 4)
             .build()
 
         val junction5 = drive.trajectorySequenceBuilder(toStack5.end())
             .setReversed(false)
             .back(20.5) // back up from cones
-            .splineToSplineHeading(Pose2d(-27.0, -4.0, 5 * PI / 4), PI / 4)
+            .splineToSplineHeading(Pose2d(-29.0, -5.0, 5 * PI / 4), PI / 4)
             .build()
 
-        toJunction = arrayOf(junction1, junction2, junction2, junction2, junction2)
+        toJunction = arrayOf(junction1, junction2, junction3, junction4, junction5)
 
         return preload.start()
     }
@@ -124,7 +128,7 @@ open class Epiphany : AutonomousTemplate() {
     override fun main() {
         runPreload(preload, toStack[0])
 
-        repeat(5) {
+        repeat(3) {
             runCycle(toJunction[it], toStack[it])
         }
 
