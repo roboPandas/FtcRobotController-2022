@@ -14,8 +14,8 @@ import java.util.concurrent.Future
 
 @Autonomous
 open class FainterLightLeft : AutonomousTemplate() {
+    private lateinit var toJunctions: Array<TrajectorySequence>
     protected lateinit var preload: TrajectorySequence
-    private lateinit var toJunction: TrajectorySequence
     private lateinit var toStack: TrajectorySequence
     private var bottomPosition = STACK_5
 //    private lateinit var park: TrajectorySequence
@@ -23,8 +23,9 @@ open class FainterLightLeft : AutonomousTemplate() {
     override fun initializeTrajectories(): Pose2d? {
         preload = drive.apply(Trajectories.FainterLight.PRELOAD).build()
         toStack = drive.apply(Trajectories.FainterLight.TO_STACK).build()
-        toJunction = drive.apply(Trajectories.FainterLight.TO_JUNCTION).build()
-
+        toJunctions = Array(CYCLES) {
+            drive.apply(Trajectories.FainterLight.buildToJunction(0.0)).build()
+        }
 //        park = drive.apply(Trajectories.FainterLight.PARK).build()
         return preload.start()
     }
@@ -32,10 +33,8 @@ open class FainterLightLeft : AutonomousTemplate() {
     override fun main() {
         runPreload(preload, toStack)
 
-        repeat(5) {
-            // correct for slow drift
-            drive.poseEstimate = drive.poseEstimate + Pose2d(1.0, 1.0, 0.0)
-            runCycle(toJunction, toStack)
+        repeat(CYCLES) {
+            runCycle(toJunctions[it], toStack)
         }
 
         drive.followTrajectorySequence(
@@ -66,7 +65,7 @@ open class FainterLightLeft : AutonomousTemplate() {
         currentCycle = createCycle(HIGH, bottomPosition)
 
         val start = currentCycle.startFunc()
-        delay(Cycle.GRAB_DELAY_MS)
+        delay(650)
 
         drive.followTrajectorySequence(toJunction)
         start.get()
@@ -84,6 +83,10 @@ open class FainterLightLeft : AutonomousTemplate() {
         currentCycle.await()
 
         bottomPosition--
+    }
+
+    companion object {
+        const val CYCLES = 3
     }
 }
 

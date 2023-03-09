@@ -125,9 +125,7 @@ open class Epiphany : AutonomousTemplate() {
     override fun main() {
         runPreload(preload, toStack[0])
 
-        repeat(3) {
-            runCycle(toJunction[it], toStack[it])
-        }
+        runCycle(toJunction[0], toStack[0])
 
 //        liftInternals.goToPositionBlocking(ZERO, LiftInternals.MOTOR_SCALE_FACTOR / 4)
     }
@@ -142,7 +140,7 @@ open class Epiphany : AutonomousTemplate() {
         currentCycle = createCycle(HIGH, bottomPosition)
 
         val start = currentCycle.startFunc()
-        delay(Cycle.GRAB_DELAY_MS)
+        delay(600)
 
         drive.followTrajectorySequence(toJunction)
         start.get()

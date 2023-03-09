@@ -34,7 +34,10 @@ abstract class AutonomousTemplate : OpMode() {
     override fun init() {
         drive = SampleMecanumDrive(hardwareMap)
         val start = initializeTrajectories()
-        if (start != null) drive.poseEstimate = start
+        if (start != null) {
+            drive.poseEstimate = start
+            telemetry.addData("Start pose", start).setRetained(true)
+        }
 
         webcam = OpenCvCameraFactory.getInstance().createWebcam(
             hardwareMap[WebcamName::class.java, "Webcam 1"]

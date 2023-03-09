@@ -46,7 +46,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // in
     public static double GEAR_RATIO = 0.05; // out/in * tuning
-    public static double TRACK_WIDTH = 14.36; // in
+    public static double TRACK_WIDTH = 15.85; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -90,10 +90,10 @@ public class DriveConstants {
     // 45
     // 45
 
-    public static double MAX_VEL = 40;
-    public static double MAX_ACCEL = 40;
-    public static double MAX_ANG_VEL = 3.7;
-    public static double MAX_ANG_ACCEL = 4;
+    public static double MAX_VEL = 5;//30;
+    public static double MAX_ACCEL = 5;//40;
+    public static double MAX_ANG_VEL = 0.5;//3.4;
+    public static double MAX_ANG_ACCEL = 0.5;//3;
 
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;

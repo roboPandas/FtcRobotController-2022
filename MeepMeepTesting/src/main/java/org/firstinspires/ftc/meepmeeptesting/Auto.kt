@@ -38,19 +38,19 @@ fun main() {
 
                 // 1
                 FainterLight.TO_STACK,
-                FainterLight.TO_JUNCTION,
+                FainterLight.buildToJunction(0.0),
                 // 2
-                FainterLight.TO_STACK,
-                FainterLight.TO_JUNCTION,
-                // 3
-                FainterLight.TO_STACK,
-                FainterLight.TO_JUNCTION,
-                // 4
-                FainterLight.TO_STACK,
-                FainterLight.TO_JUNCTION,
-                // 5
-                FainterLight.TO_STACK,
-                FainterLight.TO_JUNCTION,
+//                FainterLight.TO_STACK,
+//                FainterLight.TO_JUNCTION,
+//                // 3
+//                FainterLight.TO_STACK,
+//                FainterLight.TO_JUNCTION,
+//                // 4
+//                FainterLight.TO_STACK,
+//                FainterLight.TO_JUNCTION,
+//                // 5
+//                FainterLight.TO_STACK,
+//                FainterLight.TO_JUNCTION,
 
                 // park
                 // FainterLight.PARK

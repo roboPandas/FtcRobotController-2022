@@ -149,9 +149,4 @@ class Cycle @JvmOverloads constructor(
     enum class Stage {
         WAITING, GRABBING, GRABBED, WAITING_FOR_TEST, TEST_DROP, TEST_WAITING, TEST_REVERTING, DROPPING, DROPPED, COMPLETE
     }
-
-    companion object {
-        const val GRAB_DELAY_MS = 550L
-        const val DROP_DELAY_MS = 500L
-    }
 }
