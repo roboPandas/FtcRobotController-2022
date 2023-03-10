@@ -9,32 +9,32 @@ import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position.*
 import org.firstinspires.ftc.teamcode.roadrunner.RoadRunnerTrajectories.apply
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
 import org.firstinspires.ftc.teamcode.trajectories.Trajectories
+import org.firstinspires.ftc.teamcode.trajectories.Vec
 import org.firstinspires.ftc.teamcode.waitUntil
+import java.util.*
 import java.util.concurrent.Future
 
 @Autonomous
 open class FainterLightLeft : AutonomousTemplate() {
     private lateinit var toJunctions: Array<TrajectorySequence>
     protected lateinit var preload: TrajectorySequence
-    private lateinit var toStack: TrajectorySequence
+    private lateinit var toStacks: Array<TrajectorySequence>
     private var bottomPosition = STACK_5
 //    private lateinit var park: TrajectorySequence
 
     override fun initializeTrajectories(): Pose2d? {
         preload = drive.apply(Trajectories.FainterLight.PRELOAD).build()
-        toStack = drive.apply(Trajectories.FainterLight.TO_STACK).build()
-        toJunctions = Array(CYCLES) {
-            drive.apply(Trajectories.FainterLight.buildToJunction(0.0)).build()
-        }
+        val trajectories = Jank.buildTrajectories(CYCLES, Trajectories.FainterLight.PRELOAD)
+        toStacks = trajectories.first.map { drive.apply(it).build() }.toTypedArray()
+        toJunctions = trajectories.second.map { drive.apply(it).build() }.toTypedArray()
 //        park = drive.apply(Trajectories.FainterLight.PARK).build()
         return preload.start()
     }
 
     override fun main() {
-        runPreload(preload, toStack)
-
-        repeat(CYCLES) {
-            runCycle(toJunctions[it], toStack)
+        repeat(CYCLES + 1) {
+            if (it == 0) runPreload(preload, toStacks[it])
+            else runCycle(toJunctions[it], toStacks[it])
         }
 
         drive.followTrajectorySequence(
@@ -86,7 +86,7 @@ open class FainterLightLeft : AutonomousTemplate() {
     }
 
     companion object {
-        const val CYCLES = 3
+        const val CYCLES = 5
     }
 }
 

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.meepmeeptesting.MeepMeepTrajectories.apply
 import org.firstinspires.ftc.teamcode.trajectories.CommonTrajectorySequence
 import org.firstinspires.ftc.teamcode.trajectories.Trajectories
 import org.firstinspires.ftc.teamcode.trajectories.Trajectories.FainterLight
+import org.firstinspires.ftc.teamcode.trajectories.Vec
 import kotlin.math.PI
 
 val startPose = reversedPose(-36.0, -63.5, -PI / 2)
@@ -37,11 +38,11 @@ fun main() {
                 FainterLight.PRELOAD,
 
                 // 1
-                FainterLight.TO_STACK,
-                FainterLight.buildToJunction(0.0),
+                FainterLight.buildToStack(Vec(0.0, 0.0)),
+                FainterLight.buildToJunction(Vec(0.0, 0.0)),
                 // 2
-//                FainterLight.TO_STACK,
-//                FainterLight.TO_JUNCTION,
+                FainterLight.buildToStack(Vec(1.25, -1.25)),
+                FainterLight.buildToJunction(Vec(1.25, -1.25)),
 //                // 3
 //                FainterLight.TO_STACK,
 //                FainterLight.TO_JUNCTION,

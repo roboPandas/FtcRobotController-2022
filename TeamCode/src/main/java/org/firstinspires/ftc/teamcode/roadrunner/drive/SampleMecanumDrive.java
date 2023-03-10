@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
@@ -41,8 +42,8 @@ import java.util.List;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive { // 8, 8
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(5, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(10, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 2, 2);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 3, 0.000002);
 
     // tuned: expected / actual
     public static double LATERAL_MULTIPLIER = 60 / 42.75;
@@ -64,11 +65,14 @@ public class SampleMecanumDrive extends MecanumDrive { // 8, 8
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    private final Telemetry telemetry;
+
+    public SampleMecanumDrive(HardwareMap hardwareMap, Telemetry telemetry) {
         super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
+        this.telemetry = telemetry;
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+                new Pose2d(0.1, 0.1, Math.toRadians(1.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -202,7 +206,12 @@ public class SampleMecanumDrive extends MecanumDrive { // 8, 8
 
     public void update() {
         updatePoseEstimate();
-        DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        Pose2d pose = getPoseEstimate();
+        telemetry.addData("X", pose.getX());
+        telemetry.addData("Y", pose.getY());
+        telemetry.addData("Θ", Math.toDegrees(pose.getHeading()));
+        telemetry.update();
+        DriveSignal signal = trajectorySequenceRunner.update(pose, getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
     }
 

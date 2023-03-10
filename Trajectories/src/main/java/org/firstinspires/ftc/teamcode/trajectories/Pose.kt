@@ -7,5 +7,9 @@ data class Pose(val x: Double, val y: Double, val heading: Double) {
 
     fun withPos(vec: Vec) = withPos(vec.x, vec.y)
 
+    fun add(offset: Vec): Pose {
+        return Pose(x + offset.x, y + offset.y, heading)
+    }
+
     override fun toString() = "($x, $y) @ ${Math.toDegrees(heading)}"
 }

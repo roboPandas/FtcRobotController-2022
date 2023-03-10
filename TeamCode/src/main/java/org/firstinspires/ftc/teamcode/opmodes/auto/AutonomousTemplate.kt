@@ -32,7 +32,7 @@ abstract class AutonomousTemplate : OpMode() {
     abstract fun main()
 
     override fun init() {
-        drive = SampleMecanumDrive(hardwareMap)
+        drive = SampleMecanumDrive(hardwareMap, telemetry)
         val start = initializeTrajectories()
         if (start != null) {
             drive.poseEstimate = start
@@ -61,6 +61,9 @@ abstract class AutonomousTemplate : OpMode() {
         liftInternals.apply {
             uncheckedGrab()
             awaitClaw()
+            uncheckedDrop()
+            awaitClaw()
+            uncheckedGrab()
         }
         currentCycle = Cycle(
             this,

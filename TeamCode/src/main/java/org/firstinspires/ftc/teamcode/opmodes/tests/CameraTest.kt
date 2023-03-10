@@ -14,7 +14,7 @@ class CameraTest : AutonomousTemplate() {
     override fun main() {
 //        telemetry.addData("detected color", detectedColor)
 //        telemetry.update()
-        drive = SampleMecanumDrive(hardwareMap)
+        drive = SampleMecanumDrive(hardwareMap, telemetry)
         val start = initializeTrajectories()
         if (start != null) drive.poseEstimate = start
 
