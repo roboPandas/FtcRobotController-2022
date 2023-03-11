@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import com.qualcomm.robotcore.hardware.DistanceSensor
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.Cycle
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
@@ -24,6 +25,7 @@ abstract class AutonomousTemplate : OpMode() {
     protected lateinit var currentCycle: Cycle
     protected lateinit var pipeline: QuantizationPipeline
     protected lateinit var liftInternals: LiftInternals
+    protected lateinit var distanceSensor: DistanceSensor
     protected lateinit var webcam: OpenCvWebcam
     protected lateinit var detectedColor: Color
     protected open val reversed = false
@@ -32,6 +34,7 @@ abstract class AutonomousTemplate : OpMode() {
     abstract fun main()
 
     override fun init() {
+        distanceSensor = hardwareMap["distanceSensor"] as DistanceSensor
         drive = SampleMecanumDrive(hardwareMap, telemetry)
         val start = initializeTrajectories()
         if (start != null) {
@@ -57,13 +60,9 @@ abstract class AutonomousTemplate : OpMode() {
             }
         })
 
-        liftInternals = LiftInternals(this).apply { initSlide().get() }
-        liftInternals.apply {
+        liftInternals = LiftInternals(this).apply {
             uncheckedGrab()
             awaitClaw()
-            uncheckedDrop()
-            awaitClaw()
-            uncheckedGrab()
         }
         currentCycle = Cycle(
             this,
@@ -119,6 +118,11 @@ abstract class AutonomousTemplate : OpMode() {
     protected fun reversedVector(x: Double = 0.0, y: Double = 0.0) = Vector2d(negateIfReversed(x), y)
     protected fun TrajectorySequenceBuilder.strafeLeftReversed(a: Double) = strafeLeft(negateIfReversed(a))
     protected fun TrajectorySequenceBuilder.strafeRightReversed(a: Double) = strafeRight(negateIfReversed(a))
+    protected fun <T> log(caption: String, value: T, retained: Boolean = false): T {
+        telemetry.addData(caption, value).setRetained(retained)
+        return value
+    }
+
 
     protected fun createCycle(
         topPosition: LiftInternals.Position,
