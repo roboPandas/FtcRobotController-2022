@@ -6,17 +6,24 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.hardware.DistanceSensor
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.teamcode.Cycle
+import org.firstinspires.ftc.teamcode.Cycle.Stage.DROPPING
+import org.firstinspires.ftc.teamcode.delay
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position
+import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position.HIGH
 import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline
 import org.firstinspires.ftc.teamcode.pipelines.QuantizationPipeline.Color
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder
+import org.firstinspires.ftc.teamcode.waitUntil
 import org.openftc.easyopencv.OpenCvCamera.AsyncCameraOpenListener
 import org.openftc.easyopencv.OpenCvCameraFactory
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 // FIXME refactor this once more info on auto becomes available
 abstract class AutonomousTemplate : OpMode() {
@@ -28,6 +35,7 @@ abstract class AutonomousTemplate : OpMode() {
     protected lateinit var distanceSensor: DistanceSensor
     protected lateinit var webcam: OpenCvWebcam
     protected lateinit var detectedColor: Color
+    protected var bottomPosition = Position.STACK_5
     protected open val reversed = false
 
     open fun initializeTrajectories(): Pose2d? { return null }
@@ -68,8 +76,8 @@ abstract class AutonomousTemplate : OpMode() {
             this,
             cycleExecutor,
             liftInternals,
-            LiftInternals.Position.HIGH
-        ) { LiftInternals.Position.STACK_1 }
+            HIGH
+        ) { Position.STACK_1 }
 
         telemetry.addData("Status", "initialized")
     }
@@ -123,10 +131,39 @@ abstract class AutonomousTemplate : OpMode() {
         return value
     }
 
+    protected fun runPreload(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
+        runCycle(toJunction, toStack, Cycle::startPreload)
+
+    protected fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
+        runCycle(toJunction, toStack, Cycle::start)
+
+    private inline fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence, startFunc: Cycle.() -> Future<*>) {
+        currentCycle = createCycle(HIGH, bottomPosition)
+
+        val start = currentCycle.startFunc()
+        delay(600)
+
+        drive.followTrajectorySequence(toJunction)
+        start.get()
+
+//        val test = currentCycle.test()
+//        currentCycle.forceTestPass = true
+//        test.get()
+//        delay(Cycle.DROP_DELAY_MS)
+        currentCycle.autonomousMagicFinish()
+        waitUntil { currentCycle.stage == DROPPING }
+
+        drive.followTrajectorySequence(toStack)
+
+        // test includes finish
+        currentCycle.await()
+
+        bottomPosition--
+    }
 
     protected fun createCycle(
-        topPosition: LiftInternals.Position,
-        bottomPosition: LiftInternals.Position
+        topPosition: Position,
+        bottomPosition: Position
     ): Cycle {
         return Cycle(this, cycleExecutor, liftInternals, topPosition) { bottomPosition }
     }
