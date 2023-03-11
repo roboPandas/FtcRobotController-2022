@@ -1,22 +1,30 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.DistanceSensor
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 
-@TeleOp
-class DistanceSensorTest : OpMode() {
-    private lateinit var distanceJunction: DistanceSensor
-    private lateinit var distanceClaw: DistanceSensor
-
-    override fun init() {
-        distanceClaw = hardwareMap["distanceClaw"] as DistanceSensor
-        distanceJunction = hardwareMap["distanceJunction"] as DistanceSensor
-    }
-
-    override fun loop() {
-        telemetry.addData("distance claw", distanceClaw.getDistance(DistanceUnit.CM))
-        telemetry.addData("distance junction", distanceJunction.getDistance(DistanceUnit.CM))
+@Autonomous(group = "tests")
+class DistanceSensorTest : LinearOpMode() {
+    override fun runOpMode() {
+        val distanceSensor = hardwareMap["distanceSensor"] as DistanceSensor
+        waitForStart()
+//        val start = System.currentTimeMillis()
+//        val list = ArrayList<Double>(40)
+//        while (System.currentTimeMillis() - start < 5000) {
+//            val distance = distanceSensor.getDistance(DistanceUnit.INCH)
+//            telemetry.addData("distance", distance)
+//            telemetry.update()
+//            list += distance
+//        }
+//        telemetry.addData("average", list.sum() / list.size)
+//        telemetry.update()
+//        @Suppress("ControlFlowWithEmptyBody")
+//        while (opModeIsActive());
+        while (opModeIsActive()) {
+            telemetry.addData("distance", distanceSensor.getDistance(DistanceUnit.INCH))
+            telemetry.update()
+        }
     }
 }

@@ -74,6 +74,7 @@ open class ControlledOpMode : OpMode() {
     }
 
     override fun loop() {
+        println("loop")
         drivetrain.loop()
         currentLiftSubsystem.loop()
         attemptSwitch()

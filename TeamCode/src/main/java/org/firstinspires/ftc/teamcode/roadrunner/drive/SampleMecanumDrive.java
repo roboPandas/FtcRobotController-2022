@@ -41,12 +41,12 @@ import java.util.List;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive extends MecanumDrive { // 8, 8
+public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 2, 2);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 3, 0.000002);
 
     // tuned: expected / actual
-    public static double LATERAL_MULTIPLIER = 60 / 42.75;
+    public static double LATERAL_MULTIPLIER = 60 / 34.25;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -72,7 +72,7 @@ public class SampleMecanumDrive extends MecanumDrive { // 8, 8
         this.telemetry = telemetry;
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.1, 0.1, Math.toRadians(1.0)), 0.5);
+                new Pose2d(0.01, 0.01, Math.toRadians(0.1)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 

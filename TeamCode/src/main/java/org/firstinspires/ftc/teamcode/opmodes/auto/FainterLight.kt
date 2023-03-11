@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.Cycle
 import org.firstinspires.ftc.teamcode.delay
 import org.firstinspires.ftc.teamcode.hardware.LiftInternals
@@ -9,17 +10,16 @@ import org.firstinspires.ftc.teamcode.hardware.LiftInternals.Position.*
 import org.firstinspires.ftc.teamcode.roadrunner.RoadRunnerTrajectories.apply
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence
 import org.firstinspires.ftc.teamcode.trajectories.Trajectories
-import org.firstinspires.ftc.teamcode.trajectories.Vec
 import org.firstinspires.ftc.teamcode.waitUntil
-import java.util.*
+import java.lang.Math.floor
 import java.util.concurrent.Future
+import kotlin.collections.ArrayList
 
 @Autonomous
 open class FainterLightLeft : AutonomousTemplate() {
     private lateinit var toJunctions: Array<TrajectorySequence>
     protected lateinit var preload: TrajectorySequence
     private lateinit var toStacks: Array<TrajectorySequence>
-    private var bottomPosition = STACK_5
 //    private lateinit var park: TrajectorySequence
 
     override fun initializeTrajectories(): Pose2d? {
@@ -28,10 +28,41 @@ open class FainterLightLeft : AutonomousTemplate() {
         toStacks = trajectories.first.map { drive.apply(it).build() }.toTypedArray()
         toJunctions = trajectories.second.map { drive.apply(it).build() }.toTypedArray()
 //        park = drive.apply(Trajectories.FainterLight.PARK).build()
+
+//        // SEAN, MAKE SURE YOU KNOW THIS IS X
+//        val x = run {
+//            val start = System.currentTimeMillis()
+//            val distances = ArrayList<Double>(40)
+//            while (System.currentTimeMillis() - start < 2000) {
+//                val distance = distanceSensor.getDistance(DistanceUnit.INCH)
+//                telemetry.addData("distance", distance)
+//                telemetry.update()
+//                distances += distance
+//            }
+//
+//
+//
+//            telemetry.addData("distances", distances).setRetained(true)
+//
+//            // 26, 31
+//            // min, max
+//            // avg 28.5
+//
+//            val distance = (distances).sum() / distances.size
+//
+//
+//            log("raw distance", distance, true)
+//        } - 72 + DISTANCE_OFFSET
+//
+//        return preload.start().copy(x = x)
         return preload.start()
     }
 
     override fun main() {
+//        drive.apply {
+//            followTrajectory(trajectoryBuilder(poseEstimate).lineTo(preload.start().vec()).build())
+//        }
+
         repeat(CYCLES + 1) {
             if (it == 0) runPreload(preload, toStacks[it])
             else runCycle(toJunctions[it], toStacks[it])
@@ -55,38 +86,9 @@ open class FainterLightLeft : AutonomousTemplate() {
         lift.get()
     }
 
-    private fun runPreload(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
-        runCycle(toJunction, toStack, Cycle::startPreload)
-
-    private fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
-        runCycle(toJunction, toStack, Cycle::start)
-
-    private inline fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence, startFunc: Cycle.() -> Future<*>) {
-        currentCycle = createCycle(HIGH, bottomPosition)
-
-        val start = currentCycle.startFunc()
-        delay(650)
-
-        drive.followTrajectorySequence(toJunction)
-        start.get()
-
-//        val test = currentCycle.test()
-//        currentCycle.forceTestPass = true
-//        test.get()
-//        delay(Cycle.DROP_DELAY_MS)
-        currentCycle.autonomousMagicFinish()
-        waitUntil { currentCycle.stage == Cycle.Stage.DROPPING }
-
-        drive.followTrajectorySequence(toStack)
-
-        // test includes finish
-        currentCycle.await()
-
-        bottomPosition--
-    }
-
     companion object {
         const val CYCLES = 5
+        const val DISTANCE_OFFSET = 8.5
     }
 }
 

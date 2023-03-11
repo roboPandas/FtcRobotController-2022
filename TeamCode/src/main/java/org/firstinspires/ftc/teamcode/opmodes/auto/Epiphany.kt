@@ -16,8 +16,6 @@ import kotlin.math.PI
 
 @Autonomous
 open class Epiphany : AutonomousTemplate() {
-    private var bottomPosition = STACK_5
-
     private lateinit var preload: TrajectorySequence
     private lateinit var toJunction: Array<TrajectorySequence>
     private lateinit var toStack: Array<TrajectorySequence>
@@ -128,35 +126,5 @@ open class Epiphany : AutonomousTemplate() {
         runCycle(toJunction[0], toStack[0])
 
 //        liftInternals.goToPositionBlocking(ZERO, LiftInternals.MOTOR_SCALE_FACTOR / 4)
-    }
-
-    private fun runPreload(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
-        runCycle(toJunction, toStack, Cycle::startPreload)
-
-    private fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
-        runCycle(toJunction, toStack, Cycle::start)
-
-    private inline fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence, startFunc: Cycle.() -> Future<*>) {
-        currentCycle = createCycle(HIGH, bottomPosition)
-
-        val start = currentCycle.startFunc()
-        delay(600)
-
-        drive.followTrajectorySequence(toJunction)
-        start.get()
-
-//        val test = currentCycle.test()
-//        currentCycle.forceTestPass = true
-//        test.get()
-//        delay(Cycle.DROP_DELAY_MS)
-        currentCycle.autonomousMagicFinish()
-        waitUntil { currentCycle.stage == Cycle.Stage.DROPPING }
-
-        drive.followTrajectorySequence(toStack)
-
-        // test includes finish
-        currentCycle.await()
-
-        bottomPosition--
     }
 }

@@ -13,7 +13,7 @@ class AsyncLift(private val liftInternals: LiftInternals, private val opMode: Op
     override var canSwitch = true
     private var topPosition = LiftInternals.Position.HIGH
     private var queuedTopPosition: LiftInternals.Position? = null
-    private var bottomPosition = LiftInternals.Position.STACK_1
+    internal var bottomPosition = LiftInternals.Position.STACK_1
     private var lastBottomPosChange = BottomPosChange.NONE
 
     private var reversed = false

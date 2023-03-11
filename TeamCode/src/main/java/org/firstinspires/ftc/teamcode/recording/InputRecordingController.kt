@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.recording
 
+import android.os.Environment
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.hardware.Gamepad
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.util.function.DoubleSupplier
 
 /**
  * A replacement for a default controller which will record all inputs, making them available
@@ -13,7 +15,7 @@ import java.io.OutputStream
  * @param gamepadToReplace the default controller this is replacing, likely either gamepad1 or gamepad2
  */
 @Suppress("unused", "PrivatePropertyName")
-class InputRecordingController(private val opMode: OpMode, gamepadToReplace: Gamepad) : Gamepad() {
+class InputRecordingController(gamepadToReplace: Gamepad, private val runtime: DoubleSupplier) : Gamepad() {
     init {
         copy(gamepadToReplace)
     }
@@ -78,8 +80,9 @@ class InputRecordingController(private val opMode: OpMode, gamepadToReplace: Gam
      */
     @JvmOverloads
     fun export(fileName: String = RecordingConstants.DEFAULT_OUTPUT_FILE_NAME) {
-        val file = File(fileName)
+        val file = Environment.getExternalStorageDirectory().resolve("FIRST/data/$fileName")
         file.delete()
+        file.parentFile?.mkdirs()
         file.createNewFile()
         export(file)
     }
@@ -91,6 +94,7 @@ class InputRecordingController(private val opMode: OpMode, gamepadToReplace: Gam
         FileOutputStream(file).use {
             export(it)
         }
+        println("successfully exported to " + file.absolutePath)
     }
 
     /**
@@ -112,7 +116,7 @@ class InputRecordingController(private val opMode: OpMode, gamepadToReplace: Gam
             if (originalVal != lastVal) {
                 // something changed, save it
                 val input = ControllerInput(original, originalVal)
-                inputs.add(opMode.runtime, input)
+                inputs.add(runtime.asDouble, input)
             }
         }
     }

@@ -5,12 +5,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.noahbres.meepmeep.MeepMeep
 import com.noahbres.meepmeep.MeepMeep.Background
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder
-import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder
 import org.firstinspires.ftc.meepmeeptesting.MeepMeepTrajectories.apply
-import org.firstinspires.ftc.teamcode.trajectories.CommonTrajectorySequence
-import org.firstinspires.ftc.teamcode.trajectories.Trajectories
 import org.firstinspires.ftc.teamcode.trajectories.Trajectories.FainterLight
-import org.firstinspires.ftc.teamcode.trajectories.Vec
 import kotlin.math.PI
 
 val startPose = reversedPose(-36.0, -63.5, -PI / 2)
@@ -28,21 +24,27 @@ fun main() {
         .setConstraints(45.0, 45.0, 3.7, 4.0, 13.43)
         .setDimensions(15.0, 17.0)
         .followTrajectorySequence {
+            val halfL = (17 + (3 / 8f)) / 2.0
+            val halfW = 15.5 / 2.0
+            val start = Pose2d(-72 + halfL, 72 - halfW, 0.0)
+            it.trajectorySequenceBuilder(start)
+                .splineToSplineHeading(Pose2d(72 - halfL, 72 - 48.0, 0.0), 0.0)
+                .build()
 //            it.trajectorySequenceBuilder(Pose2d(-35.0, -62.5, PI))
 //                .setReversed(false)
 //                .strafeRight(41.8) // strafe partially to pole
 //                .splineToSplineHeading(Pose2d(-29.0, -6.0, 5 * PI / 4), PI / 4)
 //                .build()
-            it.apply(
+//            it.apply(
                 // +1
-                FainterLight.PRELOAD,
+//                FainterLight.PRELOAD,
 
-                // 1
-                FainterLight.buildToStack(Vec(0.0, 0.0)),
-                FainterLight.buildToJunction(Vec(0.0, 0.0)),
-                // 2
-                FainterLight.buildToStack(Vec(1.25, -1.25)),
-                FainterLight.buildToJunction(Vec(1.25, -1.25)),
+//                // 1
+//                FainterLight.buildToStack(Vec(0.0, 0.0)),
+//                FainterLight.buildToJunction(Vec(0.0, 0.0)),
+//                // 2
+//                FainterLight.buildToStack(Vec(1.25, -1.25)),
+//                FainterLight.buildToJunction(Vec(1.25, -1.25)),
 //                // 3
 //                FainterLight.TO_STACK,
 //                FainterLight.TO_JUNCTION,
@@ -55,7 +57,7 @@ fun main() {
 
                 // park
                 // FainterLight.PARK
-            ).build()
+//            ).build()
         }
 
     meepMeep.setBackground(Background.FIELD_POWERPLAY_OFFICIAL)
