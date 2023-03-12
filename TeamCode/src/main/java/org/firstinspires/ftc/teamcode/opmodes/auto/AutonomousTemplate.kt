@@ -146,12 +146,12 @@ abstract class AutonomousTemplate : OpMode() {
         drive.followTrajectorySequence(toJunction)
         start.get()
 
-//        val test = currentCycle.test()
-//        currentCycle.forceTestPass = true
-//        test.get()
-//        delay(Cycle.DROP_DELAY_MS)
-        currentCycle.autonomousMagicFinish()
-        waitUntil { currentCycle.stage == DROPPING }
+        val test = currentCycle.test()
+        currentCycle.forceTestPass = true
+        test.get()
+        delay(500) // TODO check
+//        currentCycle.autonomousMagicFinish()
+//        waitUntil { currentCycle.stage == DROPPING }
 
         drive.followTrajectorySequence(toStack)
 

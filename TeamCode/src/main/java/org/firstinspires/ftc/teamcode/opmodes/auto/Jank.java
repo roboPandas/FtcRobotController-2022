@@ -11,18 +11,33 @@ public class Jank {
         cycles++; // account for preload
         CommonTrajectorySequence[] toStacks = new CommonTrajectorySequence[cycles];
         CommonTrajectorySequence[] toJunctions = new CommonTrajectorySequence[cycles];
+        Vec[] stackOffsets = {
+                new Vec(0, 0), // preload
+                new Vec(0, 0), // cycle 1
+                new Vec(-2, 0), // cycle 2
+                new Vec(0, 0), // ...
+                new Vec(0, 0),
+                new Vec(0, 0)
+        };
+        Vec[] junctionOffsets = {
+                null, // preload, unused
+                new Vec(0, 0), // cycle 1
+                new Vec(-2, 0), // cycle 2
+                new Vec(0, 0), // ...
+                new Vec(0, 0),
+                new Vec(0, 0)
+        };
         System.out.println("before");
         for (int i = 0; i < cycles; i++) {
             toJunctions[i] = i == 0 ? preload : FainterLight.INSTANCE.buildToJunction(
-                    new Vec(i * 0.25, i * -0.35),
+                    junctionOffsets[i],
                     toStacks[i - 1].getEnd()
             );
             System.out.println("junction " + i);
             toStacks[i] = FainterLight.INSTANCE.buildToStack(
-                    new Vec(i * 0.25, i * -0.35),
+                    stackOffsets[i],
                     toJunctions[i].getEnd()
             );
-            System.out.println("stack " + i);
         }
         return new Pair<>(toStacks, toJunctions);
     }

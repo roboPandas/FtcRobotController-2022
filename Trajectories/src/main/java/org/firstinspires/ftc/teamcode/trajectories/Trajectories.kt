@@ -30,15 +30,22 @@ object Trajectories {
 
         val PRELOAD = CommonTrajectorySequence.builder(pose(-35.0, -63.0, PI))
             .setReversed(false)
-            .strafeRight(45.0) // strafe partially to pole
-            .splineToSplineHeading(claw2Bot(-24.0, 0.0, true, 5 * PI / 4), PI / 4) // spline to pole
+            .strafeRight(49.0) // strafe partially to pole
+            .splineToSplineHeading(claw2Bot(-26.0, 2.0, true, 5 * PI / 4), PI / 4) // spline to pole
             .build()
+
+        fun buildJunctionToGreen(start: Pose): CommonTrajectorySequence {
+            return CommonTrajectorySequence.builder(start)
+                .splineToSplineHeading(pose(-36.0, -12.0, -PI / 2), -PI / 2)
+                .build()
+        }
+
 
         fun buildToStack(offset: Vec, start: Pose): CommonTrajectorySequence {
             return CommonTrajectorySequence.builder(start)
                 .setReversed(false)
-                .splineTo(vec(-41.5, -12.3).add(offset), PI) // spline away from pole
-                .splineToSplineHeading(claw2Bot((-24.0 * 3) + 2, -12.0, false, PI).add(offset), PI) // spline to cones
+                .splineTo(vec(-41.5, -10.0).add(offset), PI) // spline away from pole
+                .splineToSplineHeading(claw2Bot((-24.0 * 3) /*+ 2*/, -10.0, false, PI).add(offset), PI) // spline to cones
                 .build()
         }
 
@@ -46,7 +53,7 @@ object Trajectories {
             return CommonTrajectorySequence.builder(start)
                 .setReversed(false)
                 .back(20.5 + offset.x) // back up from cones
-                .splineToSplineHeading(claw2Bot(-24.0, 0.0, true, 5 * PI / 4).add(offset), PI / 4) // spline to pole
+                .splineToSplineHeading(claw2Bot(-26.0, 2.0, true, 5 * PI / 4).add(offset), PI / 4) // spline to pole
                 .build()
         }
     }

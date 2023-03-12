@@ -78,5 +78,5 @@ object RoadRunnerTrajectories {
 
     private fun vec(vec: Vec) = Vector2d(vec.x, vec.y)
 
-    private fun pose(pose: Pose) = Pose2d(pose.x, pose.y, pose.heading)
+    fun pose(pose: Pose) = Pose2d(pose.x, pose.y, pose.heading)
 }
