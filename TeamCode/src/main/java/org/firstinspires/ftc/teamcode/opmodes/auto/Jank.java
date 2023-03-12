@@ -14,7 +14,7 @@ public class Jank {
         Vec[] stackOffsets = {
                 new Vec(0, 0), // preload
                 new Vec(0, 0), // cycle 1
-                new Vec(-6, 0), // cycle 2
+                new Vec(2, 0), // cycle 2
                 new Vec(0, 0), // ...
                 new Vec(0, 0),
                 new Vec(0, 0)
