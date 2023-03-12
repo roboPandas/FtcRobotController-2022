@@ -23,22 +23,35 @@ open class FainterLightLeft : AutonomousTemplate() {
     private lateinit var toJunctions: Array<TrajectorySequence>
     protected lateinit var preload: TrajectorySequence
     private lateinit var toStacks: Array<TrajectorySequence>
+    private lateinit var parking: Array<TrajectorySequence>
 
     override fun initializeTrajectories(): Pose2d? {
         preload = drive.apply(Trajectories.FainterLight.PRELOAD).build()
         val trajectories = Jank.buildTrajectories(CYCLES, Trajectories.FainterLight.PRELOAD)
         toStacks = trajectories.first.map { drive.apply(it).build() }.toTypedArray()
         toJunctions = trajectories.second.map { drive.apply(it).build() }.toTypedArray()
-
+        parking = Array(3) {
+            when (it) {
+                // gross
+                QuantizationPipeline.Color.MAGENTA.ordinal -> toStacks[CYCLES - 1]
+                // EW
+                QuantizationPipeline.Color.GREEN.ordinal -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(toJunctions[CYCLES - 2].end()))).build()
+                QuantizationPipeline.Color.CYAN.ordinal -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(toJunctions[CYCLES - 2].end()))).back(23.0).build()
+                // ???
+                else -> drive.trajectorySequenceBuilder(Pose2d()).build()
+            }
+        }
         return preload.start()
     }
 
     override fun main() {
         repeat(CYCLES + 1) {
-            if (it == 0) runPreload(preload, toStacks[it])
-            else if (it == CYCLES - 1) // last one
-                runCycle(toJunctions[it], buildPark(detectedColor))
-            else runCycle(toJunctions[it], toStacks[it])
+            when (it) {
+                0 -> runPreload(preload, toStacks[it])
+                // last one
+                CYCLES -> runCycle(toJunctions[it], parking[detectedColor.ordinal])
+                else -> runCycle(toJunctions[it], toStacks[it])
+            }
         }
 
         val lift = liftInternals.goToPosition(ZERO, LiftInternals.MOTOR_SCALE_FACTOR / 4)
@@ -46,13 +59,8 @@ open class FainterLightLeft : AutonomousTemplate() {
         lift.get()
     }
 
-    // FIXME this ONLY works for left.
-    fun buildPark(color: QuantizationPipeline.Color): TrajectorySequence {
-        return when (color) {
-            QuantizationPipeline.Color.GREEN -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(drive.poseEstimate))).build()
-            QuantizationPipeline.Color.MAGENTA -> toStacks[CYCLES - 1] // gross
-            QuantizationPipeline.Color.CYAN -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(drive.poseEstimate))).strafeLeft(24.0).build()
-        }
+    override fun initLift() {
+        // once again: don't
     }
 
     fun pose(pose: Pose2d): Pose {

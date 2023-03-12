@@ -180,7 +180,7 @@ class LiftInternals(private val opMode: OpMode) {
         // STACK_N is a stack containing N cones
         // STACK_1 is for a single cone, and should be the default bottom position
 
-        STACK_1(210), STACK_2(260), STACK_3(350), STACK_4(490), STACK_5(630),  // the lowest position that allows rotation
+        STACK_1(210), STACK_2(260), STACK_3(350), STACK_4(490), STACK_5(600),  // the lowest position that allows rotation
 
         CAN_ROTATE(1530),  // junction heights
 

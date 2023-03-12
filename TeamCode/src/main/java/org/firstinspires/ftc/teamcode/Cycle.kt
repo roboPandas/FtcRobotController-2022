@@ -39,7 +39,14 @@ class Cycle @JvmOverloads constructor(
         }
     }
 
-    fun startPreload(): Future<*> = executor.submit(::whenGrabbed)
+    fun startPreload(): Future<*> {
+        return executor.submit {
+            liftInternals.goToPositionBlocking(LiftInternals.Position.STACK_1, 1.0)
+            liftInternals.uncheckedGrab()
+            liftInternals.awaitClaw()
+            whenGrabbed()
+        }
+    }
 
     private fun whenGrabbed() {
         stage = Stage.GRABBED
@@ -75,7 +82,7 @@ class Cycle @JvmOverloads constructor(
                     liftInternals.drop()
 
                     if (!reversed) {
-                        delay(300) // small extra delay to let cone fall
+                        delay(100) // small extra delay to let cone fall
                         liftInternals.goToPositionBlocking(topPosition, 1.0)
                     }
 

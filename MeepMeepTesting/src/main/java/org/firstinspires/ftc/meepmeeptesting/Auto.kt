@@ -36,9 +36,7 @@ fun main() {
 //                .strafeRight(41.8) // strafe partially to pole
 //                .splineToSplineHeading(Pose2d(-29.0, -6.0, 5 * PI / 4), PI / 4)
 //                .build()
-            it.apply(FainterLight.PRELOAD)
-                .setReversed(false)
-                .splineToSplineHeading(Pose2d(-36.0, -12.0, -PI / 2), -PI / 2)
+            it.apply(FainterLight.PRELOAD, FainterLight.buildJunctionToGreen(FainterLight.PRELOAD.end)).back(24.0)
                 .build()
 //            it.apply(
 //                 // +1

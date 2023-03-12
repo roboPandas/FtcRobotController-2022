@@ -68,10 +68,8 @@ abstract class AutonomousTemplate : OpMode() {
             }
         })
 
-        liftInternals = LiftInternals(this).apply {
-            uncheckedGrab()
-            awaitClaw()
-        }
+        liftInternals = LiftInternals(this)
+        initLift()
         currentCycle = Cycle(
             this,
             cycleExecutor,
@@ -80,6 +78,11 @@ abstract class AutonomousTemplate : OpMode() {
         ) { Position.STACK_1 }
 
         telemetry.addData("Status", "initialized")
+    }
+
+    open fun initLift() {
+        liftInternals.uncheckedGrab()
+        liftInternals.awaitClaw()
     }
 
     // TODO: BRING THESE BACK ONCE MISALIGNMENT WORKS
@@ -132,16 +135,16 @@ abstract class AutonomousTemplate : OpMode() {
     }
 
     protected fun runPreload(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
-        runCycle(toJunction, toStack, Cycle::startPreload)
+        runCycle(toJunction, toStack, Cycle::startPreload, 700)
 
     protected fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence) =
-        runCycle(toJunction, toStack, Cycle::start)
+        runCycle(toJunction, toStack, Cycle::start, 550)
 
-    private inline fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence, startFunc: Cycle.() -> Future<*>) {
+    private inline fun runCycle(toJunction: TrajectorySequence, toStack: TrajectorySequence, startFunc: Cycle.() -> Future<*>, delay: Long) {
         currentCycle = createCycle(HIGH, bottomPosition)
 
         val start = currentCycle.startFunc()
-        delay(600)
+        delay(delay)
 
         drive.followTrajectorySequence(toJunction)
         start.get()
@@ -149,7 +152,6 @@ abstract class AutonomousTemplate : OpMode() {
         val test = currentCycle.test()
         currentCycle.forceTestPass = true
         test.get()
-        delay(500) // TODO check
 //        currentCycle.autonomousMagicFinish()
 //        waitUntil { currentCycle.stage == DROPPING }
 

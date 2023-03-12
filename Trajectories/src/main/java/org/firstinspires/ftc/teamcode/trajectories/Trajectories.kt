@@ -36,7 +36,8 @@ object Trajectories {
 
         fun buildJunctionToGreen(start: Pose): CommonTrajectorySequence {
             return CommonTrajectorySequence.builder(start)
-                .splineToSplineHeading(pose(-36.0, -12.0, -PI / 2), -PI / 2)
+                .setReversed(false)
+                .splineToSplineHeading(pose(-36.0, -12.0, PI), PI)
                 .build()
         }
 
