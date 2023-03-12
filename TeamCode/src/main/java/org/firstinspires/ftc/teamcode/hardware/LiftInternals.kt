@@ -212,7 +212,7 @@ class LiftInternals(private val opMode: OpMode) {
         // TODO also remove the reverse functions during said refactor
         // Claw
         // Grab is 0; drop is 1
-        const val GRAB_DELAY_MS = 600L
+        const val GRAB_DELAY_MS = 450L
         const val DROP_DELAY_MS = 700L
     }
 }
