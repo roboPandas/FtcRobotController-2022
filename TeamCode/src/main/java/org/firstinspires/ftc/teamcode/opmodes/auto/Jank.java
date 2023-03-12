@@ -12,17 +12,17 @@ public class Jank {
         CommonTrajectorySequence[] toStacks = new CommonTrajectorySequence[cycles];
         CommonTrajectorySequence[] toJunctions = new CommonTrajectorySequence[cycles];
         Vec[] stackOffsets = {
-                new Vec(0, 0), // preload
-                new Vec(0, 0), // cycle 1
-                new Vec(2, 0), // cycle 2
+                new Vec(0, -1), // preload
+                new Vec(-1.5, -1), // cycle 1
+                new Vec(1, -1), // cycle 2
                 new Vec(0, 0), // ...
                 new Vec(0, 0),
                 new Vec(0, 0)
         };
         Vec[] junctionOffsets = {
                 null, // preload, unused
-                new Vec(0, 0), // cycle 1
-                new Vec(-2, 0), // cycle 2
+                new Vec(2, 0), // cycle 1
+                new Vec(1, 1), // cycle 2
                 new Vec(0, 0), // ...
                 new Vec(0, 0),
                 new Vec(0, 0)

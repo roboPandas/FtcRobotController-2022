@@ -32,11 +32,10 @@ open class FainterLightLeft : AutonomousTemplate() {
         toJunctions = trajectories.second.map { drive.apply(it).build() }.toTypedArray()
         parking = Array(3) {
             when (it) {
-                // gross
-                QuantizationPipeline.Color.MAGENTA.ordinal -> toStacks[CYCLES - 1]
                 // EW
+                QuantizationPipeline.Color.MAGENTA.ordinal -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(toJunctions[CYCLES - 2].end()))).strafeRight(25.0).build()
                 QuantizationPipeline.Color.GREEN.ordinal -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(toJunctions[CYCLES - 2].end()))).build()
-                QuantizationPipeline.Color.CYAN.ordinal -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(toJunctions[CYCLES - 2].end()))).back(23.0).build()
+                QuantizationPipeline.Color.CYAN.ordinal -> drive.apply(Trajectories.FainterLight.buildJunctionToGreen(pose(toJunctions[CYCLES - 2].end()))).strafeLeft(24.0).build()
                 // ???
                 else -> drive.trajectorySequenceBuilder(Pose2d()).build()
             }

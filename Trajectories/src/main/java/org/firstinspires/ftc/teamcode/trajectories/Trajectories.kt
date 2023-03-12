@@ -31,13 +31,13 @@ object Trajectories {
         val PRELOAD = CommonTrajectorySequence.builder(pose(-35.0, -63.0, PI))
             .setReversed(false)
             .strafeRight(49.0) // strafe partially to pole
-            .splineToSplineHeading(claw2Bot(-26.0, 2.0, true, 5 * PI / 4), PI / 4) // spline to pole
+            .splineToSplineHeading(claw2Bot(-23.0, 2.0, true, 5 * PI / 4), PI / 4) // spline to pole
             .build()
 
         fun buildJunctionToGreen(start: Pose): CommonTrajectorySequence {
             return CommonTrajectorySequence.builder(start)
                 .setReversed(false)
-                .splineToSplineHeading(pose(-36.0, -12.0, PI), PI)
+                .splineToSplineHeading(pose(-34.0, -10.5, -PI / 2), -PI / 2)
                 .build()
         }
 
